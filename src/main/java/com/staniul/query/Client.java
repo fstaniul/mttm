@@ -151,4 +151,15 @@ public class Client {
     public Voice getHeadphones() {
         return headphones;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d / %d / %s", id, databaseId, nickname);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Client &&
+                ((Client) obj).databaseId == databaseId;
+    }
 }
