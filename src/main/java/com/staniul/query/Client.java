@@ -1,4 +1,4 @@
-package com.staniul.query.client;
+package com.staniul.query;
 
 import com.staniul.query.client.Platform;
 import com.staniul.query.client.Voice;
@@ -10,10 +10,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Contains all information about client.
+ */
 public class Client {
     private int id;
     private int databaseId;
     private String uniqueId;
+    private String hash64UniqueId;
+    private int currentChannelId;
 
     private String nickname;
     private String ip;
@@ -33,14 +38,12 @@ public class Client {
     private Voice microphone;
     private Voice headphones;
 
-    /**
-     * Constructor should be used only by Query.
-     * @param info Info read from teamspeak 3 server.
-     */
-    public Client(Map<String, String> info) {
-        id = Integer.parseInt(info.get("cid"));
+    Client(int clientId, Map<String, String> info) {
+        id = clientId;
         databaseId = Integer.parseInt(info.get("client_database_id"));
         uniqueId = info.get("client_unique_identifier");
+        hash64UniqueId = info.get("client_base64HashClientUID");
+        currentChannelId = Integer.parseInt(info.get("cid"));
 
         nickname = info.get("client_nickname");
         ip = info.get("connection_client_ip");
@@ -79,6 +82,14 @@ public class Client {
 
     public String getUniqueId() {
         return uniqueId;
+    }
+
+    public String getHash64UniqueId() {
+        return hash64UniqueId;
+    }
+
+    public int getCurrentChannelId() {
+        return currentChannelId;
     }
 
     public String getNickname() {

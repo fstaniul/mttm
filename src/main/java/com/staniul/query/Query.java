@@ -78,8 +78,6 @@ public class Query {
         connectionKeeper.interrupt();
     }
 
-
-
     /**
      * Every 2 minutes sends dummy message to keep up the connection with teamspeak 3 server preventing teamspeak 3
      * server query from not sending notification messages in case of no action performed on teamspeak 3 server.
