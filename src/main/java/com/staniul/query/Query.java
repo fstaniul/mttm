@@ -146,6 +146,10 @@ public class Query {
         }
     }
 
+    public Channel getChannelInfo (int channelId) throws QueryException {
+
+    }
+
     /**
      * Throws {@link QueryException} based on {@link TS3ServerQueryException}. Used multiple times so its a helpful
      * method. You can specify message that will be added to exception.
