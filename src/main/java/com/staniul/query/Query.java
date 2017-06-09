@@ -147,7 +147,7 @@ public class Query {
     }
 
     public Channel getChannelInfo (int channelId) throws QueryException {
-
+        return null;
     }
 
     /**
