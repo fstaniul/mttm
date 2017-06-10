@@ -1,11 +1,12 @@
 package com.staniul.core.security.clientaccesscheck;
 
+import com.staniul.core.security.AccessCheck;
 import com.staniul.query.Client;
 import com.staniul.util.SetUtil;
 
 import java.util.Set;
 
-public class ClientChannelgroupAccessCheck implements ClientAccessCheck {
+public class ClientChannelgroupAccessCheck implements AccessCheck<Client> {
     private Set<Integer> groups;
 
     public ClientChannelgroupAccessCheck(Integer... groups) {

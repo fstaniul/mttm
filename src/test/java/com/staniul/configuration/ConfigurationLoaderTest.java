@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class ConfigurationLoaderTest {
     @Test
     public void loadConfiguration() throws Exception {
-        Configuration configuration = ConfigurationLoader.loadConfiguration(Query.class);
+        Configuration configuration = ConfigurationLoader.load(Query.class);
         assertNotNull(configuration);
         assertEquals("localhost", configuration.getString("ip"));
         System.out.println(1 << 1);

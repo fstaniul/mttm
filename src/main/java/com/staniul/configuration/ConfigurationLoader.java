@@ -19,7 +19,7 @@ public class ConfigurationLoader {
      * @throws ConfigurationException If {@code Configurations} fails to read the configuration (file does not exists,
      *                                extension is not xml or any other IO exception occurs)
      */
-    public static XMLConfiguration loadConfiguration(Class<?> aClass) throws ConfigurationException {
+    public static XMLConfiguration load(Class<?> aClass) throws ConfigurationException {
         if (!aClass.isAnnotationPresent(ConfigFile.class))
             throw new IllegalArgumentException(String.format("A class %s is not annotated with %s", aClass, ConfigFile.class));
 

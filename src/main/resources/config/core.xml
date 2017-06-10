@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<core>
+    <commands>
+        <messages>
+            <not_found></not_found>
+            <access_denied></access_denied>
+            <execution_error></execution_error>
+        </messages>
+    </commands>
+</core>
