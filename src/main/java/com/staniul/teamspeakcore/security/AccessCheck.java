@@ -1,4 +1,4 @@
-package com.staniul.core.security;
+package com.staniul.teamspeakcore.security;
 
 import java.util.function.Function;
 

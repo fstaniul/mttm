@@ -5,10 +5,12 @@ import org.apache.commons.configuration2.XMLConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 /**
  * Configuration class for Spring
  */
+@EnableAspectJAutoProxy
 @Configuration
 @ComponentScan("com.staniul")
 public class MTTMSpringConfiguration {
