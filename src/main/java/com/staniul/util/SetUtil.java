@@ -45,16 +45,9 @@ public class SetUtil {
         else return a.stream().filter(b::contains).count();
     }
 
-    /**
-     * Returns a set of items contained in array of a specified type.
-     *
-     * @param array Array of a specified type.
-     * @param <T>   type of elements in array.
-     *
-     * @return Set created from elements in array.
-     */
-    @SafeVarargs
-    public static <T> Set<T> arrayAsSet(T... array) {
-        return Arrays.stream(array).collect(Collectors.toSet());
+    public static Set<Integer> intSet (int... ints) {
+        HashSet<Integer> result = new HashSet<>();
+        Arrays.stream(ints).forEach(result::add);
+        return result;
     }
 }

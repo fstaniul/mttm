@@ -1,6 +1,6 @@
-package com.staniul.teamspeakcore.security.clientaccesscheck;
+package com.staniul.teamspeak.security.clientaccesscheck;
 
-import com.staniul.teamspeakcore.security.AccessCheckChain;
+import com.staniul.teamspeak.security.AccessCheckChain;
 import com.staniul.query.Client;
 
 /**

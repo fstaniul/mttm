@@ -1,4 +1,4 @@
-package com.staniul.teamspeakcore.commands;
+package com.staniul.teamspeak.commands;
 
 public class CommandResponse {
     private CommandExecutionStatus status;

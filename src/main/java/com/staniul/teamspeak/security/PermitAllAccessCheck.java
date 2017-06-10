@@ -1,4 +1,4 @@
-package com.staniul.teamspeakcore.security;
+package com.staniul.teamspeak.security;
 
 public class PermitAllAccessCheck <T> implements AccessCheck<T> {
     @Override

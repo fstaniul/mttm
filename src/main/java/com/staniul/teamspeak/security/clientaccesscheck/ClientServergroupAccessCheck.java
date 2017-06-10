@@ -1,8 +1,6 @@
-package com.staniul.teamspeakcore.security.clientaccesscheck;
+package com.staniul.teamspeak.security.clientaccesscheck;
 
-import com.staniul.teamspeakcore.security.AccessCheck;
 import com.staniul.query.Client;
-import com.staniul.util.SetUtil;
 
 import java.util.Set;
 
