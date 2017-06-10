@@ -2,7 +2,6 @@ package com.staniul.query.channel;
 
 import org.junit.Test;
 
-import java.awt.geom.FlatteningPathIterator;
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
@@ -11,7 +10,7 @@ import static com.staniul.query.channel.ChannelFlagConstants.*;
 public class ChannelFlagConstantsTest {
     @Test
     public void flagsAsString() throws Exception {
-        String flags = new ChannelFlags(__DEFAULT_FLAGS).toString();
+        String flags = ChannelFlagConstants.flagsToString(__DEFAULT_FLAGS);
         String expected = "channel_flag_permanent=1 " +
                 "channel_flag_semi_permanent=0 " +
                 "channel_flag_maxclients_unlimited=1 " +
@@ -24,13 +23,15 @@ public class ChannelFlagConstantsTest {
 
     @Test
     public void flagsAsString1 () throws Exception {
-        String flags = new ChannelFlags(SEMI_PERMANENT | MAXFAMILYCLIENTS_UNLIMITED | DEFAULT).toString();
+        String flags = ChannelFlagConstants.flagsToString(SEMI_PERMANENT | MAXFAMILYCLIENTS_UNLIMITED | DEFAULT);
         String expected = "channel_flag_permanent=0 " +
                 "channel_flag_semi_permanent=1 " +
                 "channel_flag_maxclients_unlimited=0 " +
-                "channel_flag_maxfamilyclients_unlimited=0 " +
-                "channel_flag_maxfamilyclients_inherited=1 " +
+                "channel_flag_maxfamilyclients_unlimited=1 " +
+                "channel_flag_maxfamilyclients_inherited=0 " +
                 "channel_flag_default=1";
+
+        assertEquals(expected, flags);
     }
 
     @Test
@@ -42,14 +43,13 @@ public class ChannelFlagConstantsTest {
         testMap.putIfAbsent("channel_maxfamilyclients", "12");
         testMap.putIfAbsent("channel_flag_default", "1");
         testMap.putIfAbsent("channel_flag_password", "1");
-        ChannelFlags flags = ChannelFlags.parseFlags(testMap);
+        int flags = ChannelFlagConstants.parseFlags(testMap);
 
-        assertFalse(flags.isPermanent());
-        assertTrue(flags.isSemiPermanent());
-        assertFalse(flags.areMaxClientsUnlimited());
-        assertFalse(flags.areFamilyMaxClientsUnlimited());
-        assertTrue(flags.isDefaultChannel());
-        assertTrue(flags.isPasswordProtected());
+        assertEquals(0, flags & PERMANENT);
+        assertEquals(1, (flags & SEMI_PERMANENT) / SEMI_PERMANENT);
+        assertEquals(0, (flags & MAXCLIENTS_UNLIMITED) / MAXCLIENTS_UNLIMITED);
+        assertEquals(0, (flags & MAXFAMILYCLIENTS_UNLIMITED) / MAXFAMILYCLIENTS_UNLIMITED);
+        assertEquals(1, (flags & DEFAULT) / DEFAULT);
+        assertEquals(1, (flags & PASSWORD) / PASSWORD);
     }
-
 }
