@@ -1,12 +1,14 @@
 package com.staniul.util;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Utility class for {@code Set} actions.
  */
-public class SetsUtil {
+public class SetUtil {
     /**
      * Produces {@code HashSet} that is intersection of 2 sets. The order does not matter.
      *
@@ -41,5 +43,18 @@ public class SetsUtil {
 
         if (isALarger) return b.stream().filter(a::contains).count();
         else return a.stream().filter(b::contains).count();
+    }
+
+    /**
+     * Returns a set of items contained in array of a specified type.
+     *
+     * @param array Array of a specified type.
+     * @param <T>   type of elements in array.
+     *
+     * @return Set created from elements in array.
+     */
+    @SafeVarargs
+    public static <T> Set<T> arrayAsSet(T... array) {
+        return Arrays.stream(array).collect(Collectors.toSet());
     }
 }

@@ -2,7 +2,7 @@ package com.staniul.query;
 
 import com.staniul.query.client.Platform;
 import com.staniul.query.client.Voice;
-import com.staniul.util.SetsUtil;
+import com.staniul.util.SetUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -105,7 +105,7 @@ public class Client {
     }
 
     public boolean isInServergroup (Set<Integer> groups) {
-        return SetsUtil.countIntersection(servergroups, groups) > 0L;
+        return SetUtil.countIntersection(servergroups, groups) > 0L;
     }
 
     public Set<Integer> getServergroups() {
