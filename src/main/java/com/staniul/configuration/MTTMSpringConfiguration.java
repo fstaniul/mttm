@@ -17,7 +17,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public class MTTMSpringConfiguration {
     @Bean
     public Reflections reflections () {
-        return Reflections.collect();
+        return new Reflections("com.staniul");
     }
 
     @Bean
