@@ -20,6 +20,9 @@ public class Channel implements ChannelFlagConstants {
 
     private long secondsEmpty;
 
+    private int totalClients;
+    private int totalFamilyClients;
+
     private int flags;
 
     Channel(int id, Map<String, String> info) {
@@ -34,6 +37,9 @@ public class Channel implements ChannelFlagConstants {
         codecQuality = Integer.parseInt("channel_codec_quality");
 
         secondsEmpty = Long.parseLong("seconds_empty");
+
+        totalClients = Integer.parseInt(info.get("total_clients"));
+        totalFamilyClients = Integer.parseInt(info.get("total_clients_family"));
 
         flags = ChannelFlagConstants.parseFlags(info);
     }
@@ -70,6 +76,14 @@ public class Channel implements ChannelFlagConstants {
         return secondsEmpty;
     }
 
+    public int getTotalClients() {
+        return totalClients;
+    }
+
+    public int getTotalFamilyClients() {
+        return totalFamilyClients;
+    }
+
     public boolean isPermanent() {
         return (flags & PERMANENT) == 1;
     }
@@ -99,7 +113,7 @@ public class Channel implements ChannelFlagConstants {
      *
      * @param flag One of {@link ChannelFlagConstants}.
      */
-    public void set(int flag) {
+    public void setFlag(int flag) {
         flags ^= flag;
     }
 }

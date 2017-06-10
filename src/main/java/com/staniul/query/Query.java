@@ -146,8 +146,44 @@ public class Query {
         }
     }
 
-    public Channel getChannelInfo (int channelId) throws QueryException {
-        return null;
+    /**
+     * Gets channel information from teamspeak 3 server with given id.
+     *
+     * @param channelId Channel id.
+     *
+     * @return {@code Channel} object containing information about channel.
+     *
+     * @throws QueryException When query fails to get information from teamspeak 3 server, that could be channel does
+     *                        not exists with given id or connection with teamspeak 3 server was interrupted.
+     */
+    public Channel getChannelInfo(int channelId) throws QueryException {
+        try {
+            HashMap<String, String> channelInfo = jts3ServerQuery.getInfo(JTS3ServerQuery.INFOMODE_CHANNELINFO, channelId);
+            return new Channel(channelId, channelInfo);
+        } catch (TS3ServerQueryException e) {
+            throwQueryException("Failed to get channel information from teamspeak 3 server.", e);
+            return null;
+        }
+    }
+
+    /**
+     * Gets channel list from teamspeak 3 server.
+     *
+     * @return {@code ArrayList<Channel>} containing information about channels currently present on teamspeak 3 server.
+     *
+     * @throws QueryException When query fails to get channel list from teamspeak 3 server, because connection with
+     *                        teamspeak 3 being interrupted.
+     */
+    public ArrayList<Channel> getChannelList() throws QueryException {
+        try {
+            Vector<HashMap<String, String>> channelList = jts3ServerQuery.getList(JTS3ServerQuery.LISTMODE_CHANNELLIST, "-topic,-flags,-voice,-limits,-icon,-secondsempty");
+            ArrayList<Channel> result = new ArrayList<>(channelList.size());
+            channelList.stream().map(c -> new Channel(Integer.parseInt(c.get("cid")), c)).forEach(result::add);
+            return result;
+        } catch (TS3ServerQueryException e) {
+            throwQueryException("Failed to get channel list from teamspeak 3 server.", e);
+            return null;
+        }
     }
 
     /**
