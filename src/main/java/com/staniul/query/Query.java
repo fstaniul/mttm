@@ -187,6 +187,67 @@ public class Query {
     }
 
     /**
+     * Sets clients channel group for specified channel.
+     *
+     * @param clientDatabaseId Clients database id.
+     * @param channelId        Channel id.
+     * @param groupId          Channel group id.
+     *
+     * @throws QueryException When query fails to assign group for teamspeak 3 client.
+     */
+    public void setChannelGroup(int clientDatabaseId, int channelId, int groupId) throws QueryException {
+        String template = "setclientchannelgroup cldbid=%d cid=%d cgid=%d";
+        Map<String, String> serverResponse = jts3ServerQuery.doCommand(String.format(template, clientDatabaseId, channelId, groupId));
+        checkAndThrowQueryException("Failed to set channel group for client!", serverResponse);
+    }
+
+    /**
+     * Kicks client from server with reason {@code RULES VIOLATION}.
+     *
+     * @param clientId Client id.
+     *
+     * @throws QueryException When query fails to kick client from server, might be he disconnected before or connection
+     *                        with teamspeak 3 server was interrupted.
+     */
+    public void kickClient(int clientId) throws QueryException {
+        kickClient(clientId, "RULES VIOLATION");
+    }
+
+    /**
+     * Kicks client from server with specified reason.
+     *
+     * @param clientId Client id.
+     * @param msg      Reason for kick, will be displayed to client in kick message dialog.
+     *
+     * @throws QueryException When query fails to kick client from server, might be he disconnected before or connection
+     *                        with teamspeak 3 server was interrupted.
+     */
+    public void kickClient(int clientId, String msg) throws QueryException {
+        try {
+            jts3ServerQuery.kickClient(clientId, false, msg);
+        } catch (TS3ServerQueryException e) {
+            throwQueryException("Failed to kick client from server.", e);
+        }
+    }
+
+    /**
+     * Kicks client from channel with specified message.
+     *
+     * @param clientId Client id.
+     * @param msg      Reason for kick, will be displayed to client in kick message dialog.
+     *
+     * @throws QueryException When query fails to kick client from server, might be he disconnected before or connection
+     *                        with teamspeak 3 server was interrupted.
+     */
+    public void kickClientFromChannel(int clientId, String msg) throws QueryException {
+        try {
+            jts3ServerQuery.kickClient(clientId, true, msg);
+        } catch (TS3ServerQueryException e) {
+            throwQueryException("Failed to kick client from channel.", e);
+        }
+    }
+
+    /**
      * Throws {@link QueryException} based on {@link TS3ServerQueryException}. Used multiple times so its a helpful
      * method. You can specify message that will be added to exception.
      *
@@ -209,6 +270,35 @@ public class Query {
      */
     private void throwQueryException(TS3ServerQueryException ex) throws QueryException {
         throw new QueryException(ex, ex.getErrorID(), ex.getErrorMessage());
+    }
+
+    /**
+     * Checks if response returned with error and if so throws exception, otherwise returns silently.
+     *
+     * @param serverResponse Response from teamspeak 3 server after invoking command.
+     *
+     * @throws QueryException When teamspeak 3 server query returned with error it throws exception.
+     */
+    private void checkAndThrowQueryException(Map<String, String> serverResponse) throws QueryException {
+        if ("ok".equals(serverResponse.get("msg")) && "0".equals(serverResponse.get("id")))
+            return;
+
+        throw new QueryException(Integer.parseInt(serverResponse.get("id")), serverResponse.get("msg"));
+    }
+
+    /**
+     * Same as {@link #checkAndThrowQueryException(Map)}, but lets you specify message in exception.
+     *
+     * @param msg            Message to be added to exception.
+     * @param serverResponse Response from teamspeak 3 server after invoking command.
+     *
+     * @throws QueryException When teamspeak 3 server query returned with error it throws exception.
+     */
+    private void checkAndThrowQueryException(String msg, Map<String, String> serverResponse) throws QueryException {
+        if ("ok".equals(serverResponse.get("msg")) && "0".equals(serverResponse.get("id")))
+            return;
+
+        throw new QueryException(msg, Integer.parseInt(serverResponse.get("id")), serverResponse.get("msg"));
     }
 
     /**
