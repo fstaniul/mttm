@@ -1331,7 +1331,7 @@ public class JTS3ServerQuery
 	 * @throws NullPointerException If rawData is <code>null</code>.
 	 * @see JTS3ServerQuery#parseLine(String)
 	 */
-	public Vector<HashMap<String, String>> parseRawData(String rawData)
+	public static Vector<HashMap<String, String>> parseRawData(String rawData)
 	{
 		if (rawData == null)
 		{
@@ -1745,7 +1745,7 @@ public class JTS3ServerQuery
 	 * @since 0.5
 	 * @see JTS3ServerQuery#doCommand(String)
 	 */
-	public String encodeTS3String(String str)
+	public static String encodeTS3String(String str)
 	{
 		str = str.replace("\\", "\\\\");
 		str = str.replace(" ", "\\s");
@@ -1776,7 +1776,7 @@ public class JTS3ServerQuery
 	 * @see JTS3ServerQuery#doCommand(String)
 	 * @see JTS3ServerQuery#parseRawData(String)
 	 */
-	public String decodeTS3String(String str)
+	public static String decodeTS3String(String str)
 	{
 		str = str.replace("\\\\", "\\[$mksave]");
 		str = str.replace("\\s", " ");
@@ -1810,7 +1810,7 @@ public class JTS3ServerQuery
 	 * @see JTS3ServerQuery#getList(int, String)
 	 * @see JTS3ServerQuery#parseRawData(String)
 	 */
-	public HashMap<String, String> parseLine(String line)
+	public static HashMap<String, String> parseLine(String line)
 	{
 		if (line == null)
 		{

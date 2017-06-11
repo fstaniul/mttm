@@ -1,6 +1,7 @@
 package com.staniul.query;
 
 import com.staniul.configuration.annotations.ConfigFile;
+import com.staniul.util.StringUtil;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import org.apache.commons.configuration2.Configuration;
@@ -244,6 +245,115 @@ public class Query {
             jts3ServerQuery.kickClient(clientId, true, msg);
         } catch (TS3ServerQueryException e) {
             throwQueryException("Failed to kick client from channel.", e);
+        }
+    }
+
+    /**
+     * <p>Sends message to client. If message is too long it will divide it on spaces. If you want the message to be
+     * divided otherwise then use {@link #sendTextMessageToClient(int, String[])} or {@link
+     * #sendTextMessageToClient(int, Collection)}<br /></p>
+     * <p>
+     * <p>Teamspeak 3 max message length is 1024 byte long in UTF-8 encoding. For sake of simplicity messages are
+     * divided after 512 chars on space. Since most characters uses 1 byte in UTF-8, in most case use it should be
+     * sufficient.<br /> Otherwise you need to divide message by yourself or exception will be thrown.</p>
+     *
+     * @param clientId Id of client to whom we send message.
+     * @param message  Message to send.
+     *
+     * @throws QueryException When teamspeak 3 query fails to send message.
+     */
+    public void sendTextMessageToClient(int clientId, String message) throws QueryException {
+        sendTextMessageToClient(clientId, StringUtil.splitOnSize(message, " ", 512));
+    }
+
+    /**
+     * Sends messages to client. Messages cannot be longer then 1024 bytes long.
+     *
+     * @param clientId Id of client to whom we send message.
+     * @param messages Collection of Strings. Each string will be sent as separate message. Each message cannot be
+     *                 longer then 1024 byte.
+     *
+     * @throws QueryException When messages are too long or teamspeak 3 query fails to send messages.
+     */
+    public void sendTextMessageToClient(int clientId, Collection<String> messages) throws QueryException {
+        sendTextMessageToClient(clientId, (String[]) messages.toArray());
+    }
+
+    /**
+     * Sends messages to client. Messages cannot be longer then 1024 bytes long.
+     *
+     * @param clientId Id of client to whom we send message.
+     * @param messages Array of Strings containing messages to send. Each message must be max of 1024 bytes long.
+     *
+     * @throws QueryException When messages are too long or teamspeak 3 query fails to send the message.
+     */
+    public void sendTextMessageToClient(int clientId, String[] messages) throws QueryException {
+        for (int i = 0; i < messages.length; i++) {
+            String msg = messages[i];
+            if (msg.getBytes().length > 1024)
+                throw new QueryException("Messages are too long! Message too long index: " + i);
+        }
+
+        for (String msg : messages) {
+            try {
+                jts3ServerQuery.sendTextMessage(clientId, JTS3ServerQuery.TEXTMESSAGE_TARGET_CLIENT, msg);
+            } catch (TS3ServerQueryException e) {
+                throwQueryException("Failed to send message to client!", e);
+            }
+        }
+    }
+
+    /**
+     * <p>Sends message to channel. If message is too long it will divide it on spaces. If you want the message to be
+     * divided otherwise then use {@link #sendTextMessageToChannel(int, String[])} or {@link
+     * #sendTextMessageToChannel(int, Collection)}<br /></p>
+     * <p>
+     * <p>Teamspeak 3 max message length is 1024 byte long in UTF-8 encoding. For sake of simplicity messages are
+     * divided after 512 chars on space. Since most characters uses 1 byte in UTF-8, in most case use it should be
+     * sufficient.<br /> Otherwise you need to divide message by yourself or exception will be thrown.</p>
+     *
+     * @param channelId Id of channel.
+     * @param message   Message to send.
+     *
+     * @throws QueryException WHen teamspeak 3 server query fails to send message.
+     */
+    public void sendTextMessageToChannel(int channelId, String message) throws QueryException {
+        sendTextMessageToChannel(channelId, StringUtil.splitOnSize(message, " ", 512));
+    }
+
+    /**
+     * Sends messages to channel. Max message length is 1024 byte in UTF-8 encoding.
+     *
+     * @param channelId Id of channel.
+     * @param messages  Messages to send.
+     *
+     * @throws QueryException When messages are too long or teamspeak 3 query fails to send messages.
+     */
+    public void sendTextMessageToChannel(int channelId, Collection<String> messages) throws QueryException {
+        sendTextMessageToChannel(channelId, messages.toArray(new String[messages.size()]));
+    }
+
+    /**
+     * Sends messages to channel. Max message length is 1024 byte in UTF-8 encoding.
+     *
+     * @param channelId Id of channel.
+     * @param messages  Messages to send.
+     *
+     * @throws QueryException When messages are too long or teamspeak 3 query fails to send messages.
+     */
+    public void sendTextMessageToChannel(int channelId, String[] messages) throws QueryException {
+        for (int i = 0; i < messages.length; i++) {
+            String msg = messages[i];
+            if (msg.getBytes().length > 1024)
+                throw new QueryException("Messages are too long! Message too long index: " + i);
+        }
+
+        for (String msg : messages) {
+            try {
+                jts3ServerQuery.sendTextMessage(channelId, JTS3ServerQuery.TEXTMESSAGE_TARGET_CHANNEL, msg);
+            } catch (TS3ServerQueryException e) {
+                throwQueryException("Failed to send message to client!", e);
+            }
         }
     }
 

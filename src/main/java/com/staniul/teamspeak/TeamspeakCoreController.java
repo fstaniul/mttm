@@ -2,11 +2,13 @@ package com.staniul.teamspeak;
 
 import com.staniul.configuration.ConfigurationLoader;
 import com.staniul.configuration.annotations.ConfigFile;
+import com.staniul.query.Client;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.util.ReflectionUtil;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -25,6 +28,8 @@ import java.util.*;
 @Component
 @ConfigFile("teamspeak.xml")
 public class TeamspeakCoreController implements ApplicationContextAware {
+    private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
+
     private ApplicationContext applicationContext;
     private XMLConfiguration config;
     private HashMap<String, MethodContainer> commands;
@@ -32,15 +37,15 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections) throws ConfigurationException {
+    public TeamspeakCoreController(ApplicationContext applicationContext) throws ConfigurationException {
+        this.applicationContext = applicationContext;
         config = ConfigurationLoader.load(TeamspeakCoreController.class);
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
         leaveEvents = new HashSet<>();
-        findMethods(reflections);
     }
 
-    private void findMethods(Reflections reflections) {
+    public void findMethods(Reflections reflections) {
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(Teamspeak3Module.class);
         for (Class<?> type : types) {
             findCommands(type);
@@ -62,10 +67,21 @@ public class TeamspeakCoreController implements ApplicationContextAware {
 
     private void findCommands (Class<?> type) {
         Set<Method> commands = ReflectionUtil.getMethodsAnnotatedWith(type, Teamspeak3Command.class);
+        log.debug("################# Found commands: " + commands.toString());
         for (Method command : commands) {
             Teamspeak3Command ann = command.getAnnotation(Teamspeak3Command.class);
             Object target = applicationContext.getBean(type);
             this.commands.putIfAbsent(ann.value(), new MethodContainer(target, command));
+        }
+    }
+
+    public void callCommand (String command, Client client, String params) {
+        MethodContainer mc = commands.get(command);
+        log.debug(mc);
+        try {
+            mc.method.invoke(mc.target, client, params);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error("Failed to invoke command!", e);
         }
     }
 
@@ -74,7 +90,7 @@ public class TeamspeakCoreController implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    private static class MethodContainer {
+    public static class MethodContainer {
         private Object target;
         private Method method;
 
@@ -88,6 +104,11 @@ public class TeamspeakCoreController implements ApplicationContextAware {
             return obj instanceof MethodContainer &&
                     ((MethodContainer) obj).method.equals(method) &&
                     ((MethodContainer) obj).target.equals(target);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("Method: %s, Target: %s", method, target);
         }
     }
 }

@@ -38,7 +38,7 @@ public class Client {
     private Voice microphone;
     private Voice headphones;
 
-    Client(int clientId, Map<String, String> info) {
+    public Client(int clientId, Map<String, String> info) {
         id = clientId;
         databaseId = Integer.parseInt(info.get("client_database_id"));
         uniqueId = info.get("client_unique_identifier");

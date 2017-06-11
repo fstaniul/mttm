@@ -13,44 +13,32 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @Aspect
 public class CommandAccessCheckAspect {
     private static Logger log = Logger.getLogger(CommandAccessCheckAspect.class);
 
-    @Pointcut(value = "execution(public com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client, java.lang.String)) && " +
+    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client, java.lang.String)) && " +
             "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
             "args(client, params)", argNames = "client,params")
     public void invokeCommand(Client client, String params) {
     }
 
     @Around(value = "invokeCommand(client, params)", argNames = "pjp,client,params")
-    public Object checkClientAccess(ProceedingJoinPoint pjp, Client client, String params) {
+    public Object checkClientAccess(ProceedingJoinPoint pjp, Client client, String params) throws Throwable {
         Teamspeak3Command ann = AspectUtil.getAnnotationOfAspectMethod(pjp, Teamspeak3Command.class);
         AccessCheck<Client> accessCheck;
         if (ann.groups().length == 0) accessCheck = new PermitAllAccessCheck<>();
         else accessCheck = ClientGroupAccessCheck.create(ann.groups(), ann.check());
 
         if (accessCheck == null) {
-            return new CommandResponse(CommandExecutionStatus.EXECUTION_TERMINATED, "");
+            return new CommandResponse(CommandExecutionStatus.EXECUTION_TERMINATED, null);
         }
 
         if (accessCheck.apply(client)) {
-            try {
-                return pjp.proceed(new Object[] {client, params});
-            } catch (Throwable throwable) {
-                return new CommandResponse(CommandExecutionStatus.EXECUTION_TERMINATED, "");
-            }
+                return pjp.proceed();
         }
 
-        return new CommandResponse(CommandExecutionStatus.ACCESS_DENIED, "");
+        return new CommandResponse(CommandExecutionStatus.ACCESS_DENIED, null);
     }
 }

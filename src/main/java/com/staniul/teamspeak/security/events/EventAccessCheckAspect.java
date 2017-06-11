@@ -16,11 +16,10 @@ import org.aspectj.lang.annotation.Pointcut;
 public class EventAccessCheckAspect {
     private static Logger log = Logger.getLogger(EventAccessCheckAspect.class);
 
-    @Pointcut("execution(public void * (com.staniul.query.Client)) && " +
+    @Pointcut("execution(void * (com.staniul.query.Client)) && " +
             "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && " +
             "args(client)")
     public void joinEvent (Client client) {
-
     }
 
     @Around(value = "joinEvent(client)", argNames = "pjp,client")
@@ -32,7 +31,7 @@ public class EventAccessCheckAspect {
 
         if (accessCheck != null && accessCheck.apply(client)) {
             try {
-                return pjp.proceed(new Object[] {client});
+                return pjp.proceed();
             } catch (Throwable e) {
                 log.error("Failed to proceed with method execution in check client access of event access check aspect!");
             }
