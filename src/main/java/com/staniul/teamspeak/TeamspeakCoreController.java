@@ -4,6 +4,7 @@ import com.staniul.configuration.ConfigurationLoader;
 import com.staniul.configuration.annotations.ConfigFile;
 import com.staniul.query.Client;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.util.ReflectionUtil;
 import javafx.scene.effect.Reflection;
@@ -63,7 +64,7 @@ public class TeamspeakCoreController implements ApplicationContextAware {
             Teamspeak3Event ann = event.getAnnotation(Teamspeak3Event.class);
             Object target = applicationContext.getBean(type);
 
-            if (ann.value() == Teamspeak3Event.Types.JOIN)
+            if (ann.value() == EventType.JOIN)
                 joinEvents.add(new MethodContainer(target, event));
             else leaveEvents.add(new MethodContainer(target, event));
         }

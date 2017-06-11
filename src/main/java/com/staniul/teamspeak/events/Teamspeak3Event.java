@@ -20,7 +20,7 @@ public @interface Teamspeak3Event {
     /**
      * Type of event, when it should occur.
      */
-    Types value();
+    EventType value();
 
     /**
      * Groups for which event should be fired. If no groups where specified then event will be called on every client.
@@ -31,8 +31,4 @@ public @interface Teamspeak3Event {
      * Access check to be used when checking. Default one is {@link ClientServergroupAccessCheck}
      */
     Class<? extends ClientGroupAccessCheck> check() default ClientServergroupAccessCheck.class;
-
-    enum Types {
-        JOIN, LEAVE;
-    }
 }
