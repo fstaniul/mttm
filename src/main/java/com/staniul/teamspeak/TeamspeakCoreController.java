@@ -6,6 +6,7 @@ import com.staniul.query.Client;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.util.ReflectionUtil;
+import javafx.scene.effect.Reflection;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -31,21 +33,23 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
+    private Reflections reflections;
     private XMLConfiguration config;
     private HashMap<String, MethodContainer> commands;
     private Set<MethodContainer> joinEvents;
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(ApplicationContext applicationContext) throws ConfigurationException {
-        this.applicationContext = applicationContext;
+    public TeamspeakCoreController(Reflections reflections) throws ConfigurationException {
+        this.reflections = reflections;
         config = ConfigurationLoader.load(TeamspeakCoreController.class);
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
         leaveEvents = new HashSet<>();
     }
 
-    public void findMethods(Reflections reflections) {
+    @PostConstruct
+    public void findMethods() {
         Set<Class<?>> types = reflections.getTypesAnnotatedWith(Teamspeak3Module.class);
         for (Class<?> type : types) {
             findCommands(type);

@@ -2,7 +2,6 @@ package com.staniul.configuration;
 
 import com.staniul.query.Query;
 import com.staniul.teamspeak.TeamspeakCoreController;
-import javafx.scene.effect.Reflection;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.reflections.Reflections;
@@ -25,9 +24,7 @@ public class MTTMSpringConfiguration {
 
     @Bean
     public TeamspeakCoreController coreController (Reflections reflections) throws ConfigurationException {
-        TeamspeakCoreController coreController = new TeamspeakCoreController();
-        coreController.findMethods(reflections);
-        return coreController;
+        return new TeamspeakCoreController(reflections);
     }
 
     @Bean
