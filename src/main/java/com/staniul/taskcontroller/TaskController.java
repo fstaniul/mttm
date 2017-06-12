@@ -102,8 +102,7 @@ public class TaskController implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext)
-            throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.appContext = applicationContext;
     }
 }

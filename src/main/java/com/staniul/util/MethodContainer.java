@@ -39,11 +39,11 @@ public class MethodContainer {
             method.invoke(target, parameters);
             exceptionCounter = 0;
         } catch (IllegalAccessException e) {
-            exceptionCounter ++;
-            log.error("Failed to invoke event: " + this, e);
+            exceptionCounter++;
+            log.error("Method that is private and cannot be invoked from outside function!" + this, e);
         } catch (InvocationTargetException e) {
-            exceptionCounter ++;
-            log.error("Error during event call: " + this, e);
+            exceptionCounter++;
+            log.error("Error during method call: " + this, e);
         }
     }
 }

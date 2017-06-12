@@ -1,8 +1,5 @@
 package com.staniul.teamspeak.events;
 
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccessCheck;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientServergroupAccessCheck;
-
 import java.lang.annotation.*;
 
 /**

@@ -18,4 +18,15 @@ public class MethodTimerTask extends TimerTask {
         if (methodContainer.isCausingExceptionRegularly())
             cancel();
     }
+
+    @Override
+    public String toString() {
+        return methodContainer.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof MethodTimerTask &&
+                ((MethodTimerTask) obj).methodContainer.equals(methodContainer);
+    }
 }

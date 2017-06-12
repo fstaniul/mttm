@@ -1,7 +1,7 @@
 package com.staniul.teamspeak.commands;
 
-import com.staniul.configuration.ConfigurationLoader;
-import com.staniul.configuration.annotations.ConfigFile;
+import com.staniul.xmlconfig.ConfigurationLoader;
+import com.staniul.xmlconfig.ConfigFile;
 import com.staniul.query.Client;
 import com.staniul.query.Query;
 import com.staniul.query.QueryException;
@@ -11,8 +11,6 @@ import org.apache.log4j.Logger;
 import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 /**
  * Command messages send command responses to clients after command were executed, whether it was successful or not.
@@ -44,22 +42,20 @@ public class CommandMessenger {
             response.setMessage(new String[]{ config.getString(response.getStatus().toString().toLowerCase()) });
         }
 
-//        try {
-//            query.sendTextMessageToClient(client.getId(), response.getMessage());
-//        } catch (QueryException e) {
-//            log.error("Failed to send message to client!", e);
-//        }
-        log.info(Arrays.toString(response.getMessage()));
+        try {
+            query.sendTextMessageToClient(client.getId(), response.getMessage());
+        } catch (QueryException e) {
+            log.error("Failed to send message to client!", e);
+        }
     }
 
     @AfterThrowing(value = "commandExecution(client)", argNames = "client")
     public void sendMessageAfterCommandThrow (Client client) {
         String message = config.getString(CommandExecutionStatus.EXECUTION_TERMINATED.toString().toLowerCase());
-//        try {
-//            query.sendTextMessageToClient(client.getId(), message);
-//        } catch (QueryException e) {
-//            log.error("Failed to send message to client!", e);
-//        }
-        log.info(message);
+        try {
+            query.sendTextMessageToClient(client.getId(), message);
+        } catch (QueryException e) {
+            log.error("Failed to send message to client!", e);
+        }
     }
 }

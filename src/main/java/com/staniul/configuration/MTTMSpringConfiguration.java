@@ -1,9 +1,9 @@
 package com.staniul.configuration;
 
+import com.staniul.xmlconfig.ConfigurationLoader;
 import com.staniul.query.Query;
-import com.staniul.teamspeak.TeamspeakCoreController;
+
 import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.reflections.Reflections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

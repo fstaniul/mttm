@@ -1,6 +1,5 @@
-package com.staniul.configuration;
+package com.staniul.xmlconfig;
 
-import com.staniul.configuration.annotations.ConfigFile;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -19,12 +18,14 @@ public class ConfigurationLoader {
      * @throws ConfigurationException If {@code Configurations} fails to read the configuration (file does not exists,
      *                                extension is not xml or any other IO exception occurs)
      */
-    public static XMLConfiguration load(Class<?> aClass) throws ConfigurationException {
+    public static CustomXMLConfiguration load(Class<?> aClass) throws ConfigurationException {
         if (!aClass.isAnnotationPresent(ConfigFile.class))
             throw new IllegalArgumentException(String.format("A class %s is not annotated with %s", aClass, ConfigFile.class));
 
         String configFile = aClass.getAnnotation(ConfigFile.class).value();
 
-        return configurations.xml(ConfigurationLoader.class.getClassLoader().getResource("config/" + configFile));
+        XMLConfiguration xmlConfig = configurations.xml(ConfigurationLoader.class.getClassLoader().getResource("config/" + configFile));
+
+        return new CustomXMLConfiguration(xmlConfig);
     }
 }

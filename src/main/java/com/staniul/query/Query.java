@@ -1,6 +1,6 @@
 package com.staniul.query;
 
-import com.staniul.configuration.annotations.ConfigFile;
+import com.staniul.xmlconfig.ConfigFile;
 import com.staniul.util.StringUtil;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
