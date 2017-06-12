@@ -49,7 +49,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
     }
 
     private <T> List<T> internalCustomGetClass(Class<T> tClass, String prefix, ConfigTypeConverter typeConverter, CustomConfigLoad customConfigLoad) {
-        String template = prefix + "." + customConfigLoad.value() + "[@%s]";
+        String template = prefix + "." + ( customConfigLoad.value().equals("") ? tClass.getSimpleName().toLowerCase() : customConfigLoad.value() ) + "[@%s]";
         Set<Field> fields = ReflectionUtil.getFieldsAnnotatedWith(tClass, ConfigEntry.class);
         List<FieldDataContainer> data = fields.stream().map(f -> new FieldDataContainer(f, f.getAnnotation(ConfigEntry.class).value())).collect(Collectors.toList());
         if(readData(data, template, typeConverter))
@@ -72,8 +72,6 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         Integer[] cc = {Integer.MAX_VALUE}; //Java cheat
         data.forEach(d -> cc[0] = Math.min(cc[0], d.getValues().size()));
         List<T> tList = new ArrayList<>(cc[0]);
-
-        System.out.println(cc[0]);
 
         for (int[] i = {0}; i[0] < cc[0]; i[0]++) {
             T t = ReflectionUtil.createDefaultOrNull(tClass);
