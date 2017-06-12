@@ -4,8 +4,8 @@ import com.staniul.query.Client;
 import com.staniul.teamspeak.commands.CommandExecutionStatus;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccessCheck;
-import com.staniul.teamspeak.security.clientaccesscheck.GroupAccess;
 import com.staniul.util.AroundAspectUtil;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -57,9 +57,9 @@ public class CommandEventAccessCheckAspect {
     }
 
     private boolean checkClientAccess (ProceedingJoinPoint pjp, Client client) {
-        List<GroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, GroupAccess.class);
+        List<ClientGroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, ClientGroupAccess.class);
         boolean access = true;
-        for (GroupAccess ann : anns) {
+        for (ClientGroupAccess ann : anns) {
             ClientGroupAccessCheck check = ClientGroupAccessCheck.create(ann.value(), ann.check());
             if (check == null || !check.apply(client))
                 access = false;

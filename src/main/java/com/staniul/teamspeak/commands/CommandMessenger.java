@@ -32,14 +32,14 @@ public class CommandMessenger {
         this.query = query;
     }
 
-    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client, java.lang.String)) && " +
-            "args(client,params)", argNames = "client, params")
-    public void commandExecution (Client client, String params) {
+    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client,..)) && " +
+            "args(client,..)", argNames = "client")
+    public void commandExecution (Client client) {
 
     }
 
-    @AfterReturning(value = "commandExecution(client,params)", returning = "response", argNames = "client,params,response")
-    public void sendMessageAfterCommandReturn (Client client, String params, CommandResponse response) {
+    @AfterReturning(value = "commandExecution(client)", returning = "response", argNames = "client,response")
+    public void sendMessageAfterCommandReturn (Client client, CommandResponse response) {
         if (response.getStatus() != CommandExecutionStatus.EXECUTED_SUCCESSFULLY) {
             response.setMessage(new String[]{ config.getString(response.getStatus().toString().toLowerCase()) });
         }
@@ -52,8 +52,8 @@ public class CommandMessenger {
         log.info(Arrays.toString(response.getMessage()));
     }
 
-    @AfterThrowing(value = "commandExecution(client,params)", argNames = "client,params")
-    public void sendMessageAfterCommandThrow (Client client, String params) {
+    @AfterThrowing(value = "commandExecution(client)", argNames = "client")
+    public void sendMessageAfterCommandThrow (Client client) {
         String message = config.getString(CommandExecutionStatus.EXECUTION_TERMINATED.toString().toLowerCase());
 //        try {
 //            query.sendTextMessageToClient(client.getId(), message);

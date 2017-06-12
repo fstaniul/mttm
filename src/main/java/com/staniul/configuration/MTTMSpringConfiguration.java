@@ -23,11 +23,6 @@ public class MTTMSpringConfiguration {
     }
 
     @Bean
-    public TeamspeakCoreController coreController (Reflections reflections) throws ConfigurationException {
-        return new TeamspeakCoreController(reflections);
-    }
-
-    @Bean
     public Query query () throws Exception {
         XMLConfiguration queryConfiguration = ConfigurationLoader.load(Query.class);
         Query query = new Query(queryConfiguration);

@@ -9,8 +9,8 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(GroupAccessContainer.class)
-public @interface GroupAccess {
+@Repeatable(ClientGroupAccessContainer.class)
+public @interface ClientGroupAccess {
     /**
      * Groups that are allowed to call this command.
      * If left empty, all clients are permitted to call this command.

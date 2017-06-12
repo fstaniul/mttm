@@ -3,6 +3,9 @@ package com.staniul.teamspeak;
 import com.staniul.configuration.ConfigurationLoader;
 import com.staniul.configuration.annotations.ConfigFile;
 import com.staniul.query.Client;
+import com.staniul.teamspeak.commands.CommandExecutionStatus;
+import com.staniul.teamspeak.commands.CommandMessenger;
+import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
@@ -34,6 +37,7 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
+    private CommandMessenger commandMessenger;
     private Reflections reflections;
     private XMLConfiguration config;
     private HashMap<String, MethodContainer> commands;
@@ -41,8 +45,9 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections) throws ConfigurationException {
+    public TeamspeakCoreController(Reflections reflections, CommandMessenger commandMessenger) throws ConfigurationException {
         this.reflections = reflections;
+        this.commandMessenger = commandMessenger;
         config = ConfigurationLoader.load(TeamspeakCoreController.class);
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
@@ -82,11 +87,16 @@ public class TeamspeakCoreController implements ApplicationContextAware {
 
     public void callCommand (String command, Client client, String params) {
         MethodContainer mc = commands.get(command);
-        log.debug(mc);
-        try {
-            mc.method.invoke(mc.target, client, params);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            log.error("Failed to invoke command!", e);
+
+        if (mc == null)
+            commandMessenger.sendMessageAfterCommandReturn(client, new CommandResponse(CommandExecutionStatus.NOT_FOUND, null));
+
+        else {
+            try {
+                mc.method.invoke(mc.target, client, params);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                log.error("Failed to invoke command!", e);
+            }
         }
     }
 

@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * Subclass of ClientGroupAccessCheck that permits all clients.
- * Used as default if groups() of @GroupAccess annotation are
+ * Used as default if groups() of @ClientGroupAccess annotation are
  */
 public class ClientPermitAllAccessCheck extends ClientGroupAccessCheck {
     public ClientPermitAllAccessCheck() {
