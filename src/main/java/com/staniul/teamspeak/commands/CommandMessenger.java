@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 /**
- * Command messages send command responses to clients after commands were executed, whether it was successful or not.
+ * Command messages send command responses to clients after command were executed, whether it was successful or not.
  */
 @Component
 @Aspect

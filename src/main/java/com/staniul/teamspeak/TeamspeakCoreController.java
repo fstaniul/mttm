@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * Controller of teamspeak 3 behaviour, that is events and commands. All commands called on teamspeak 3 server must be
+ * Controller of teamspeak 3 behaviour, that is events and commandeventscontrol. All commandeventscontrol called on teamspeak 3 server must be
  * registered within this controller to be invoked. All events that should be aware of clients joining and leaving
  * teamspeak 3 server should be registered within this controller.
  */
@@ -72,7 +72,7 @@ public class TeamspeakCoreController implements ApplicationContextAware {
 
     private void findCommands (Class<?> type) {
         Set<Method> commands = ReflectionUtil.getMethodsAnnotatedWith(type, Teamspeak3Command.class);
-        log.debug("################# Found commands: " + commands.toString());
+        log.debug("################# Found commandeventscontrol: " + commands.toString());
         for (Method command : commands) {
             Teamspeak3Command ann = command.getAnnotation(Teamspeak3Command.class);
             Object target = applicationContext.getBean(type);

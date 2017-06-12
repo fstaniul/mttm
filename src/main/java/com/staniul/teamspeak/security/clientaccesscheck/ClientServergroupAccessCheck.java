@@ -4,6 +4,9 @@ import com.staniul.query.Client;
 
 import java.util.Set;
 
+/**
+ * Checks if client is in one of many a servergroups based on given groups.
+ */
 public class ClientServergroupAccessCheck extends ClientGroupAccessCheck {
     public ClientServergroupAccessCheck(Set<Integer> groups) {
         super(groups);

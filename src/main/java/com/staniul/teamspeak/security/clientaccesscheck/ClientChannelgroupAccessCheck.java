@@ -4,6 +4,9 @@ import com.staniul.query.Client;
 
 import java.util.Set;
 
+/**
+ * Checks if client channelgroup is one of the given groups.
+ */
 public class ClientChannelgroupAccessCheck extends ClientGroupAccessCheck {
     public ClientChannelgroupAccessCheck(Set<Integer> groups) {
         super(groups);

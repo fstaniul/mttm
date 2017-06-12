@@ -6,12 +6,14 @@ import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
+import com.staniul.teamspeak.security.clientaccesscheck.GroupAccess;
 import org.springframework.stereotype.Component;
 
 @Component
 @Teamspeak3Module
 public class DummyTestModule {
-    @Teamspeak3Command(value = "nana", groups = {12})
+    @Teamspeak3Command(value = "nana")
+    @GroupAccess({12})
     public CommandResponse everyOneCanCallMe (Client client, String params) {
         System.out.println("I AM BEING CALLED!");
         return new CommandResponse("I've been called!");
