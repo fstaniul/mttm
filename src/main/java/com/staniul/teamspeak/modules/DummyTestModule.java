@@ -1,7 +1,6 @@
 package com.staniul.teamspeak.modules;
 
 import com.staniul.query.Client;
-import com.staniul.teamspeak.Teamspeak3Module;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
@@ -10,7 +9,6 @@ import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import org.springframework.stereotype.Component;
 
 @Component
-@Teamspeak3Module
 public class DummyTestModule {
     @Teamspeak3Command(value = "nana")
     @ClientGroupAccess({12})
