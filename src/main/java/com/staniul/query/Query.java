@@ -1,5 +1,6 @@
 package com.staniul.query;
 
+import com.staniul.query.channel.ChannelProperties;
 import com.staniul.xmlconfig.ConfigFile;
 import com.staniul.util.StringUtil;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
@@ -9,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @ConfigFile("query.xml")
 public class Query {
@@ -104,17 +106,17 @@ public class Query {
 
     /**
      * Gets list of clients currently connected to teamspeak 3 server.
-     * Clients are stored in ArrayList.
+     * Clients are stored in List.
      *
-     * @return {@code ArrayList<Client>} containing all clients currently connected to teamspeak 3 server.
+     * @return {@code List<Client>} containing all clients currently connected to teamspeak 3 server.
      *
      * @throws QueryException If server query request returns with error, probably when query've been disconnected from
      *                        teamspeak 3 server.
      */
-    public ArrayList<Client> getClientList() throws QueryException {
+    public List<Client> getClientList() throws QueryException {
         try {
             Vector<HashMap<String, String>> clientList = jts3ServerQuery.getList(JTS3ServerQuery.LISTMODE_CLIENTLIST, "-uid,-away,-voice,-times,-groups,-info,-icon,-country,-ip");
-            ArrayList<Client> result = new ArrayList<>(clientList.size());
+            List<Client> result = new ArrayList<>(clientList.size());
             clientList.stream()
                     .map(c -> new Client(Integer.parseInt(c.get("clid")), c))
                     .forEach(result::add);
@@ -170,15 +172,15 @@ public class Query {
     /**
      * Gets channel list from teamspeak 3 server.
      *
-     * @return {@code ArrayList<Channel>} containing information about channels currently present on teamspeak 3 server.
+     * @return {@code List<Channel>} containing information about channels currently present on teamspeak 3 server.
      *
      * @throws QueryException When query fails to get channel list from teamspeak 3 server, because connection with
      *                        teamspeak 3 being interrupted.
      */
-    public ArrayList<Channel> getChannelList() throws QueryException {
+    public List<Channel> getChannelList() throws QueryException {
         try {
             Vector<HashMap<String, String>> channelList = jts3ServerQuery.getList(JTS3ServerQuery.LISTMODE_CHANNELLIST, "-topic,-flags,-voice,-limits,-icon,-secondsempty");
-            ArrayList<Channel> result = new ArrayList<>(channelList.size());
+            List<Channel> result = new ArrayList<>(channelList.size());
             channelList.stream().map(c -> new Channel(Integer.parseInt(c.get("cid")), c)).forEach(result::add);
             return result;
         } catch (TS3ServerQueryException e) {
@@ -245,6 +247,23 @@ public class Query {
             jts3ServerQuery.kickClient(clientId, true, msg);
         } catch (TS3ServerQueryException e) {
             throwQueryException("Failed to kick client from channel.", e);
+        }
+    }
+
+    /**
+     * Moves client to channel with given id.
+     *
+     * @param clientId  Id of client.
+     * @param channelId Id of channel.
+     *
+     * @throws QueryException When query fails to move client. Client might have disconnected from server before this
+     *                        call.
+     */
+    public void moveClient(int clientId, int channelId) throws QueryException {
+        try {
+            jts3ServerQuery.moveClient(clientId, channelId, "");
+        } catch (TS3ServerQueryException e) {
+            throwQueryException(String.format("Failed to move client (%d) to channel (%d)", clientId, channelId), e);
         }
     }
 
@@ -355,6 +374,72 @@ public class Query {
                 throwQueryException("Failed to send message to client!", e);
             }
         }
+    }
+
+    /**
+     * Gets list of clients with assigned channel groups for channel with a given id.
+     *
+     * @param channelId Id of a channel.
+     *
+     * @return List of ClientChannelInfo object that contain information about clients groups for specified channel.
+     *
+     * @throws QueryException When query fails to get information from teamspeak 3 server.
+     */
+    public List<ClientChannelInfo> getChannelgroupClientList(int channelId) throws QueryException {
+        String request = String.format("channelgroupclientlist cid=%d", channelId);
+
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException("Failed to get channelgroup client list from teamspeak 3 server.", response);
+
+        Vector<HashMap<String, String>> parsed = JTS3ServerQuery.parseRawData(response.get("response"));
+        return parsed.stream().map(ClientChannelInfo::new).collect(Collectors.toList());
+    }
+
+    /**
+     * Creates channel from properties.
+     *
+     * @param properties Properties for new created channel.
+     *
+     * @return Id of newly created channel.
+     *
+     * @throws QueryException When query fails to create new teamspeak 3 channel.
+     */
+    public int channelCreate(ChannelProperties properties) throws QueryException {
+        String request = "channelcreate " + properties.toTeamspeak3QueryString();
+        HashMap<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException("Failed to create teamspeak 3 channel!", response);
+        String channelId = JTS3ServerQuery.parseLine(response.get("response")).get("cid");
+        return Integer.parseInt(channelId);
+    }
+
+    /**
+     * Deletes channel with a given id.
+     *
+     * @param id Id of channel to delete.
+     *
+     * @throws QueryException When query fails to delete channel.
+     */
+    public void channelDelete(int id) throws QueryException {
+        try {
+            jts3ServerQuery.deleteChannel(id, true);
+        } catch (TS3ServerQueryException e) {
+            throwQueryException(String.format("Failed to delete channel (%d).", id), e);
+        }
+    }
+
+    /**
+     * Renames channel with given id.
+     *
+     * @param newName   New name for channel.
+     * @param channelId Channel id.
+     *
+     * @throws QueryException When query fails to change channel name, or channel name cannot be changed (it is already
+     *                        in use in the same scope, or channel with given id does not exists).
+     */
+    public void channelRename(String newName, int channelId) throws QueryException {
+        String request = String.format("channeledit cid=%d channel_name=%s", channelId, JTS3ServerQuery.encodeTS3String(newName));
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException("Failed to rename channel!", response);
     }
 
     /**

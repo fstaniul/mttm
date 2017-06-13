@@ -25,17 +25,17 @@ public class SerializeUtil {
      * Reads object form a file.
      *
      * @param fileName Name of file to which object was serialized.
-     * @param tClass   Class of type which we want to read.
      * @param <T>      Type of class to read.
      *
      * @return Read object of specified type from file.
      *
      * @throws IOException            When there is problem with reading from file, file does not exists.
      * @throws ClassNotFoundException When read object is not of specified type.
+     * @throws ClassCastException     When specified type does not match.
      */
-    public static <T> T deserialize(String fileName, Class<T> tClass) throws IOException, ClassNotFoundException {
+    public static <T> T deserialize(String fileName) throws IOException, ClassNotFoundException, ClassCastException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-            return tClass.cast(ois.readObject());
+            return (T) ois.readObject();
         }
     }
 }

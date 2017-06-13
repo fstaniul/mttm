@@ -12,9 +12,14 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Aspect which controls command invocation by checking if client has access to command based on {@link Teamspeak3Command} annotation.
@@ -23,6 +28,13 @@ import java.util.List;
 @Aspect
 public class CommandEventAccessCheckAspect {
     private static Logger log = Logger.getLogger(CommandEventAccessCheckAspect.class);
+
+    private Environment environment;
+
+    @Autowired
+    public CommandEventAccessCheckAspect (Environment environment) {
+        this.environment = environment;
+    }
 
     @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client, ..)) && " +
             "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
@@ -60,7 +72,8 @@ public class CommandEventAccessCheckAspect {
         List<ClientGroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, ClientGroupAccess.class);
         boolean access = true;
         for (ClientGroupAccess ann : anns) {
-            ClientGroupAccessCheck check = ClientGroupAccessCheck.create(ann.value(), ann.check());
+            Set<Integer> groups = Arrays.stream(environment.getProperty(ann.value()).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
+            ClientGroupAccessCheck check = ClientGroupAccessCheck.create(groups, ann.check());
             if (check == null || !check.apply(client))
                 access = false;
         }

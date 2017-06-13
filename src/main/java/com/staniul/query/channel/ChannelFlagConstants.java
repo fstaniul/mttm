@@ -48,7 +48,7 @@ public interface ChannelFlagConstants {
      * When creating a new channel through {@code ChannelProperties} you should always set the flags. Failing to do so
      * will result in flags being set to 0 and that to unwanted behaviour.
      */
-    int __DEFAULT_FLAGS = PERMANENT | MAXCLIENTS_UNLIMITED | MAXFAMILYCLIENTS_UNLIMITED;
+    int __DEFAULT_FLAGS = PERMANENT;
 
     /**
      * Transforms flags stored as {@code int} number into a readable by teamspeak 3 server query set of flags

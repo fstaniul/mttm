@@ -26,13 +26,12 @@ public abstract class ClientGroupAccessCheck implements AccessCheck<Client> {
      * @param aClass Subclass of {@code ClientGroupAccessCheck}
      * @return Instantiated object of given subclass.
      */
-    public static ClientGroupAccessCheck create (int[] groups, Class<? extends ClientGroupAccessCheck> aClass) {
-        if (groups.length == 0) return new ClientPermitAllAccessCheck();
+    public static ClientGroupAccessCheck create (Set<Integer> groups, Class<? extends ClientGroupAccessCheck> aClass) {
+        if (groups.size() == 0) return new ClientPermitAllAccessCheck();
 
-        Set<Integer> groupSet = SetUtil.intSet(groups);
         try {
             Constructor<? extends ClientGroupAccessCheck> constructor = aClass.getConstructor(Set.class);
-            return constructor.newInstance(groupSet);
+            return constructor.newInstance(groups);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             log.error("Failed to create a client group access check from given class!", e);
             return null;

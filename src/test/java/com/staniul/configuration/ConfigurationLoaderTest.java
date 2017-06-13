@@ -13,7 +13,6 @@ public class ConfigurationLoaderTest {
         Configuration configuration = ConfigurationLoader.load(Query.class);
         assertNotNull(configuration);
         assertEquals("localhost", configuration.getString("ip"));
-        System.out.println(1 << 1);
     }
 
 }

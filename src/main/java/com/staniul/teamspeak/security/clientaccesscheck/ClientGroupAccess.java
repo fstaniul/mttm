@@ -12,10 +12,10 @@ import java.lang.annotation.*;
 @Repeatable(ClientGroupAccessContainer.class)
 public @interface ClientGroupAccess {
     /**
-     * Groups that are allowed to call this command.
-     * If left empty, all clients are permitted to call this command.
+     * String that points to application.properties property with groups permitted given as list if integers divided by
+     * comma.
      */
-    int[] value();
+    String value();
 
     /**
      * Access check that will check if client has access to this command.

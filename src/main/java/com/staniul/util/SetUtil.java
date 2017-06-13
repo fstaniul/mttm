@@ -1,8 +1,6 @@
 package com.staniul.util;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,9 +43,30 @@ public class SetUtil {
         else return a.stream().filter(b::contains).count();
     }
 
-    public static Set<Integer> intSet (int... ints) {
+    /**
+     * Creates set from integers.
+     *
+     * @param ints Integers to be added to set.
+     *
+     * @return Set of Integers.
+     */
+    public static Set<Integer> intSet(int... ints) {
         HashSet<Integer> result = new HashSet<>();
         Arrays.stream(ints).forEach(result::add);
         return result;
+    }
+
+    /**
+     * Creates set from iterable content.
+     *
+     * @param iterable Iterable content.
+     * @param <T>      Type of items in itarable content.
+     *
+     * @return Set of items from iterable content.
+     */
+    public static <T> Set<T> form(Iterable<T> iterable) {
+        Set<T> set = new HashSet<>();
+        for (T item : iterable) set.add(item);
+        return set;
     }
 }
