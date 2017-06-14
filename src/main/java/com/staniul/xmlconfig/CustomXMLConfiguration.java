@@ -1,7 +1,7 @@
 package com.staniul.xmlconfig;
 
 import com.staniul.util.ReflectionUtil;
-import com.staniul.util.StringToTypeConverter;
+import com.staniul.util.StringToTypeConverterFactory;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
@@ -29,7 +29,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         return getClass(tClass, prefix, null);
     }
 
-    public <T> T getClass (Class<T> tClass, String prefix, StringToTypeConverter typeConverter) {
+    public <T> T getClass (Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
         return getClasses(tClass, prefix, typeConverter).get(0);
     }
 
@@ -41,7 +41,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         return getClasses(tClass, prefix, null);
     }
 
-    public <T> List<T> getClasses (Class<T> tClass, String prefix, StringToTypeConverter typeConverter) {
+    public <T> List<T> getClasses (Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
         if (tClass.isAnnotationPresent(CustomConfigLoad.class)) {
             return internalCustomGetClass(tClass, prefix, typeConverter, tClass.getAnnotation(CustomConfigLoad.class));
         }
@@ -49,7 +49,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         return internalGetClass(tClass, prefix, typeConverter);
     }
 
-    private <T> List<T> internalCustomGetClass(Class<T> tClass, String prefix, StringToTypeConverter typeConverter, CustomConfigLoad customConfigLoad) {
+    private <T> List<T> internalCustomGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter, CustomConfigLoad customConfigLoad) {
         String template = prefix + "." + ( customConfigLoad.value().equals("") ? tClass.getSimpleName().toLowerCase() : customConfigLoad.value() ) + "[@%s]";
         Set<Field> fields = ReflectionUtil.getFieldsAnnotatedWith(tClass, ConfigEntry.class);
         List<FieldDataContainer> data = fields.stream().map(f -> new FieldDataContainer(f, f.getAnnotation(ConfigEntry.class).value())).collect(Collectors.toList());
@@ -59,7 +59,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         return null;
     }
 
-    private <T> List<T> internalGetClass(Class<T> tClass, String prefix, StringToTypeConverter typeConverter) {
+    private <T> List<T> internalGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
         String template = prefix + "." + tClass.getSimpleName().toLowerCase() + "[@%s]";
         Set<Field> fields = ReflectionUtil.getFields(tClass);
         List<FieldDataContainer> data = fields.stream().map(FieldDataContainer::new).collect(Collectors.toList());
@@ -84,7 +84,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         return tList;
     }
 
-    private boolean readData (List<FieldDataContainer> dataContainers, String template, StringToTypeConverter typeConverter) {
+    private boolean readData (List<FieldDataContainer> dataContainers, String template, StringToTypeConverterFactory typeConverter) {
         for (FieldDataContainer fdc : dataContainers) {
             List<String> strData = Arrays.stream(getStringArray(String.format(template, fdc.getEntry()))).collect(Collectors.toList());
             if (strData == null) return false;

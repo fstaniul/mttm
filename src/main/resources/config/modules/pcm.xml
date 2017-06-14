@@ -11,6 +11,8 @@
                 fail="Wystąpił błąd podczas tworzenia twojego nowego kanału! Proszę skontaktuj się z administracją w celu jego rozwiązania. Przepraszamy za utrudnienia."/>
         <delete success="Kanał o numerze [b]$NUMBER$[/b] został usunięty."
                 fail="Nie można było usnąć kanału o numerze [b]$NUMBER$[/b]. Możliwe, że jest to wolny kanał, bądź kanał o podanym numerze nie istnieje."/>
+        <chso notfound="Nie znalazłam kanału o numerze [b]$NUMBER$[/b]."
+              success="Zmieniłam właściciela kanału o numerze [b]$NUMBER$[/b] na użytkownika o id [b]$CLDBID$[/b]"/>
     </messages>
 
     <freechannel name="WOLNY"
@@ -19,5 +21,6 @@
 
     <channelgroups>
         <owner id="96"/>
+        <guest id="8"/>
     </channelgroups>
 </privatechannelmanager>

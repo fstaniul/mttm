@@ -1,5 +1,6 @@
 package com.staniul.teamspeak.modules.privatechannelmanager;
 
+import com.staniul.teamspeak.commands.validators.TwoIntegerParamsValidator;
 import com.staniul.teamspeak.query.*;
 import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
@@ -142,10 +143,11 @@ public class PrivateChannelManager {
 
     private ChannelProperties createDefaultPropertiesForFreeChannel(int channelNumber) {
         String name = String.format("[%03d] %s", channelNumber, config.getString("freechannel[@name]"));
-        String descritpion = config.getString("freechannel[@description]").replace("$NUMBER$", Integer.toString(channelNumber));
+        String description = config.getString("freechannel[@description]").replace("$NUMBER$", Integer.toString(channelNumber));
         return new ChannelProperties()
                 .setName(name)
                 .setTopic(config.getString("freechannel[@topic]"))
+                .setDescription(description)
                 .setParent(config.getInt("parentchannel[@id]"))
                 .setCodec(4)
                 .setCodecQuality(1)
@@ -330,6 +332,33 @@ public class PrivateChannelManager {
         if (!channel.getName().matches(nameTemplate)) {
             String newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), config.getString("clientchannel[@invalidnumbername]"));
             query.channelRename(newChannelName, privateChannel.getId());
+        }
+    }
+
+    @Teamspeak3Command("!chso")
+    @ClientGroupAccess("administrators")
+    @ValidateParams(TwoIntegerParamsValidator.class)
+    public CommandResponse changeChannelOwnerCommand(Client client, String params) throws QueryException {
+        String[] splParams = params.split("\\s+");
+        int channelNumber = Integer.parseInt(splParams[0]);
+        int clientDatabaseId = Integer.parseInt(splParams[1]);
+
+        synchronized (channelsLock) {
+            PrivateChannel channel = channels.stream()
+                    .filter(ch -> ch.getNumber() == channelNumber)
+                    .findFirst()
+                    .orElse(null);
+
+            if (channel == null)
+                return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", splParams[0]));
+
+            query.setChannelGroup(clientDatabaseId, channel.getId(), config.getInt("channelgroups.owner[@id]"));
+            query.setChannelGroup(channel.getOwner(), channel.getId(), config.getInt("channelgroups.guest[@id]"));
+            channel.setOwner(clientDatabaseId);
+
+            return new CommandResponse(config.getString("messages.chso[@success]")
+                    .replace("$NUMBER$", Integer.toString(channel.getNumber()))
+                    .replace("$CLDBID$", Integer.toString(channel.getOwner())));
         }
     }
 }

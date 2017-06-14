@@ -9,14 +9,14 @@ import java.util.function.Function;
  * This class is thread safe, but another synchronization would be needed when adding new converters.
  * You can store multiple converters in this one.
  */
-public class StringToTypeConverter {
+public class StringToTypeConverterFactory {
     private Map<Class<?>, Function<String, ?>> converterMap;
 
-    public StringToTypeConverter() {
+    public StringToTypeConverterFactory() {
         converterMap = new HashMap<>();
     }
 
-    public <T> StringToTypeConverter add(Class<T> tClass, Function<String, T> tFunction) {
+    public <T> StringToTypeConverterFactory add(Class<T> tClass, Function<String, T> tFunction) {
         if (tClass.isPrimitive() || tClass.equals(String.class))
             throw new IllegalArgumentException("Strings and Primitives are not supported.");
 
