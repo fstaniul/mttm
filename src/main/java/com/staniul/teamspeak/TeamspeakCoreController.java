@@ -2,7 +2,7 @@ package com.staniul.teamspeak;
 
 import com.staniul.query.Client;
 import com.staniul.teamspeak.commands.CommandExecutionStatus;
-import com.staniul.teamspeak.commands.CommandMessenger;
+import com.staniul.teamspeak.commands.CommandMessengerAspect;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
@@ -29,16 +29,16 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
-    private CommandMessenger commandMessenger;
+    private CommandMessengerAspect commandMessenger;
     private Reflections reflections;
     private HashMap<String, MethodContainer> commands;
     private Set<MethodContainer> joinEvents;
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections, CommandMessenger commandMessenger) throws ConfigurationException {
+    public TeamspeakCoreController(Reflections reflections, CommandMessengerAspect commandMessengerAspect) throws ConfigurationException {
         this.reflections = reflections;
-        this.commandMessenger = commandMessenger;
+        this.commandMessenger = commandMessengerAspect;
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
         leaveEvents = new HashSet<>();

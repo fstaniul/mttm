@@ -6,6 +6,8 @@ import com.staniul.query.channel.ChannelProperties;
 import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
+import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientServergroupAccessCheck;
 import com.staniul.util.SerializeUtil;
@@ -86,8 +88,60 @@ public class PrivateChannelManager {
 
     @Teamspeak3Command("!chdel")
     @ClientGroupAccess(value = "administrators", check = ClientServergroupAccessCheck.class)
-    public CommandResponse deleteChannel (Client client, String params) {
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse deleteChannelCommand (Client client, String params) throws QueryException {
+        int channelNumber = Integer.parseInt(params);
+        try {
+            if (deleteChannel(channelNumber)) {
+                return new CommandResponse(config.getString("messages.delete[@successful]").replace("$NUMBER$", Integer.toString(channelNumber)));
+            } else return new CommandResponse(config.getString("messages.delete[@fail]").replace("$NUMBER$", Integer.toString(channelNumber)));
+        } catch (QueryException e) {
+            log.error(String.format("Failed to delete channel with number (%d)", channelNumber), e);
+            throw e;
+        }
+    }
 
+    public boolean deleteChannel (int channelNumber) throws QueryException {
+        synchronized (channelsLock) {
+            if (channelNumber < 0 || channelNumber > channels.size())
+                return false;
+
+            PrivateChannel channelToDelete = channels.stream()
+                    .filter(privateChannel -> privateChannel.getNumber() == channelNumber)
+                    .findFirst()
+                    .orElse(null);
+
+            if (channelToDelete == null || channelToDelete.isFree()) return false;
+
+            query.channelDelete(channelToDelete.getId());
+
+            if (channelNumber < channels.size()) {
+                ChannelProperties properties = createDefaultPropertiesForFreeChannel(channelNumber)
+                        .setOrder(channelToDelete.getId());
+                int channelId = query.channelCreate(properties);
+
+                channelToDelete.setOwner(PrivateChannel.FREE_CHANNEL_OWNER);
+                channelToDelete.setId(channelId);
+            }
+            else {
+                channels.remove(channelToDelete);
+            }
+
+            return true;
+        }
+    }
+
+    private ChannelProperties createDefaultPropertiesForFreeChannel (int channelNumber) {
+        String name = String.format("[%03d] %s", channelNumber, config.getString("freechannel[@name]"));
+        String descritpion = config.getString("freechannel[@description]").replace("$NUMBER$", Integer.toString(channelNumber));
+        return new ChannelProperties()
+                .setName(name)
+                .setTopic(config.getString("freechannel[@topic]"))
+                .setParent(config.getInt("parentchannel[@id]"))
+                .setCodec(4)
+                .setCodecQuality(1)
+                .setMaxClients(0)
+                .setMaxFamilyClients(0);
     }
 
     @Task(delay = 5000)
@@ -109,10 +163,23 @@ public class PrivateChannelManager {
                 if (clientsChannel == null) {
                     PrivateChannel freeChannel = getFreeChannel();
 
-                    if (freeChannel == null)
-                        clientsChannel = createNewChannelForClient(client);
+                    int channelNumber = freeChannel == null ? channels.size() + 1 : freeChannel.getNumber();
+                    ChannelProperties properties = createDefaultPropertiesForClientsChannel(client, channelNumber);
 
-                    else clientsChannel = changeFreeChannelToBeClientsOne(client, freeChannel);
+                    clientsChannel = new PrivateChannel(channelNumber);
+
+                    if (freeChannel != null) {
+                        properties.setOrder(freeChannel.getId());
+                        query.channelDelete(freeChannel.getId());
+                        clientsChannel = freeChannel;
+                    }
+
+                    int channelId = query.channelCreate(properties);
+
+                    clientsChannel.setId(channelId);
+                    clientsChannel.setOwner(client.getDatabaseId());
+
+                    if (freeChannel == null) channels.add(clientsChannel);
                 }
 
                 moveClientToChannel(client, clientsChannel);
@@ -126,7 +193,7 @@ public class PrivateChannelManager {
 
     private void messageClientAboutFailedCreation(Client client) {
         try {
-            query.sendTextMessageToClient(client.getId(), config.getString("messages[@fail]"));
+            query.sendTextMessageToClient(client.getId(), config.getString("messages.create[@fail]"));
         } catch (QueryException e) {
             log.error("Failed to inform client about fail in channel creation.", e);
         }
@@ -134,39 +201,15 @@ public class PrivateChannelManager {
 
     private void messageClientAboutSuccessfulCreation(Client client, PrivateChannel clientsChannel) {
         try {
-            String message = config.getString("messages[@success]").replace("$NUMBER$", Integer.toString(clientsChannel.getNumber()));
+            String message = config.getString("messages.create[@success]").replace("$NUMBER$", Integer.toString(clientsChannel.getNumber()));
             query.sendTextMessageToClient(client.getId(), message);
         } catch (QueryException e) {
             log.error("Failed to inform client about successful channel creation.", e);
         }
     }
 
-    private PrivateChannel createNewChannelForClient(Client client) throws QueryException {
-        int number = channels.size() + 1;
-        ChannelProperties properties = createDefaultPropertiesForClientsChannel(client, number);
-
-        int channelId = query.channelCreate(properties);
-
-        PrivateChannel clientsChannel = new PrivateChannel(channelId, number, client.getDatabaseId());
-        channels.add(clientsChannel);
-        return clientsChannel;
-    }
-
-    private PrivateChannel changeFreeChannelToBeClientsOne(Client client, PrivateChannel freeChannel) throws QueryException {
-        ChannelProperties properties = createDefaultPropertiesForClientsChannel(client, freeChannel.getNumber());
-        properties.setOrder(freeChannel.getId());
-
-        int channelId = query.channelCreate(properties);
-        query.channelDelete(freeChannel.getId());
-
-        freeChannel.setId(channelId);
-        freeChannel.setOwner(client.getDatabaseId());
-
-        return freeChannel;
-    }
-
     private ChannelProperties createDefaultPropertiesForClientsChannel(Client client, int number) {
-        String name = String.format("[%02d] %s %s", number, config.getString("clientchannel[@name]"), client.getNickname());
+        String name = String.format("[%03d] %s %s", number, config.getString("clientchannel[@name]"), client.getNickname());
         if (name.length() > 40) name = name.substring(0, 40);
 
         return new ChannelProperties()
@@ -197,6 +240,42 @@ public class PrivateChannelManager {
             query.moveClient(client.getId(), clientsChannel.getId());
         } catch (QueryException e) {
             log.error(e.getMessage(), e);
+        }
+    }
+
+    @Task(delay = 60000)
+    public void checkChannels () {
+        synchronized (channelsLock) {
+            boolean stillEmpty = true;
+
+            for (int i = channels.size() - 1; i >= 0; i--) {
+                PrivateChannel channel = channels.get(i);
+
+                if (!channel.isFree())
+                    stillEmpty = false;
+
+                if (stillEmpty)
+                    channels.remove(i);
+
+                try {
+                    Channel info = query.getChannelInfo(channel.getId());
+                    checkIfShouldBeMoved(channel, info);
+                    checkChannelName(channel, info);
+                } catch (QueryException e) {
+                    log.error("Failed to manage channels!", e);
+                }
+            }
+        }
+    }
+
+    private void checkIfShouldBeMoved(PrivateChannel privateChannel, Channel channel) {
+
+    }
+
+    private void checkChannelName(PrivateChannel privateChannel, Channel channel) throws QueryException {
+        String nameTemplate = String.format("\\[%03d\\].*", privateChannel.getNumber());
+        if (!channel.getName().matches(nameTemplate)) {
+            String newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), config.getString("clientchannel[@invalidnumbername]"));
         }
     }
 }

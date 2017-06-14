@@ -13,6 +13,8 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Aspect
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CommandEventAccessCheckAspect {
     private static Logger log = Logger.getLogger(CommandEventAccessCheckAspect.class);
 

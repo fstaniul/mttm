@@ -18,15 +18,15 @@ import org.springframework.stereotype.Component;
 @Component
 @Aspect
 @ConfigFile("commandmessages.xml")
-public class CommandMessenger {
-    private static Logger log = Logger.getLogger(CommandMessenger.class);
+public class CommandMessengerAspect {
+    private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
 
     private XMLConfiguration config;
     private Query query;
 
     @Autowired
-    public CommandMessenger (Query query) throws ConfigurationException {
-        config = ConfigurationLoader.load(CommandMessenger.class);
+    public CommandMessengerAspect(Query query) throws ConfigurationException {
+        config = ConfigurationLoader.load(CommandMessengerAspect.class);
         this.query = query;
     }
 

@@ -3,9 +3,15 @@ package com.staniul.teamspeak.modules.privatechannelmanager;
 import java.io.Serializable;
 
 public class PrivateChannel implements Serializable {
+    public transient static final int FREE_CHANNEL_OWNER = -1;
+
     private int id;
     private int number;
     private int owner;
+
+    public PrivateChannel(int number) {
+        this.number = number;
+    }
 
     public PrivateChannel(int id, int number, int owner) {
         this.id = id;
@@ -34,6 +40,6 @@ public class PrivateChannel implements Serializable {
     }
 
     public boolean isFree () {
-        return owner == -1;
+        return owner == FREE_CHANNEL_OWNER;
     }
 }

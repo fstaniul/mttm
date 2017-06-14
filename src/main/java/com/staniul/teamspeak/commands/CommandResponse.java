@@ -5,7 +5,7 @@ import com.staniul.util.StringUtil;
 /**
  * <p>Class that represents a command response. Each command should return this class object.</p>
  *
- * <p>Used by {@link CommandMessenger} to send response to client after command execution, whether it was successful or
+ * <p>Used by {@link CommandMessengerAspect} to send response to client after command execution, whether it was successful or
  * not.</p>
  */
 public class CommandResponse {

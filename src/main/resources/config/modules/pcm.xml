@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <pcm>
-    <parentchannel id="737" />
+    <parentchannel id="737"/>
     <clientchannel name="Kanał:"
-                   description="Prywatny kanał [b]%s[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.\n[i]Ta wiadomość może zostać usunięta.[/i]" />
-    <messages success="Twój nowy kanał ma numer [b]$NUMBER$[/b]. Pamiętaj, aby nie zmieniać numeru kanału. Jeżeli zauważysz, że wolny jest kanał o niższym numerze, możesz zmienić nazwę swojego kanału na [b]MOVE[/b] i kanał zostanie przeniesiony wyżej."
-              fail="Wystąpił błąd podczas tworzenia twojego nowego kanału! Proszę skontaktuj się z administracją w celu jego rozwiązania. Przepraszamy za utrudnienia." />
+                   description="Prywatny kanał [b]%s[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.\n[i]Ta wiadomość może zostać usunięta.[/i]"
+                   invalidnumbername="Nie zmieniaj numeru kanału!" />
+
+    <messages>
+        <create success="Twój nowy kanał ma numer [b]$NUMBER$[/b]. Pamiętaj, aby nie zmieniać numeru kanału. Jeżeli zauważysz, że wolny jest kanał o niższym numerze, możesz zmienić nazwę swojego kanału na [b]MOVE[/b] i kanał zostanie przeniesiony wyżej."
+                fail="Wystąpił błąd podczas tworzenia twojego nowego kanału! Proszę skontaktuj się z administracją w celu jego rozwiązania. Przepraszamy za utrudnienia."/>
+        <delete success="Kanał o numerze [b]$NUMBER$[/b] został usunięty."
+                fail="Nie można było usnąć kanału o numerze [b]$NUMBER[/b]. Możliwe, że jest to wolny kanał, bądź kanał o podanym numerze nie istnieje."/>
+    </messages>
+
+    <freechannel name="WOLNY"
+                 topic="WOLNY"
+                 description="Wolny kanał o numerze [b]$NUMBER$[/b].\n\nJeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny. Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.\n\nJeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]WOLNY $NUMBER$[/b]" />
 
     <channelgroups>
-        <owner id="96" />
+        <owner id="96"/>
     </channelgroups>
 </pcm>
