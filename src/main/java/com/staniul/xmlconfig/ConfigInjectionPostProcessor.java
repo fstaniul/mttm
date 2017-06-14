@@ -14,7 +14,7 @@ public class ConfigInjectionPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
         Class<?> oClass = o.getClass();
-        if (oClass.isAnnotationPresent(ConfigFile.class)) {
+        if (oClass.isAnnotationPresent(UseConfig.class)) {
             try {
                 CustomXMLConfiguration configuration = ConfigurationLoader.load(oClass);
                 Set<Field> fields = ReflectionUtil.getFieldsAnnotatedWith(oClass, WireConfig.class);

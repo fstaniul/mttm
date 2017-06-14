@@ -1,7 +1,6 @@
 package com.staniul.teamspeak.commands;
 
-import com.staniul.xmlconfig.ConfigurationLoader;
-import com.staniul.xmlconfig.ConfigFile;
+import com.staniul.xmlconfig.UseConfig;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-@ConfigFile("cmdmsg.xml")
+@UseConfig("cmdmsg.xml")
 public class CommandMessengerAspect {
     private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
 

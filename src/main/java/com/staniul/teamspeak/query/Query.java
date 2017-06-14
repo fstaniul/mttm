@@ -1,7 +1,7 @@
 package com.staniul.teamspeak.query;
 
 import com.staniul.teamspeak.query.channel.ChannelProperties;
-import com.staniul.xmlconfig.ConfigFile;
+import com.staniul.xmlconfig.UseConfig;
 import com.staniul.util.StringUtil;
 import com.staniul.xmlconfig.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
-@ConfigFile("query.xml")
+@UseConfig("query.xml")
 public class Query {
     /**
      * Apache Log4j logger to log errors and activities.

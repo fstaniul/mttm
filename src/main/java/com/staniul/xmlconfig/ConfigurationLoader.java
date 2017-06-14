@@ -8,7 +8,7 @@ public class ConfigurationLoader {
     private static final Configurations configurations = new Configurations();
 
     /**
-     * Loads configuration for a class. Class needs to be annotated with {@link ConfigFile} annotation pointing to a
+     * Loads configuration for a class. Class needs to be annotated with {@link UseConfig} annotation pointing to a
      * file in resources/config directory.
      *
      * @param aClass Class for which we load config.
@@ -19,10 +19,10 @@ public class ConfigurationLoader {
      *                                extension is not xml or any other IO exception occurs)
      */
     public static CustomXMLConfiguration load(Class<?> aClass) throws ConfigurationException {
-        if (!aClass.isAnnotationPresent(ConfigFile.class))
-            throw new IllegalArgumentException(String.format("A class %s is not annotated with %s", aClass, ConfigFile.class));
+        if (!aClass.isAnnotationPresent(UseConfig.class))
+            throw new IllegalArgumentException(String.format("A class %s is not annotated with %s", aClass, UseConfig.class));
 
-        String configFile = aClass.getAnnotation(ConfigFile.class).value();
+        String configFile = aClass.getAnnotation(UseConfig.class).value();
 
         XMLConfiguration xmlConfig = configurations.xml(ConfigurationLoader.class.getClassLoader().getResource("config/" + configFile));
 

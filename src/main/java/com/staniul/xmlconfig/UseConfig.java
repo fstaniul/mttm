@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ConfigFile {
+public @interface UseConfig {
     /**
      * Name of file in resources/config folder.
      * @return Name of file.

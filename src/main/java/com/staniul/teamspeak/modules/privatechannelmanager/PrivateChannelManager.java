@@ -10,8 +10,7 @@ import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
 import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.util.SerializeUtil;
-import com.staniul.xmlconfig.ConfigFile;
-import com.staniul.xmlconfig.ConfigurationLoader;
+import com.staniul.xmlconfig.UseConfig;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.WireConfig;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -31,7 +30,7 @@ import java.util.stream.Collectors;
  * Teamspeak 3 module responsible for managing teamspeak 3 private channels.
  */
 @Component
-@ConfigFile("modules/pcm.xml")
+@UseConfig("modules/pcm.xml")
 public class PrivateChannelManager {
     private static Logger log = Logger.getLogger(PrivateChannelManager.class);
 
