@@ -256,6 +256,34 @@ public class Query {
     }
 
     /**
+     * Adds client to servergroup.
+     *
+     * @param clientDatabaseId Client database id.
+     * @param servergroupId    Servergroup id.
+     *
+     * @throws QueryException When query fails to add client to a servergroup.
+     */
+    public void servergroupAddClient(int clientDatabaseId, int servergroupId) throws QueryException {
+        String request = String.format("servergroupaddclient cldbid=%d sgid=%d", clientDatabaseId, servergroupId);
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException(String.format("Failed to add client (%d) to servergroup (%d)", clientDatabaseId, servergroupId), response);
+    }
+
+    /**
+     * Removes client from servergroup.
+     *
+     * @param clientDatabaseId Client database id.
+     * @param servergroupId    Servergroup id.
+     *
+     * @throws QueryException When query fails to remove client from servergroup.
+     */
+    public void servergroupDeleteClient(int clientDatabaseId, int servergroupId) throws QueryException {
+        String request = String.format("servergroupdelclient cldbid=%d sgid=%d", clientDatabaseId, servergroupId);
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException(String.format("Failed to remove client (%d) from servergroup (%d)", clientDatabaseId, servergroupId), response);
+    }
+
+    /**
      * Moves client to channel with given id.
      *
      * @param clientId  Id of client.

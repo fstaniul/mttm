@@ -112,4 +112,20 @@ public class CustomXMLConfiguration extends XMLConfiguration {
 
         return true;
     }
+
+    public Set<Integer> getIntSet (String key) {
+        try {
+            return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
+        } catch (Exception e) {
+            return new HashSet<>();
+        }
+    }
+
+    public Set<Integer> getIntSet (String key, Set<Integer> defaultValues) {
+        try {
+            return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
+        } catch (Exception e) {
+            return defaultValues;
+        }
+    }
 }

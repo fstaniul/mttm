@@ -15,7 +15,6 @@ import java.util.Set;
 public class ServergroupPresets {
     private Set<Group> administrators;
     private Set<Group> headAdministrators;
-    private Set<Group> ignored;
     private Set<Group> registered;
     private Set<Group> guest;
 
@@ -26,7 +25,6 @@ public class ServergroupPresets {
     private void initGroups() {
         administrators = SetUtil.form(config.getClasses(Group.class, "administrators"));
         headAdministrators = SetUtil.form(config.getClasses(Group.class, "headAdministrators"));
-        ignored = SetUtil.form(config.getClasses(Group.class, "ignored"));
         registered = SetUtil.form(config.getClasses(Group.class, "registered"));
         guest = SetUtil.form(config.getClasses(Group.class, "guest"));
     }
@@ -37,10 +35,6 @@ public class ServergroupPresets {
 
     public Set<Group> getHeadAdministrators() {
         return Collections.unmodifiableSet(headAdministrators);
-    }
-
-    public Set<Group> getIgnored() {
-        return Collections.unmodifiableSet(ignored);
     }
 
     public Set<Group> getRegistered() {

@@ -108,6 +108,10 @@ public class Client {
         return SetUtil.countIntersection(servergroups, groups) > 0L;
     }
 
+    public boolean isOnlyInServergroup (int group) {
+        return servergroups.size() == 1 && servergroups.contains(group);
+    }
+
     public Set<Integer> getServergroups() {
         return servergroups;
     }

@@ -1,4 +1,4 @@
-package com.staniul.modules.privatechannelmanager;
+package com.staniul.modules.channelsmanagers;
 
 import org.junit.Test;
 
