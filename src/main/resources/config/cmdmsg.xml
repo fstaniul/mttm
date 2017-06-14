@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<commandmessages>
+<commandmessenger>
     <execution_terminated>Wystąpił błąd podczas wykonywania komendy!</execution_terminated>
     <not_found>Nie znalazłam tej komendy!</not_found>
     <access_denied>Nie masz dostępu do tej komendy!</access_denied>
     <invalid_parameters>Podałeś/aś nieprawidłowe parametry!</invalid_parameters>
-</commandmessages>
+</commandmessenger>

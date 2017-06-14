@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-@ConfigFile("commandmessages.xml")
+@ConfigFile("cmdmsg.xml")
 public class CommandMessengerAspect {
     private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
 
