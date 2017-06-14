@@ -216,7 +216,7 @@ public class PrivateChannelManager {
                 .setName(name)
                 .setCodec(4)
                 .setCodecQuality(10)
-                .setDescription(String.format(config.getString("clientchannel[@description]"), client.getNickname()))
+                .setDescription(config.getString("clientchannel[@description]").replace("$NICKNAME$", client.getNickname()))
                 .setParent(config.getInt("parentchannel[@id]"))
                 .setFlag(ChannelFlagConstants.MAXCLIENTS_UNLIMITED | ChannelFlagConstants.MAXFAMILYCLIENTS_UNLIMITED);
     }
