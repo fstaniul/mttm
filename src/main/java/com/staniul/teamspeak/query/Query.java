@@ -1,17 +1,22 @@
-package com.staniul.query;
+package com.staniul.teamspeak.query;
 
-import com.staniul.query.channel.ChannelProperties;
+import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.xmlconfig.ConfigFile;
 import com.staniul.util.StringUtil;
+import com.staniul.xmlconfig.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Component
 @ConfigFile("query.xml")
 public class Query {
     /**
@@ -27,6 +32,7 @@ public class Query {
     /**
      * Configuration of this class. Contains information about teamspeak 3 connection.
      */
+    @WireConfig
     private Configuration configuration;
 
     /**
@@ -44,11 +50,8 @@ public class Query {
     /**
      * Used to create a new query object. Should be only created by spring, since we only use one connection with
      * teamspeak 3 server.
-     *
-     * @param configuration A {@link Configuration} containing connection information for teamspeak 3 server.
      */
-    public Query(Configuration configuration) {
-        this.configuration = configuration;
+    public Query() {
         this.jts3ServerQuery = new JTS3ServerQuery("Query");
         connected = false;
     }
@@ -58,6 +61,7 @@ public class Query {
      *
      * @throws Exception If jts3serverquery fails to establish connection with teamspeak 3 server.
      */
+    @PostConstruct
     public void connect() throws Exception {
         internalConnect();
         connectionKeeper = new Thread(new ConnectionKeeper(), "Query Connection Keeper");
@@ -80,10 +84,11 @@ public class Query {
      * Disconnects from teamspeak 3 server.
      * Kills connection keeper.
      */
+    @PreDestroy
     public void disconnect() {
         connected = false;
-        jts3ServerQuery.closeTS3Connection();
         connectionKeeper.interrupt();
+        jts3ServerQuery.closeTS3Connection();
     }
 
     /**
@@ -92,7 +97,7 @@ public class Query {
      * @return {@code Client} object containing information about client with given id.
      *
      * @throws QueryException If server query request returns with error, client does not exists or probably when
-     *                        query've been disconnected from teamspeak 3 server.
+     *                        query's been disconnected from teamspeak 3 server.
      */
     public Client getClientInfo(int clientId) throws QueryException {
         try {
@@ -425,6 +430,18 @@ public class Query {
         } catch (TS3ServerQueryException e) {
             throwQueryException(String.format("Failed to delete channel (%d).", id), e);
         }
+    }
+
+    /**
+     * Moves channel with given id to position after channel with given id.
+     *
+     * @param channelId      Id of channel to move.
+     * @param afterChannelId Id of channel to place channel after it.
+     */
+    public void channelMove(int channelId, int afterChannelId) throws QueryException {
+        String request = String.format("channeledit cid=%d channel_order=%d", channelId, afterChannelId);
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException(String.format("Failed to move channel (%d) after channel (%d)", channelId, afterChannelId), response);
     }
 
     /**

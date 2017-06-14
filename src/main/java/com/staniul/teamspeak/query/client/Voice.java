@@ -1,4 +1,4 @@
-package com.staniul.query.client;
+package com.staniul.teamspeak.query.client;
 
 public class Voice {
     private boolean connected;

@@ -1,4 +1,4 @@
-package com.staniul.query.channel;
+package com.staniul.teamspeak.query.channel;
 
 import java.util.Map;
 
@@ -68,10 +68,10 @@ public interface ChannelFlagConstants {
 
     /**
      * <p>Reads flags from map containing channel information. This method should be used only by {@link
-     * com.staniul.query.Query Query} and {@link com.staniul.query.Channel} classes to parse teamspeak 3 server query
+     * com.staniul.teamspeak.query.Query Query} and {@link com.staniul.teamspeak.query.Channel} classes to parse teamspeak 3 server query
      * information.</p>
      * <p>If you want to get channel flags and/or information go see {@link
-     * com.staniul.query.Query#getChannelInfo(int)}</p>
+     * com.staniul.teamspeak.query.Query#getChannelInfo(int)}</p>
      *
      * @param channelInfo Information about channel read from teamspeak 3 query contained in map.
      *

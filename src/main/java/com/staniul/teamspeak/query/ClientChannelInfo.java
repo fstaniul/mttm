@@ -1,6 +1,5 @@
-package com.staniul.query;
+package com.staniul.teamspeak.query;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ClientChannelInfo {

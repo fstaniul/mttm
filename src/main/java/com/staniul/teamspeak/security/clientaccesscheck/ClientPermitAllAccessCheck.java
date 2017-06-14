@@ -1,8 +1,6 @@
 package com.staniul.teamspeak.security.clientaccesscheck;
 
-import com.staniul.query.Client;
-
-import java.util.Set;
+import com.staniul.teamspeak.query.Client;
 
 /**
  * Subclass of ClientGroupAccessCheck that permits all clients.

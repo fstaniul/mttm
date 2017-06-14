@@ -1,4 +1,4 @@
-package com.staniul.query;
+package com.staniul.teamspeak.query;
 
 import java.util.Map;
 

@@ -1,8 +1,6 @@
 package com.staniul.teamspeak.commands;
 
-import com.staniul.query.Client;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccessCheck;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientServergroupAccessCheck;
+import com.staniul.teamspeak.query.Client;
 
 import java.lang.annotation.*;
 

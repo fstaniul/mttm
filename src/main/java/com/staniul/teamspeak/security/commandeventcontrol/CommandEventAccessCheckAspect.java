@@ -1,6 +1,6 @@
 package com.staniul.teamspeak.security.commandeventcontrol;
 
-import com.staniul.query.Client;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.commands.CommandExecutionStatus;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
@@ -39,13 +39,13 @@ public class CommandEventAccessCheckAspect {
         this.environment = environment;
     }
 
-    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client, ..)) && " +
+    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client, ..)) && " +
             "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
             "args(client, ..)", argNames = "client")
     public void invokeCommand(Client client) {
     }
 
-    @Pointcut("execution(* * (com.staniul.query.Client)) && " +
+    @Pointcut("execution(* * (com.staniul.teamspeak.query.Client)) && " +
             "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && " +
             "args(client)")
     public void joinEvent (Client client) {

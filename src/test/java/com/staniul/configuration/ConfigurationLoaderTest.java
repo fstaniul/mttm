@@ -1,7 +1,7 @@
 package com.staniul.configuration;
 
 import com.staniul.xmlconfig.ConfigurationLoader;
-import com.staniul.query.Query;
+import com.staniul.teamspeak.query.Query;
 import org.apache.commons.configuration2.Configuration;
 import org.junit.Test;
 

@@ -13,5 +13,5 @@ public @interface ConfigFile {
      * Name of file in resources/config folder.
      * @return Name of file.
      */
-    public String value() default "";
+    String value();
 }

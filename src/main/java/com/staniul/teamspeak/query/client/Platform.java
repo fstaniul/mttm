@@ -1,4 +1,4 @@
-package com.staniul.query.client;
+package com.staniul.teamspeak.query.client;
 
 public enum Platform {
     Windows, OSX, Android, Unknown;

@@ -1,6 +1,6 @@
 package com.staniul.teamspeak;
 
-import com.staniul.query.Client;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.commands.CommandExecutionStatus;
 import com.staniul.teamspeak.commands.CommandMessengerAspect;
 import com.staniul.teamspeak.commands.CommandResponse;

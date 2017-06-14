@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <groups>
     <administrators>
-        <group id="" rank="" />
-        <group id="" rank="" />
+
     </administrators>
     <headAdministrators>
         <group id="12" rank="1" />
         <group id="100" rank="2" />
     </headAdministrators>
     <registered>
-        <group id="" rank="" />
+
     </registered>
+    <ignored>
+
+    </ignored>
+
+    <guest>
+
+    </guest>
 </groups>

@@ -1,14 +1,11 @@
 package com.staniul.teamspeak.security.clientaccesscheck;
 
-import com.staniul.query.Client;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.security.AccessCheck;
-import com.staniul.util.SetUtil;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

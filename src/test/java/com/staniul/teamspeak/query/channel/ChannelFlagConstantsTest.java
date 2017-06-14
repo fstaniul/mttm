@@ -1,11 +1,11 @@
-package com.staniul.query.channel;
+package com.staniul.teamspeak.query.channel;
 
 import org.junit.Test;
 
 import java.util.HashMap;
 
 import static org.junit.Assert.*;
-import static com.staniul.query.channel.ChannelFlagConstants.*;
+import static com.staniul.teamspeak.query.channel.ChannelFlagConstants.*;
 
 public class ChannelFlagConstantsTest {
     @Test

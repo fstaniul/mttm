@@ -1,6 +1,6 @@
-package com.staniul.query;
+package com.staniul.teamspeak.query;
 
-import com.staniul.query.channel.ChannelFlagConstants;
+import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
 
 import java.util.Map;
 

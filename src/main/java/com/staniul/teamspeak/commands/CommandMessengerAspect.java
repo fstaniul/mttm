@@ -2,9 +2,10 @@ package com.staniul.teamspeak.commands;
 
 import com.staniul.xmlconfig.ConfigurationLoader;
 import com.staniul.xmlconfig.ConfigFile;
-import com.staniul.query.Client;
-import com.staniul.query.Query;
-import com.staniul.query.QueryException;
+import com.staniul.teamspeak.query.Client;
+import com.staniul.teamspeak.query.Query;
+import com.staniul.teamspeak.query.QueryException;
+import com.staniul.xmlconfig.WireConfig;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -21,16 +22,16 @@ import org.springframework.stereotype.Component;
 public class CommandMessengerAspect {
     private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
 
+    @WireConfig
     private XMLConfiguration config;
     private Query query;
 
     @Autowired
     public CommandMessengerAspect(Query query) throws ConfigurationException {
-        config = ConfigurationLoader.load(CommandMessengerAspect.class);
         this.query = query;
     }
 
-    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.query.Client,..)) && " +
+    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client,..)) && " +
             "args(client,..)", argNames = "client")
     public void commandExecution (Client client) {
 

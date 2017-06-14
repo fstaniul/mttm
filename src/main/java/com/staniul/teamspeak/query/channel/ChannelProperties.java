@@ -1,4 +1,4 @@
-package com.staniul.query.channel;
+package com.staniul.teamspeak.query.channel;
 
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 
@@ -35,7 +35,7 @@ public class ChannelProperties implements ChannelFlagConstants {
     }
 
     public String getName() {
-        return name;
+        return name.length() > 40 ? name.substring(0, 40) : name;
     }
 
     public ChannelProperties setName(String name) {
@@ -127,7 +127,7 @@ public class ChannelProperties implements ChannelFlagConstants {
     public String toTeamspeak3QueryString () {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("channel_name=").append(JTS3ServerQuery.encodeTS3String(name)).append(" ");
+        sb.append("channel_name=").append(JTS3ServerQuery.encodeTS3String(getName())).append(" ");
         if (!"".equals(description))
             sb.append("channel_description=").append(JTS3ServerQuery.encodeTS3String(description)).append(" ");
         if (!"".equals(topic)) sb.append("channel_topic=").append(JTS3ServerQuery.encodeTS3String(topic)).append(" ");

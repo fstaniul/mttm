@@ -1,14 +1,17 @@
 package com.staniul.configuration;
 
+import com.staniul.xmlconfig.ConfigInjectionPostProcessor;
 import com.staniul.xmlconfig.ConfigurationLoader;
-import com.staniul.query.Query;
+import com.staniul.teamspeak.query.Query;
 
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.reflections.Reflections;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.springframework.context.annotation.*;
 
 /**
  * Configuration class for Spring
@@ -16,17 +19,14 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @EnableAspectJAutoProxy
 @Configuration
 @ComponentScan("com.staniul")
+@Import(ConfigInjectionPostProcessor.class)
 public class MTTMSpringConfiguration {
     @Bean
-    public Reflections reflections () {
-        return new Reflections("com.staniul");
-    }
-
-    @Bean
-    public Query query () throws Exception {
-        XMLConfiguration queryConfiguration = ConfigurationLoader.load(Query.class);
-        Query query = new Query(queryConfiguration);
- //       query.connect();
-        return query;
+    public Reflections reflections() {
+        return new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage("com.staniul"))
+                .setScanners(new SubTypesScanner(),
+                        new MethodAnnotationsScanner(),
+                        new TypeAnnotationsScanner()));
     }
 }

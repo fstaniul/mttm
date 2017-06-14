@@ -1,4 +1,4 @@
-package com.staniul.query;
+package com.staniul.teamspeak.query;
 
 /**
  * Exception thrown by Query methods when they finish with error.

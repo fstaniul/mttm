@@ -23,7 +23,7 @@ public class TaskController implements ApplicationContextAware {
     @Autowired
     public TaskController (Reflections reflections) {
         this.reflections = reflections;
-        timer = new Timer("TaskController's Timer");
+        timer = new Timer("Task's Timer");
     }
 
     @PostConstruct

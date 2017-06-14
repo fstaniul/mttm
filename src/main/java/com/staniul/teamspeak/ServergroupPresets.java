@@ -1,12 +1,12 @@
 package com.staniul.teamspeak;
 
 import com.staniul.util.SetUtil;
-import com.staniul.xmlconfig.ConfigurationLoader;
 import com.staniul.xmlconfig.ConfigFile;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import com.staniul.xmlconfig.WireConfig;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.Set;
 
@@ -19,12 +19,11 @@ public class ServergroupPresets {
     private Set<Group> registered;
     private Set<Group> guest;
 
-    public ServergroupPresets () throws ConfigurationException {
-        CustomXMLConfiguration config = ConfigurationLoader.load(ServergroupPresets.class);
-        initGroups(config);
-    }
+    @WireConfig
+    private CustomXMLConfiguration config;
 
-    private void initGroups(CustomXMLConfiguration config) {
+    @PostConstruct
+    private void initGroups() {
         administrators = SetUtil.form(config.getClasses(Group.class, "administrators"));
         headAdministrators = SetUtil.form(config.getClasses(Group.class, "headAdministrators"));
         ignored = SetUtil.form(config.getClasses(Group.class, "ignored"));
