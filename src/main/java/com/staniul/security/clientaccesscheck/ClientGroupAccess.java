@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.security.clientaccesscheck;
+package com.staniul.security.clientaccesscheck;
 
 import java.lang.annotation.*;
 

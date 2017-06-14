@@ -1,4 +1,4 @@
-package com.staniul.validation;
+package com.staniul.util.validation;
 
 /**
  * Validator of type. Functional interface that defines validation

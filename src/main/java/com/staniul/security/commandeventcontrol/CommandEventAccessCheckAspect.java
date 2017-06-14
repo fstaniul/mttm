@@ -1,11 +1,11 @@
-package com.staniul.teamspeak.security.commandeventcontrol;
+package com.staniul.security.commandeventcontrol;
 
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.commands.CommandExecutionStatus;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccessCheck;
+import com.staniul.security.clientaccesscheck.ClientGroupAccess;
+import com.staniul.security.clientaccesscheck.ClientGroupAccessCheck;
 import com.staniul.util.AroundAspectUtil;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;

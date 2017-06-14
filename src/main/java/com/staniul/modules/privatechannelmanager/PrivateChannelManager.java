@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.modules.privatechannelmanager;
+package com.staniul.modules.privatechannelmanager;
 
 import com.staniul.teamspeak.commands.validators.TwoIntegerParamsValidator;
 import com.staniul.teamspeak.query.*;
@@ -9,7 +9,7 @@ import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
 import com.staniul.teamspeak.commands.validators.ValidateParams;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
+import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.util.SerializeUtil;
 import com.staniul.xmlconfig.UseConfig;
 import com.staniul.xmlconfig.CustomXMLConfiguration;

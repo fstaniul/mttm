@@ -1,4 +1,4 @@
-package com.staniul.configuration;
+package com.staniul;
 
 import com.staniul.xmlconfig.ConfigInjectionPostProcessor;
 import com.staniul.xmlconfig.ConfigurationLoader;

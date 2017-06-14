@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.modules.publicchannelcreator;
+package com.staniul.modules.publicchannelcreator;
 
 import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.query.Channel;

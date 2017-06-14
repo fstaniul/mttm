@@ -1,7 +1,7 @@
-package com.staniul.teamspeak.security.clientaccesscheck;
+package com.staniul.security.clientaccesscheck;
 
 import com.staniul.teamspeak.query.Client;
-import com.staniul.teamspeak.security.AccessCheck;
+import com.staniul.security.AccessCheck;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;

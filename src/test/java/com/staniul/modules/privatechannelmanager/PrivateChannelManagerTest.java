@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.modules.privatechannelmanager;
+package com.staniul.modules.privatechannelmanager;
 
 import org.junit.Test;
 

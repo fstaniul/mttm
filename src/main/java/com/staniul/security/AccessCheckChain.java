@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.security;
+package com.staniul.security;
 
 import java.util.Arrays;
 import java.util.List;

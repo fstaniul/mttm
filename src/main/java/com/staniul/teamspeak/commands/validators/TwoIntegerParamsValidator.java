@@ -1,6 +1,6 @@
 package com.staniul.teamspeak.commands.validators;
 
-import com.staniul.validation.Validator;
+import com.staniul.util.validation.Validator;
 
 public class TwoIntegerParamsValidator implements Validator<String> {
     @Override

@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.security;
+package com.staniul.security;
 
 /**
  * Access check that allways gives access.
