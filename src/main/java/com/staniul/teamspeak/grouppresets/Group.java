@@ -1,4 +1,4 @@
-package com.staniul.teamspeak;
+package com.staniul.teamspeak.grouppresets;
 
 public class Group implements Comparable<Group> {
     private int id;

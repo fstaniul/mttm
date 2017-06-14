@@ -1,6 +1,6 @@
 package com.staniul;
 
-import com.staniul.teamspeak.ServergroupPresets;
+import com.staniul.teamspeak.grouppresets.ServergroupPresets;
 import com.staniul.teamspeak.query.Client;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.staniul.teamspeak;
+package com.staniul.teamspeak.grouppresets;
 
 import com.staniul.util.SetUtil;
 import com.staniul.xmlconfig.UseConfig;
