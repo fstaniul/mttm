@@ -50,7 +50,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
     }
 
     private <T> List<T> internalCustomGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter, CustomConfigLoad customConfigLoad) {
-        String template = prefix + "." + ( customConfigLoad.value().equals("") ? tClass.getSimpleName().toLowerCase() : customConfigLoad.value() ) + "[@%s]";
+        String template = ("".equals(prefix) ? "" : (prefix + ".")) + ( customConfigLoad.value().equals("") ? tClass.getSimpleName().toLowerCase() : customConfigLoad.value() ) + "[@%s]";
         Set<Field> fields = ReflectionUtil.getFieldsAnnotatedWith(tClass, ConfigEntry.class);
         List<FieldDataContainer> data = fields.stream().map(f -> new FieldDataContainer(f, f.getAnnotation(ConfigEntry.class).value())).collect(Collectors.toList());
         if(readData(data, template, typeConverter))
@@ -60,7 +60,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
     }
 
     private <T> List<T> internalGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
-        String template = prefix + "." + tClass.getSimpleName().toLowerCase() + "[@%s]";
+        String template = ("".equals(prefix) ? "" : (prefix + ".")) + tClass.getSimpleName().toLowerCase() + "[@%s]";
         Set<Field> fields = ReflectionUtil.getFields(tClass);
         List<FieldDataContainer> data = fields.stream().map(FieldDataContainer::new).collect(Collectors.toList());
         if (readData(data, template, typeConverter))

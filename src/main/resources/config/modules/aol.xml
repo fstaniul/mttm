@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<adminonlinelist>
+    <groups>
+        <servergroup id="647" rank="1" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
+        <servergroup id="787" rank="2" icon="http://ts.electronicsports.pl/teamspeak/icon_aotw.png"/>
+        <servergroup id="6" rank="3" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
+        <servergroup id="679" rank="4" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
+    </groups>
+
+    <displaychannel id="9097"/>
+</adminonlinelist>

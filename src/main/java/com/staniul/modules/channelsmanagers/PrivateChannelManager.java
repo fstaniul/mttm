@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -49,17 +50,20 @@ public class PrivateChannelManager {
         this.query = query;
     }
 
-    @PostConstruct
+//    @PostConstruct
     private void loadChannels() {
-        try {
-            channels = SerializeUtil.deserialize(fileName);
-        } catch (IOException | ClassNotFoundException e) {
-            log.error("Failed to read object from file!", e);
-            createChannelsFromTeamspeak3Server();
-        }
+        File file = new File(fileName);
+        if (file.exists() && file.isFile()) {
+            try {
+                channels = SerializeUtil.deserialize(fileName);
+            } catch (IOException | ClassNotFoundException e) {
+                log.error("Failed to read object from file!", e);
+                createChannelsFromTeamspeak3Server();
+            }
+        } else createChannelsFromTeamspeak3Server();
     }
 
-    @PreDestroy
+//    @PreDestroy
     private void saveChannels() {
         try {
             SerializeUtil.serialize(fileName, channels);
@@ -95,7 +99,7 @@ public class PrivateChannelManager {
     }
 
     @Teamspeak3Command("!chdel")
-    @ClientGroupAccess(value = "administrators")
+    @ClientGroupAccess(value = "servergroups.admins")
     @ValidateParams(IntegerParamsValidator.class)
     public CommandResponse deleteChannelCommand(Client client, String params) throws QueryException {
         int channelNumber = Integer.parseInt(params);
@@ -336,7 +340,7 @@ public class PrivateChannelManager {
     }
 
     @Teamspeak3Command("!chso")
-    @ClientGroupAccess("administrators")
+    @ClientGroupAccess("servergroups.admins")
     @ValidateParams(TwoIntegerParamsValidator.class)
     public CommandResponse changeChannelOwnerCommand(Client client, String params) throws QueryException {
         String[] splParams = params.split("\\s+");

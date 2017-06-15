@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Aspect
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(0)
 public class CommandEventAccessCheckAspect {
     private static Logger log = Logger.getLogger(CommandEventAccessCheckAspect.class);
 
@@ -40,13 +40,13 @@ public class CommandEventAccessCheckAspect {
     }
 
     @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client, ..)) && " +
-            "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
-            "args(client, ..)", argNames = "client")
+            "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && @annotation(com.staniul.security.clientaccesscheck.ClientGroupAccess) && " +
+            "args(client, ..)")
     public void invokeCommand(Client client) {
     }
 
-    @Pointcut("execution(* * (com.staniul.teamspeak.query.Client)) && " +
-            "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && " +
+    @Pointcut("execution(public void * (com.staniul.teamspeak.query.Client)) && " +
+            "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && @annotation(com.staniul.security.clientaccesscheck.ClientGroupAccess) && " +
             "args(client)")
     public void joinEvent (Client client) {
     }

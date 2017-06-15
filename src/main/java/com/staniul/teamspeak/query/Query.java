@@ -1,5 +1,6 @@
 package com.staniul.teamspeak.query;
 
+import com.staniul.teamspeak.TeamspeakCoreController;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.xmlconfig.UseConfig;
 import com.staniul.util.StringUtil;
@@ -8,6 +9,7 @@ import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -51,9 +53,15 @@ public class Query {
      * Used to create a new query object. Should be only created by spring, since we only use one connection with
      * teamspeak 3 server.
      */
+    @Autowired
     public Query() {
         this.jts3ServerQuery = new JTS3ServerQuery("Query");
         connected = false;
+    }
+
+    @Autowired
+    public void setTeamspeakActionListener (TeamspeakCoreController coreController) {
+        this.jts3ServerQuery.setTeamspeakActionListener(new TeamspeakActionListenerImpl(this, coreController));
     }
 
     /**
@@ -485,6 +493,20 @@ public class Query {
         String request = String.format("channeledit cid=%d channel_name=%s", channelId, JTS3ServerQuery.encodeTS3String(newName));
         Map<String, String> response = jts3ServerQuery.doCommand(request);
         checkAndThrowQueryException("Failed to rename channel!", response);
+    }
+
+    /**
+     * Changes channel description.
+     *
+     * @param description Channel description.
+     * @param channelId   If of teamspeak 3 channel.
+     *
+     * @throws QueryException When query fails to edit channel's description.
+     */
+    public void channelChangeDescription(String description, int channelId) throws QueryException {
+        String request = String.format("channeledit cid=%d channel_description=%s", channelId, JTS3ServerQuery.encodeTS3String(description));
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException("Failed to change channel description!", response);
     }
 
     /**

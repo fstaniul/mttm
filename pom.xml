@@ -86,6 +86,13 @@
             <artifactId>joda-time</artifactId>
             <version>2.9.9</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>5.2</version>
+        </dependency>
     </dependencies>
 
     <build>

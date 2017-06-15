@@ -1,4 +1,4 @@
-package com.staniul.modules.registerer;
+package com.staniul.modules.registerers;
 
 import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.grouppresets.ServergroupPresets;

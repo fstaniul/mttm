@@ -15,9 +15,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -25,7 +26,7 @@ import java.util.*;
  * Controller of teamspeak 3 behaviour, that is events and commands.
  */
 @Component
-public class TeamspeakCoreController implements ApplicationContextAware {
+public class TeamspeakCoreController implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
@@ -47,7 +48,6 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     /**
      * Finds methods that are events, commands and tasks.
      */
-    @PostConstruct
     private void init() {
         findCommands();
         findEvents();
@@ -139,5 +139,15 @@ public class TeamspeakCoreController implements ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private boolean initialized = false;
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (initialized) return;
+
+        initialized = false;
+        init();
     }
 }

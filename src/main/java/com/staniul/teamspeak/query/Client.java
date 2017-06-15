@@ -38,6 +38,29 @@ public class Client {
     private Voice microphone;
     private Voice headphones;
 
+    public Client (Client client) {
+        id = client.getId();
+        databaseId = client.getDatabaseId();
+        uniqueId = client.getUniqueId();
+        hash64UniqueId = client.getHash64UniqueId();
+        currentChannelId = client.getCurrentChannelId();
+
+        nickname = client.getNickname();
+        ip = client.getIp();
+
+        servergroups = client.getServergroups();
+        channelgroup = client.getChannelgroup();
+
+        query = client.isQuery();
+        commander = client.isCommander();
+        away = client.isAway();
+
+        platform = client.getPlatform();
+
+        microphone = client.getMicrophone();
+        headphones = client.getHeadphones();
+    }
+
     public Client(int clientId, Map<String, String> info) {
         id = clientId;
         databaseId = Integer.parseInt(info.get("client_database_id"));

@@ -16,4 +16,9 @@ public class Voice {
     public boolean isMuted() {
         return muted;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Muted (%s), Connected (%s)", muted, connected);
+    }
 }

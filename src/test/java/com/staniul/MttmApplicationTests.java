@@ -1,5 +1,7 @@
 package com.staniul;
 
+import com.staniul.teamspeak.CoreCommands;
+import com.staniul.teamspeak.TeamspeakCoreController;
 import com.staniul.teamspeak.grouppresets.ServergroupPresets;
 import com.staniul.teamspeak.query.Client;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
@@ -20,8 +22,14 @@ public class MttmApplicationTests {
     @Autowired
     private ServergroupPresets presets;
 
+    @Autowired
+    private TeamspeakCoreController coreController;
+
+    @Autowired
+    private CoreCommands coreCommands;
+
     @Test
     public void textApplicationContextLoad () throws Exception {
-        System.out.println(presets.getHeadAdministrators());
+        coreController.callCommand("!stop", client, "");
     }
 }

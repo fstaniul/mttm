@@ -1,6 +1,6 @@
 package com.staniul.configuration;
 
-import com.staniul.modules.registerer.ClientRegisterer;
+import com.staniul.modules.registerers.ClientRegisterer;
 import com.staniul.xmlconfig.ConfigurationLoader;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.xmlconfig.CustomXMLConfiguration;

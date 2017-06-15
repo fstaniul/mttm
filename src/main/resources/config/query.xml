@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <query>
     <ip>localhost</ip>
-    <port></port>
-    <login></login>
-    <password></password>
-    <serverid></serverid>
+    <port>10011</port>
+    <login>serveradmin</login>
+    <password>ts20122012</password>
+    <serverid>1</serverid>
+    <name>Weronika</name>
 </query>
