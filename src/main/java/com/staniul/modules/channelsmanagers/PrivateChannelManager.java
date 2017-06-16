@@ -254,7 +254,7 @@ public class PrivateChannelManager {
         }
     }
 
-    @Task(delay = 300000)
+    @Task(delay = 5 * 60 * 1000)
     public void checkChannels() {
         synchronized (channelsLock) {
             boolean stillEmpty = true;
@@ -332,7 +332,7 @@ public class PrivateChannelManager {
     private void checkChannelName(PrivateChannel privateChannel, Channel channel) throws QueryException {
         String nameTemplate = String.format("\\[%03d\\].*", privateChannel.getNumber());
         if (!channel.getName().matches(nameTemplate)) {
-            String newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), config.getString("clientchannel[@invalidnumbername]"));
+            String newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), channel.getName().substring(6));
             query.channelRename(newChannelName, privateChannel.getId());
         }
     }
@@ -362,5 +362,48 @@ public class PrivateChannelManager {
                     .replace("$NUMBER$", Integer.toString(channel.getNumber()))
                     .replace("$CLDBID$", Integer.toString(channel.getOwner())));
         }
+    }
+
+    @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 0, second = 0)
+    public void moveChannelsUp () {
+        synchronized (channelsLock) {
+            for (int i = 0; i < channels.size(); i++) {
+                PrivateChannel channel = channels.get(i);
+                if (channel.isFree()) {
+                    PrivateChannel usedChannel = findNextUsedChannel(i+1);
+                    if (usedChannel == null) break;
+
+                    try {
+                        query.channelMove(usedChannel.getId(), channel.getId());
+                        query.channelDelete(channel.getId());
+
+                        Channel channelInfo = query.getChannelInfo(usedChannel.getId());
+                        String newName = String.format("[03%d] %s", channel.getNumber(), channelInfo.getName().substring(6));
+                        query.channelRename(newName, usedChannel.getId());
+
+                        channel.setId(usedChannel.getId());
+                        channel.setOwner(usedChannel.getOwner());
+
+                        channels.remove(usedChannel);
+
+                        for (int j = i + 1; j < channels.size(); j++)
+                            channels.get(j).setNumber(channels.get(j).getNumber() - 1);
+
+                    } catch (QueryException e) {
+                        log.error("Failed to perform free channel cleanup!", e);
+                    }
+                }
+            }
+        }
+    }
+
+    private PrivateChannel findNextUsedChannel (int index) {
+        for (int i = index; i < channels.size(); i++) {
+            PrivateChannel channel = channels.get(i);
+            if (!channel.isFree())
+                return channel;
+        }
+
+        return null;
     }
 }

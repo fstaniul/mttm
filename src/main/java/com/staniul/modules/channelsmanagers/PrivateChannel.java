@@ -42,4 +42,8 @@ public class PrivateChannel implements Serializable {
     public boolean isFree () {
         return owner == FREE_CHANNEL_OWNER;
     }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
 }
