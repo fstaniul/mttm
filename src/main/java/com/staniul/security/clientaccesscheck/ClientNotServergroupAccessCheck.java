@@ -1,7 +1,7 @@
 package com.staniul.security.clientaccesscheck;
 
 import com.staniul.teamspeak.query.Client;
-import com.staniul.util.SetUtil;
+import com.staniul.util.collections.SetUtil;
 
 import java.util.Set;
 

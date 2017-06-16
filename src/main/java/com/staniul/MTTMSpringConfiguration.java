@@ -1,10 +1,7 @@
 package com.staniul;
 
-import com.staniul.xmlconfig.ConfigInjectionPostProcessor;
-import com.staniul.xmlconfig.ConfigurationLoader;
-import com.staniul.teamspeak.query.Query;
+import com.staniul.xmlconfig.di.ConfigInjectionPostProcessor;
 
-import org.apache.commons.configuration2.XMLConfiguration;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;

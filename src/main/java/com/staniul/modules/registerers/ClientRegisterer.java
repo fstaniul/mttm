@@ -1,13 +1,12 @@
 package com.staniul.modules.registerers;
 
 import com.staniul.taskcontroller.Task;
-import com.staniul.teamspeak.grouppresets.ServergroupPresets;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
-import com.staniul.xmlconfig.UseConfig;
-import com.staniul.xmlconfig.WireConfig;
+import com.staniul.xmlconfig.annotations.UseConfig;
+import com.staniul.xmlconfig.annotations.WireConfig;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,12 +23,10 @@ public class ClientRegisterer {
     @WireConfig
     private CustomXMLConfiguration config;
     private Query query;
-    private ServergroupPresets groups;
 
     @Autowired
-    public ClientRegisterer (Query query, ServergroupPresets groups) {
+    public ClientRegisterer (Query query) {
         this.query = query;
-        this.groups = groups;
     }
 
     @Task(delay = 1800000)

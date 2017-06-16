@@ -2,9 +2,9 @@ package com.staniul.teamspeak.query;
 
 import com.staniul.teamspeak.TeamspeakCoreController;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
-import com.staniul.xmlconfig.UseConfig;
-import com.staniul.util.StringUtil;
-import com.staniul.xmlconfig.WireConfig;
+import com.staniul.xmlconfig.annotations.UseConfig;
+import com.staniul.util.lang.StringUtil;
+import com.staniul.xmlconfig.annotations.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import org.apache.commons.configuration2.Configuration;
@@ -12,8 +12,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -69,7 +67,7 @@ public class Query {
      *
      * @throws Exception If jts3serverquery fails to establish connection with teamspeak 3 server.
      */
-    @PostConstruct
+//    @PostConstruct TODO: TURN THAT ON BEFORE DEPLOY
     public void connect() throws Exception {
         internalConnect();
         connectionKeeper = new Thread(new ConnectionKeeper(), "Query Connection Keeper");
@@ -92,7 +90,7 @@ public class Query {
      * Disconnects from teamspeak 3 server.
      * Kills connection keeper.
      */
-    @PreDestroy
+//    @PreDestroy TODO: TURN THAT ON BEFORE DEPLOY
     public void disconnect() {
         connected = false;
         connectionKeeper.interrupt();

@@ -25,4 +25,9 @@ public class Servergroup {
     public String getIcon() {
         return icon;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d (%d): %s", id, rank, icon);
+    }
 }

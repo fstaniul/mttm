@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <registercounter>
+    <log folder="~/teamspeak3-electronicsports-amd64/logs" />
 
+    <register-groups>
+        <group id="641" />
+        <group id="789" />
+    </register-groups>
+
+    <registered-display id="10664" header="Zarejestrowani dnia $DATE$:" />
 </registercounter>

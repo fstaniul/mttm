@@ -1,4 +1,4 @@
-package com.staniul.util;
+package com.staniul.util.reflection;
 
 import org.apache.log4j.Logger;
 

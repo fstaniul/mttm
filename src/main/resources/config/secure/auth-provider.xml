@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<authentication-provider>
+    <groups ids="647" roles="HEADADMIN,ADMIN,USER,GUEST" />
+    <groups ids="787,679,6" roles="ADMIN,USER,GUEST" />
+    <groups ids="641,789" roles="USER,GUEST" />
+    <groups ids="8,773" roles="GUEST" />
+</authentication-provider>

@@ -1,7 +1,7 @@
 package com.staniul.teamspeak.commands;
 
 import com.staniul.teamspeak.commands.validators.ValidateParams;
-import com.staniul.util.AroundAspectUtil;
+import com.staniul.util.spring.AroundAspectUtil;
 import com.staniul.util.validation.Validator;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -1,7 +1,10 @@
 package com.staniul.xmlconfig;
 
-import com.staniul.util.ReflectionUtil;
-import com.staniul.util.StringToTypeConverterFactory;
+import com.staniul.util.reflection.ReflectionUtil;
+import com.staniul.xmlconfig.annotations.ConfigField;
+import com.staniul.xmlconfig.convert.NullTypeConverter;
+import com.staniul.xmlconfig.convert.StringToTypeConverter;
+import com.staniul.xmlconfig.convert.StringToTypeConverterFactory;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
@@ -21,98 +24,6 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         super(c);
     }
 
-    public <T> T getClass (Class<T> tClass) {
-        return getClass(tClass, "");
-    }
-
-    public <T> T getClass (Class<T> tClass, String prefix) {
-        return getClass(tClass, prefix, null);
-    }
-
-    public <T> T getClass (Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
-        return getClasses(tClass, prefix, typeConverter).get(0);
-    }
-
-    public <T> List<T> getClasses (Class<T> tClass) {
-        return getClasses(tClass, "");
-    }
-
-    public <T> List<T> getClasses (Class<T> tClass, String prefix) {
-        return getClasses(tClass, prefix, null);
-    }
-
-    public <T> List<T> getClasses (Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
-        if (tClass.isAnnotationPresent(CustomConfigLoad.class)) {
-            return internalCustomGetClass(tClass, prefix, typeConverter, tClass.getAnnotation(CustomConfigLoad.class));
-        }
-
-        return internalGetClass(tClass, prefix, typeConverter);
-    }
-
-    private <T> List<T> internalCustomGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter, CustomConfigLoad customConfigLoad) {
-        String template = ("".equals(prefix) ? "" : (prefix + ".")) + ( customConfigLoad.value().equals("") ? tClass.getSimpleName().toLowerCase() : customConfigLoad.value() ) + "[@%s]";
-        Set<Field> fields = ReflectionUtil.getFieldsAnnotatedWith(tClass, ConfigEntry.class);
-        List<FieldDataContainer> data = fields.stream().map(f -> new FieldDataContainer(f, f.getAnnotation(ConfigEntry.class).value())).collect(Collectors.toList());
-        if(readData(data, template, typeConverter))
-            return createObjects(tClass, data);
-
-        return null;
-    }
-
-    private <T> List<T> internalGetClass(Class<T> tClass, String prefix, StringToTypeConverterFactory typeConverter) {
-        String template = ("".equals(prefix) ? "" : (prefix + ".")) + tClass.getSimpleName().toLowerCase() + "[@%s]";
-        Set<Field> fields = ReflectionUtil.getFields(tClass);
-        List<FieldDataContainer> data = fields.stream().map(FieldDataContainer::new).collect(Collectors.toList());
-        if (readData(data, template, typeConverter))
-            return createObjects (tClass, data);
-
-        return null;
-    }
-
-    private <T> List<T> createObjects(Class<T> tClass, List<FieldDataContainer> data) {
-        Integer[] cc = {Integer.MAX_VALUE}; //Java cheat
-        data.forEach(d -> cc[0] = Math.min(cc[0], d.getValues().size()));
-        List<T> tList = new ArrayList<>(cc[0]);
-
-        for (int[] i = {0}; i[0] < cc[0]; i[0]++) {
-            T t = ReflectionUtil.createDefaultOrNull(tClass);
-            assert t != null;
-            data.forEach(d -> ReflectionUtil.setField(d.getField(), t, d.getValues().get(i[0])));
-            tList.add(t);
-        }
-
-        return tList;
-    }
-
-    private boolean readData (List<FieldDataContainer> dataContainers, String template, StringToTypeConverterFactory typeConverter) {
-        for (FieldDataContainer fdc : dataContainers) {
-            List<String> strData = Arrays.stream(getStringArray(String.format(template, fdc.getEntry()))).collect(Collectors.toList());
-            if (strData == null) return false;
-
-            Class<?> fieldTypeClass = fdc.getField().getType();
-
-            if (typeConverter != null && (fieldTypeClass.isPrimitive() || fieldTypeClass.equals(String.class))) {
-                fdc.setValues(strData.stream().map(s -> typeConverter.convert(fieldTypeClass, s)).collect(Collectors.toList()));
-            } else {
-                List<?> l;
-                if (fieldTypeClass.equals(Integer.TYPE) || fieldTypeClass.equals(Integer.class))
-                    l = strData.stream().map(Integer::parseInt).collect(Collectors.toList());
-                else if (fieldTypeClass.equals(Long.TYPE) || fieldTypeClass.equals(Long.class))
-                    l = strData.stream().map(Boolean::parseBoolean).collect(Collectors.toList());
-                else if (fieldTypeClass.equals(Double.TYPE) || fieldTypeClass.equals(Double.class))
-                    l = strData.stream().map(Double::parseDouble).collect(Collectors.toList());
-                else if (fieldTypeClass.equals(Float.TYPE) || fieldTypeClass.equals(Float.class))
-                    l = strData.stream().map(Float::parseFloat).collect(Collectors.toList());
-                else if (fieldTypeClass.equals(Long.TYPE) || fieldTypeClass.equals(Long.class))
-                    l = strData.stream().map(Long::parseLong).collect(Collectors.toList());
-                else l = strData;
-                fdc.setValues(l);
-            }
-        }
-
-        return true;
-    }
-
     public Set<Integer> getIntSet (String key) {
         try {
             return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
@@ -126,6 +37,112 @@ public class CustomXMLConfiguration extends XMLConfiguration {
             return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
         } catch (Exception e) {
             return defaultValues;
+        }
+    }
+
+    public <T> Set<T> getSet (Class<T> tClass, String entry) {
+        return getSet(tClass, entry, new StringToTypeConverterFactory());
+    }
+
+    public <T> Set<T> getSet (Class<T> tClass, String entry, StringToTypeConverter<T> typeConverter) {
+        return getSet(tClass, entry, new StringToTypeConverterFactory().add(tClass, typeConverter));
+    }
+
+    private <T> Set<T> getSet (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+        List<String> strings = Arrays.stream(getString(entry).split(",")).collect(Collectors.toList());
+        Set<T> tSet = new HashSet<>();
+        strings.forEach(s -> tSet.add(converterFactory.convert(tClass, s)));
+        return tSet;
+    }
+
+    public <T> T getClass (Class<T> tClass, String entry) {
+        return getClass(tClass, entry, new StringToTypeConverterFactory());
+    }
+
+    public <T> T getClass (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+        Set<Field> fields = ReflectionUtil.getFields(tClass);
+        Map<Field, String> valueMap = new HashMap<>();
+        String template = entry + "[@%s]";
+
+        for (Field field : fields) {
+            String fieldName;
+            if (field.isAnnotationPresent(ConfigField.class))
+                fieldName = field.getAnnotation(ConfigField.class).value();
+            else fieldName = field.getName();
+
+            String value = getString(String.format(template, fieldName));
+            valueMap.put(field, value);
+        }
+
+        try {
+            T t = tClass.newInstance();
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(ConfigField.class))
+                    addConverterToFactory (converterFactory, field.getType(), field.getAnnotation(ConfigField.class));
+
+                Object value = converterFactory.convert(field.getType(), valueMap.get(field));
+                ReflectionUtil.setField(field, t, value);
+            }
+            return t;
+        } catch (InstantiationException | IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    public <T> List<T> getClasses (Class<T> tClass, String entry) {
+        return getClasses(tClass, entry, new StringToTypeConverterFactory());
+    }
+
+    public <T> List<T> getClasses (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+        Set<Field> fields = ReflectionUtil.getFields(tClass);
+        Map<Field, List<String>> valueMap = new HashMap<>();
+
+        for (Field field : fields) {
+            String template = entry + "[@%s]";
+            String fieldName;
+
+            if (field.isAnnotationPresent(ConfigField.class)) {
+                fieldName = field.getAnnotation(ConfigField.class).value();
+            } else {
+                fieldName = field.getName();
+            }
+
+            List<String> list = getList(String.class, String.format(template, fieldName));
+            valueMap.put(field, list);
+        }
+
+        int count = valueMap.entrySet().stream().mapToInt(e -> e.getValue().size()).min().orElse(-1);
+
+        if (count == -1) return null;
+
+        try {
+            List<T> result = new ArrayList<>();
+            for (int i = 0; i < count; i++) {
+                T t = tClass.newInstance();
+
+                for (Field field : fields) {
+                    if (field.isAnnotationPresent(ConfigField.class))
+                        addConverterToFactory(converterFactory, field.getType(), field.getAnnotation(ConfigField.class));
+                    Object value = converterFactory.convert(field.getType(), valueMap.get(field).get(i));
+                    ReflectionUtil.setField(field, t, value);
+                }
+
+                result.add(t);
+            }
+
+            return result;
+        } catch (IllegalAccessException | InstantiationException e) {
+            return null;
+        }
+    }
+
+    private void addConverterToFactory(StringToTypeConverterFactory converterFactory, Class<?> type, ConfigField annotation) {
+        if (!NullTypeConverter.class.equals(annotation.converter())) {
+            try {
+                converterFactory.add(type, annotation.converter().newInstance());
+            } catch (InstantiationException | IllegalAccessException e) {
+                // do nothing
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.staniul.util;
+package com.staniul.util.collections;
 
 import java.util.*;
 import java.util.stream.Collectors;

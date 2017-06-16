@@ -1,4 +1,6 @@
-package com.staniul.xmlconfig;
+package com.staniul.xmlconfig.annotations;
+
+import com.staniul.xmlconfig.ConfigurationLoader;
 
 import java.lang.annotation.*;
 

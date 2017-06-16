@@ -2,7 +2,7 @@ package com.staniul.teamspeak.query;
 
 import com.staniul.teamspeak.query.client.Platform;
 import com.staniul.teamspeak.query.client.Voice;
-import com.staniul.util.SetUtil;
+import com.staniul.util.collections.SetUtil;
 
 import java.util.Arrays;
 import java.util.Collections;

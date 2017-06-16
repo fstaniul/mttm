@@ -1,4 +1,4 @@
-package com.staniul.util;
+package com.staniul.util.spring;
 
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import org.aspectj.lang.ProceedingJoinPoint;

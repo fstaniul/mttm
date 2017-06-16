@@ -1,4 +1,4 @@
-package com.staniul.xmlconfig;
+package com.staniul.xmlconfig.annotations;
 
 import java.lang.annotation.*;
 

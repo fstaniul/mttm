@@ -7,8 +7,8 @@ import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
-import com.staniul.xmlconfig.UseConfig;
-import com.staniul.xmlconfig.WireConfig;
+import com.staniul.xmlconfig.annotations.UseConfig;
+import com.staniul.xmlconfig.annotations.WireConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

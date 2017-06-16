@@ -1,4 +1,4 @@
-package com.staniul.util;
+package com.staniul.util.lang;
 
 import java.io.*;
 

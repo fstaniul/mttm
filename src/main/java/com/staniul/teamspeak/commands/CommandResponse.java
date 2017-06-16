@@ -1,6 +1,6 @@
 package com.staniul.teamspeak.commands;
 
-import com.staniul.util.StringUtil;
+import com.staniul.util.lang.StringUtil;
 
 /**
  * <p>Class that represents a command response. Each command should return this class object.</p>

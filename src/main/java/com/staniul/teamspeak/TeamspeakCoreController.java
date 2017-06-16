@@ -7,7 +7,7 @@ import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
-import com.staniul.util.MethodContainer;
+import com.staniul.util.reflection.MethodContainer;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;

@@ -1,6 +1,6 @@
 package com.staniul.taskcontroller;
 
-import com.staniul.util.MethodContainer;
+import com.staniul.util.reflection.MethodContainer;
 
 import java.lang.reflect.Method;
 import java.util.TimerTask;

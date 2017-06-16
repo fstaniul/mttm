@@ -1,8 +1,7 @@
 package com.staniul.util;
 
+import com.staniul.util.lang.StringUtil;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 

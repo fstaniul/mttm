@@ -1,5 +1,6 @@
 package com.staniul.xmlconfig;
 
+import com.staniul.xmlconfig.annotations.UseConfig;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;

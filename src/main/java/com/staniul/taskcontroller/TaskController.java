@@ -1,5 +1,6 @@
 package com.staniul.taskcontroller;
 
+import org.aspectj.lang.annotation.Aspect;
 import org.joda.time.DateTime;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
@@ -26,7 +27,7 @@ public class TaskController implements ApplicationContextAware {
         timer = new Timer("Task's Timer");
     }
 
-    @PostConstruct
+//    @PostConstruct TODO: TURN THAT ON BEFORE DEPLOY
     private void init () {
         Set<Method> methods = reflections.getMethodsAnnotatedWith(Task.class);
         for (Method method : methods) {

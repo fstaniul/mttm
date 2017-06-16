@@ -2,7 +2,6 @@ package com.staniul;
 
 import com.staniul.teamspeak.CoreCommands;
 import com.staniul.teamspeak.TeamspeakCoreController;
-import com.staniul.teamspeak.grouppresets.ServergroupPresets;
 import com.staniul.teamspeak.query.Client;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import org.junit.Test;
@@ -20,9 +19,6 @@ public class MttmApplicationTests {
     public static Client client = new Client(18, map);
 
     @Autowired
-    private ServergroupPresets presets;
-
-    @Autowired
     private TeamspeakCoreController coreController;
 
     @Autowired
@@ -30,6 +26,6 @@ public class MttmApplicationTests {
 
     @Test
     public void textApplicationContextLoad () throws Exception {
-        coreController.callCommand("!stop", client, "");
+
     }
 }
