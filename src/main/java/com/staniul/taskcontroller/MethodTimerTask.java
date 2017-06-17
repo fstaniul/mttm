@@ -15,8 +15,6 @@ public class MethodTimerTask extends TimerTask {
     @Override
     public void run() {
         methodContainer.invoke();
-        if (methodContainer.isCausingExceptionRegularly())
-            cancel();
     }
 
     @Override

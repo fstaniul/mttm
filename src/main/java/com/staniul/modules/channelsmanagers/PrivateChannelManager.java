@@ -332,7 +332,7 @@ public class PrivateChannelManager {
     private void checkChannelName(PrivateChannel privateChannel, Channel channel) throws QueryException {
         String nameTemplate = String.format("\\[%03d\\].*", privateChannel.getNumber());
         if (!channel.getName().matches(nameTemplate)) {
-            String newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), channel.getName().substring(6));
+            String newChannelName = String.format("[%03d]%s", privateChannel.getNumber(), channel.getName().substring(5));
             query.channelRename(newChannelName, privateChannel.getId());
         }
     }
@@ -378,7 +378,7 @@ public class PrivateChannelManager {
                         query.channelDelete(channel.getId());
 
                         Channel channelInfo = query.getChannelInfo(usedChannel.getId());
-                        String newName = String.format("[03%d] %s", channel.getNumber(), channelInfo.getName().substring(6));
+                        String newName = String.format("[03%d]%s", channel.getNumber(), channelInfo.getName().substring(5));
                         query.channelRename(newName, usedChannel.getId());
 
                         channel.setId(usedChannel.getId());

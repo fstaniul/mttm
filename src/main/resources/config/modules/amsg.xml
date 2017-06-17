@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<admin-messenger>
+    <admin-groups ids="647,787,6,679" />
+    <commands>
+        <msgdel response="Usunęłam wiadomość: $MSG$" not-found="Nie znalazłam wiadomości!"/>
+    </commands>
+</admin-messenger>

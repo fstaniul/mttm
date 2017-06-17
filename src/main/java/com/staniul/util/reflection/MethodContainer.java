@@ -10,12 +10,10 @@ public class MethodContainer {
 
     private Object target;
     private Method method;
-    private int exceptionCounter;
 
     public MethodContainer(Object target, Method method) {
         this.target = target;
         this.method = method;
-        exceptionCounter = 0;
     }
 
     @Override
@@ -30,19 +28,12 @@ public class MethodContainer {
         return String.format("Method: %s, Target: %s", method, target);
     }
 
-    public boolean isCausingExceptionRegularly() {
-        return exceptionCounter > 1;
-    }
-
     public void invoke (Object... parameters) {
         try {
             method.invoke(target, parameters);
-            exceptionCounter = 0;
         } catch (IllegalAccessException e) {
-            exceptionCounter++;
-            log.error("Method that is private and cannot be invoked from outside function!" + this, e);
+            log.error("Method is private and cannot be invoked from outside class: " + this, e);
         } catch (InvocationTargetException e) {
-            exceptionCounter++;
             log.error("Error during method call: " + this, e);
         }
     }

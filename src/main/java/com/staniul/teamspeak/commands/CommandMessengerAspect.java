@@ -43,6 +43,9 @@ public class CommandMessengerAspect {
             response.setMessage(new String[]{ config.getString(response.getStatus().toString().toLowerCase()) });
         }
 
+        if (response.getMessage() == null)
+            return;
+
         try {
             query.sendTextMessageToClient(client.getId(), response.getMessage());
         } catch (QueryException e) {
