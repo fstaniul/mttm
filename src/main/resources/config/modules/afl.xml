@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<admins-offline-list>
+    <groups>
+        <servergroup2 id="647" name="Head Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
+        <servergroup2 id="6" name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
+        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
+    </groups>
+
+    <aotw id="787"/>
+
+    <display channel-id="7710"
+             listsign=" • "
+             entry="[b]$ENTRY$[/b]"
+             header="[size=13][color=blue] $HEADER$:[/color][/size]" />
+
+    <commands>
+        <refafl response="Odświerzyłam listę administratorów." />
+    </commands>
+
+</admins-offline-list>

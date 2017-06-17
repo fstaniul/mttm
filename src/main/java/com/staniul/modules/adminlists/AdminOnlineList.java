@@ -18,6 +18,8 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @UseConfig("modules/aol.xml")
@@ -37,8 +39,9 @@ public class AdminOnlineList {
     }
 
     @PostConstruct
-    private void init () {
+    private void init() throws QueryException {
         setServergroupList();
+        setCurrentlyOnlineAdmins();
     }
 
     private void setServergroupList () {
@@ -51,11 +54,15 @@ public class AdminOnlineList {
 
     @Teamspeak3Event(EventType.JOIN)
     @ClientGroupAccess("servergroups.admins")
-    public void addClientToList (Client client) {
-        Admin admin = createAdmin (client);
+    public void adminJoinedEvent (Client client) {
+        addAdminToList(client);
+        refreshDisplay();
+    }
+
+    private void addAdminToList (Client client) {
+        Admin admin = createAdmin(client);
         admins.add(admin);
         sortAdmins();
-        refreshDisplay();
     }
 
     private Admin createAdmin(Client client) {
@@ -98,5 +105,12 @@ public class AdminOnlineList {
         } catch (QueryException e) {
             log.error(String.format("Failed to change channel description of channel (%d)", config.getInt("displaychannel[@id]")));
         }
+    }
+
+    public void setCurrentlyOnlineAdmins() throws QueryException {
+        Set<Integer> adminGroups = servergroupList.stream().map(sg -> sg.getId()).collect(Collectors.toSet());
+        List<Client> clients = query.getClientList().stream().filter(c -> c.isInServergroup(adminGroups)).collect(Collectors.toList());
+        clients.forEach(this::addAdminToList);
+        refreshDisplay();
     }
 }

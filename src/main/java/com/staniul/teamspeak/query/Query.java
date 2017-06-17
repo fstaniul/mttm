@@ -161,6 +161,21 @@ public class Query {
     }
 
     /**
+     * Gets list of client information from teamspeak 3 database. These are all offline information stored about client.
+     * Client database list is narrowed to one group.
+     * @param servergroupId Servergroup id.
+     * @return List of clients database info in this group.
+     * @throws QueryException When query fails to get information from teamspeak 3 server.
+     */
+    public List<ClientDatabase> getClientDatabaseListInServergroup (int servergroupId) throws QueryException {
+        List<Integer> clientDatabaseIds = servergroupClientList(servergroupId);
+        List<ClientDatabase> clientDatabaseList = new ArrayList<>(clientDatabaseIds.size());
+        for (Integer clientDatabaseId : clientDatabaseIds)
+            clientDatabaseList.add(getClientDatabaseInfo(clientDatabaseId));
+        return clientDatabaseList;
+    }
+
+    /**
      * Gets channel information from teamspeak 3 server with given id.
      *
      * @param channelId Channel id.

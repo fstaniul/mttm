@@ -197,4 +197,8 @@ public class AdminsCompetitionJudge {
 
         return config.getString("avatars[@url]").replace("$DATE$", date);
     }
+
+    public AdminOfTheWeek getCurrentAdminOfTheWeek() {
+        return currentAdminOfTheWeek;
+    }
 }

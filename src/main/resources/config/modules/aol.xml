@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<adminonlinelist>
+<admin-online-list>
     <groups>
         <servergroup id="647" rank="1" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
         <servergroup id="787" rank="2" icon="http://ts.electronicsports.pl/teamspeak/icon_aotw.png"/>
@@ -8,4 +8,4 @@
     </groups>
 
     <displaychannel id="9097"/>
-</adminonlinelist>
+</admin-online-list>
