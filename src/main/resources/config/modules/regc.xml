@@ -7,5 +7,7 @@
         <group id="789" />
     </register-groups>
 
+    <admin-groups ids="6,679,787"/>
+
     <registered-display id="10664" header="Zarejestrowani dnia $DATE$:" />
 </registercounter>

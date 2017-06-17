@@ -94,6 +94,15 @@ public class RegisterCounter {
             this.data.put(k, inner);
         });
 
+        try {
+            List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
+            this.data.forEach((date, regMap) ->
+                    regMap.forEach((adminId, regCount) ->
+                            regMap.compute(adminId, (aId, rC) -> adminIds.contains(aId) ? rC : null)));
+        } catch (QueryException e) {
+            log.error("Failed to get admin list from teamspeak 3 server!", e);
+        }
+
 //        this.data = new HashMap<>();
 //        for (Map.Entry<String, Map<Integer, Set<Integer>>> entry : data.entrySet()) {
 //            this.data.putIfAbsent(entry.getKey(), new HashMap<>());
@@ -157,6 +166,13 @@ public class RegisterCounter {
         Map<Integer, Integer> countedReg = new HashMap<>();
         registeredYesterday.forEach((k, v) -> countedReg.put(k, v.size()));
 
+        try {
+            List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
+            countedReg.forEach((adminId, regCount) -> countedReg.compute(adminId, (aId, rC) -> adminIds.contains(aId) ? rC : null));
+        } catch (QueryException e) {
+            log.error("Failed to get admin list from teamspeak 3 server!", e);
+        }
+
         data.put(formatter.print(yesterday), countedReg);
 
         refreshDisplay(formatter.print(yesterday));
@@ -169,15 +185,24 @@ public class RegisterCounter {
     private void refreshDisplay (String date) {
         try {
             Map<Integer, Integer> regAtDate = getRegisteredAtDate(date);
+//            List<ClientDatabase> adminList = new ArrayList<>();
+//            for (Map.Entry<Integer, Integer> e : regAtDate.entrySet()) {
+//                adminList.add(query.getClientDatabaseInfo(e.getKey()));
+//            }
+
+            List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
             List<ClientDatabase> adminList = new ArrayList<>();
-            for (Map.Entry<Integer, Integer> e : regAtDate.entrySet()) {
-                adminList.add(query.getClientDatabaseInfo(e.getKey()));
-            }
+            for (Integer adminId : adminIds)
+                adminList.add(query.getClientDatabaseInfo(adminId));
+
 
             StringBuilder sb = new StringBuilder();
             sb.append(config.getString("registered-display[@header]").replace("$DATE$", date)).append("\n");
             for (ClientDatabase admin : adminList) {
-                sb.append(String.format("%3d", regAtDate.get(admin.getDatabaseId())))
+                Integer regAtThisDate = regAtDate.get(admin.getDatabaseId());
+                sb.append("[B]")
+                        .append(String.format("%3d", regAtThisDate == null ? 0 : regAtThisDate))
+                        .append("[/B]")
                         .append(" | ")
                         .append(admin.getNickname())
                         .append("\n");

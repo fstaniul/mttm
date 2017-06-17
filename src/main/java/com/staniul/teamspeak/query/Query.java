@@ -58,7 +58,7 @@ public class Query {
     }
 
     @Autowired
-    public void setTeamspeakActionListener (TeamspeakCoreController coreController) {
+    public void setTeamspeakActionListener(TeamspeakCoreController coreController) {
         this.jts3ServerQuery.setTeamspeakActionListener(new TeamspeakActionListenerImpl(this, coreController));
     }
 
@@ -287,6 +287,73 @@ public class Query {
         String request = String.format("servergroupdelclient cldbid=%d sgid=%d", clientDatabaseId, servergroupId);
         Map<String, String> response = jts3ServerQuery.doCommand(request);
         checkAndThrowQueryException(String.format("Failed to remove client (%d) from servergroup (%d)", clientDatabaseId, servergroupId), response);
+    }
+
+    /**
+     * Gets list of clients database id's in servergroup of given id.
+     *
+     * @param servergroupId Id of a servergroup.
+     *
+     * @return List of clients database id's in this group.
+     *
+     * @throws QueryException When query fails to get client list from teamspeak 3 server.
+     */
+    public List<Integer> servergroupClientList(int servergroupId) throws QueryException {
+        String request = String.format("servergroupclientlist sgid=%d", servergroupId);
+        Map<String, String> response = jts3ServerQuery.doCommand(request);
+        checkAndThrowQueryException(String.format("Failed to get list of clients in servergroup (%d)", servergroupId), response);
+        return JTS3ServerQuery.parseRawData(response.get("response"))
+                .stream()
+                .map(e -> Integer.parseInt(e.get("cldbid")))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets list of clients database ids in servergroups of given id. It just invokes {@link
+     * #servergroupClientList(int)} for each group and adds result to one list.
+     *
+     * @param servergroupIds Ids of servergroups.
+     *
+     * @return List of clients database ids in those servergroups.
+     *
+     * @throws QueryException When query fails to get list of clients in servergroup.
+     */
+    public List<Integer> servergroupClientList(int... servergroupIds) throws QueryException {
+        List<Integer> groupsIds = new ArrayList<>(servergroupIds.length);
+        for (int servergroupId : servergroupIds)
+            groupsIds.add(servergroupId);
+        return servergroupClientList(groupsIds);
+    }
+
+    /**
+     * Gets list of clients database ids in servergroups of given id. It just invokes {@link
+     * #servergroupClientList(int)} for each group and adds result to one list.
+     *
+     * @param servergroupIds Ids of servergroups.
+     *
+     * @return List of clients database ids in those servergroups.
+     *
+     * @throws QueryException When query fails to get list of clients in servergroup.
+     */
+    public List<Integer> servergroupClientList(Integer... servergroupIds) throws QueryException {
+        return servergroupClientList(Arrays.asList(servergroupIds));
+    }
+
+    /**
+     * Gets list of clients database ids in servergroups of given id. It just invokes {@link
+     * #servergroupClientList(int)} for each group and adds result to one list.
+     *
+     * @param servergroupIds Ids of servergroups.
+     *
+     * @return List of clients database ids in those servergroups.
+     *
+     * @throws QueryException When query fails to get list of clients in servergroup.
+     */
+    public List<Integer> servergroupClientList(Collection<Integer> servergroupIds) throws QueryException {
+        List<Integer> result = new ArrayList<>();
+        for (Integer groupId : servergroupIds)
+            result.addAll(servergroupClientList(groupId));
+        return result;
     }
 
     /**

@@ -31,6 +31,7 @@ public class CommandMessengerAspect {
     }
 
     @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client,..)) && " +
+            "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
             "args(client,..)", argNames = "client")
     public void commandExecution (Client client) {
 

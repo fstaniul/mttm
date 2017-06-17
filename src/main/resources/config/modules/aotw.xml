@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<adminoftheweek>
+    <aotw-group id="787"/>
+    <admin-groups ids=""/>
+
+    <display id="11192"
+             name="[cspacer]$NICKNAME$"
+             header="Administrator tygodnia:"
+             icon="http://ts.electronicsports.pl/teamspeak/icon_aotw.png"/>
+
+    <no-display id="11192"
+                name="Brak!" />
+
+    <avatars origin="~/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
+             destination="~/www/teamspeak/$DATE$.gif"
+             url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif"/>
+
+    <commands>
+        <refaotw success="Zresetowałam administratora tygodnia! Jeżeli nie ma zmiany znaczy, że wystąpił błąd!"
+                 fail="Wystąpił błąd podczas ustawiania nowego administratora tygodnia!"/>
+    </commands>
+</adminoftheweek>
