@@ -185,11 +185,14 @@ public class PrivateChannelManager {
 
                     if (freeChannel != null) {
                         properties.setOrder(freeChannel.getId());
-                        query.channelDelete(freeChannel.getId());
                         clientsChannel = freeChannel;
                     }
 
                     int channelId = query.channelCreate(properties);
+                    createSubChannels (channelId);
+
+                    if (freeChannel != null)
+                        query.channelDelete(freeChannel.getId());
 
                     clientsChannel.setId(channelId);
                     clientsChannel.setOwner(client.getDatabaseId());
@@ -204,6 +207,17 @@ public class PrivateChannelManager {
                 messageClientAboutFailedCreation(client);
             }
         }
+    }
+
+    private void createSubChannels(int channelId) throws QueryException {
+        ChannelProperties properties = new ChannelProperties()
+                .setCodec(4)
+                .setCodecQuality(10)
+                .setParent(channelId)
+                .setFlag(ChannelFlagConstants.MAXCLIENTS_UNLIMITED | ChannelFlagConstants.MAXFAMILYCLIENTS_UNLIMITED)
+                .setName("#1");
+        query.channelCreate(properties);
+        query.channelCreate(properties.setName("#2"));
     }
 
     private void messageClientAboutFailedCreation(Client client) {
