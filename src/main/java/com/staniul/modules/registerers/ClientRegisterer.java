@@ -1,6 +1,9 @@
 package com.staniul.modules.registerers;
 
+import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.taskcontroller.Task;
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
@@ -25,14 +28,13 @@ public class ClientRegisterer {
     private Query query;
 
     @Autowired
-    public ClientRegisterer (Query query) {
+    public ClientRegisterer(Query query) {
         this.query = query;
     }
 
     @Task(delay = 1800000)
-    public void checkForNewClients () throws QueryException {
+    public void checkForNewClients() throws QueryException {
         List<Client> clients = query.getClientList();
-        List<Client> newClients = new LinkedList<>();
 
         clients.stream()
                 .filter(client -> client.isOnlyInServergroup(config.getInt("groups.guest[@id]")))
@@ -40,7 +42,6 @@ public class ClientRegisterer {
                 .forEach(client -> {
                     try {
                         query.servergroupAddClient(client.getDatabaseId(), config.getInt("groups.new[@id]"));
-                        newClients.add(client);
                     } catch (QueryException e) {
                         log.error(e.getMessage(), e);
                     }
@@ -57,7 +58,10 @@ public class ClientRegisterer {
                     }
                 });
 
-        List<String> messages = createMessagesForAdmins (newClients);
+        List<Client> newClients = getNewClientList();
+        if (newClients.size() == 0) return;
+
+        List<String> messages = createMessagesForAdmins(newClients);
 
         List<Client> admins = clients.stream()
                 .filter(client -> client.isInServergroup(config.getIntSet("groups.admins[@id]")))
@@ -67,10 +71,16 @@ public class ClientRegisterer {
         for (Client client : admins) {
             try {
                 query.sendTextMessageToClient(client.getId(), messages);
-            } catch (QueryException e){
+            } catch (QueryException e) {
                 log.error(String.format("Failed to send message to client %s", client), e);
             }
         }
+    }
+
+    private List<Client> getNewClientList() throws QueryException {
+        return query.getClientList().stream()
+                .filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
+                .collect(Collectors.toList());
     }
 
     private List<String> createMessagesForAdmins(List<Client> newClients) {
@@ -93,5 +103,17 @@ public class ClientRegisterer {
         result.add(builder.toString());
 
         return result;
+    }
+
+    @Teamspeak3Command("!reg")
+    @ClientGroupAccess("servergroups.admins")
+    public CommandResponse checkForNewClients(Client client, String params) throws QueryException {
+        List<Client> newClients = getNewClientList();
+
+        if (newClients.size() == 0)
+            return new CommandResponse(config.getString("messages.newclients[@no]"));
+
+        List<String> messages = createMessagesForAdmins(newClients);
+        return new CommandResponse(messages.toArray(new String[]{}));
     }
 }

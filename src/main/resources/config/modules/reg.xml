@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <registerer>
     <groups>
-        <guest id="8" />
-        <new id="" timeconnected="1800000" />
-        <admins id="647,786,6,679" />
-        <ignored id="930" />
+        <guest id="8"/>
+        <new id="" timeconnected="1800000"/>
+        <admins id="647,786,6,679"/>
+        <ignored id="930"/>
     </groups>
 
     <messages>
-        <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | " />
+        <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | "
+                    no="Brak nowych użytkowników."/>
     </messages>
 </registerer>

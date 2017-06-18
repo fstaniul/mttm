@@ -8,6 +8,7 @@ import com.staniul.xmlconfig.annotations.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,7 +61,7 @@ public class Query {
     }
 
     @Autowired
-    public void setTeamspeakActionListener(TeamspeakCoreController coreController) {
+    public void setTeamspeakActionListener(TeamspeakCoreController coreController) throws ConfigurationException {
         this.jts3ServerQuery.setTeamspeakActionListener(new TeamspeakActionListenerImpl(this, coreController));
     }
 
@@ -86,6 +87,9 @@ public class Query {
         jts3ServerQuery.connectTS3Query(configuration.getString("ip"), configuration.getInt("port"));
         jts3ServerQuery.loginTS3(configuration.getString("login"), configuration.getString("password"));
         jts3ServerQuery.selectVirtualServer(configuration.getInt("serverid"));
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_SERVER, 0);
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_TEXTPRIVATE, 0);
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_CHANNEL, configuration.getInt("event-channel[@id]"));
     }
 
     /**

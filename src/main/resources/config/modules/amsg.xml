@@ -3,5 +3,6 @@
     <admin-groups ids="647,787,6,679" />
     <commands>
         <msgdel response="Usunęłam wiadomość: $MSG$" not-found="Nie znalazłam wiadomości!" />
+        <msgshow no-msg="Brak wiadomości do pokazania!" />
     </commands>
 </admin-messenger>

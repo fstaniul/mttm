@@ -1,20 +1,27 @@
 package com.staniul.teamspeak.query;
 
 import com.staniul.teamspeak.TeamspeakCoreController;
+import com.staniul.xmlconfig.ConfigurationLoader;
+import com.staniul.xmlconfig.CustomXMLConfiguration;
+import com.staniul.xmlconfig.annotations.UseConfig;
 import de.stefan1200.jts3serverquery.TeamspeakActionListener;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 
+@UseConfig("query.xml")
 public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
     private static Logger log = Logger.getLogger(TeamspeakActionListenerImpl.class);
 
-    private TeamspeakCoreController controller;
-    private Query query;
+    private final TeamspeakCoreController controller;
+    private final Query query;
+    private final CustomXMLConfiguration config;
 
-    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller) {
+    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller) throws ConfigurationException {
         this.query = query;
         this.controller = controller;
+        config = ConfigurationLoader.load(TeamspeakActionListenerImpl.class);
     }
 
     @Override
@@ -29,6 +36,15 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
 
         else if ("notifyclientleftview".equals(eventType)) {
             invokeLeaveEvent(eventInfo);
+        }
+
+        else if ("notifyclientmoved".equals(eventType) &&
+                eventInfo.get("ctid").equals(config.getString("event-channel[@id]"))) {
+            try {
+                query.sendTextMessageToClient(Integer.parseInt(eventInfo.get("clid")), config.getString("welcome-msg"));
+            } catch (QueryException e) {
+                log.error("Failed to send message to admin when he joined channel to get message from bot!", e);
+            }
         }
     }
 

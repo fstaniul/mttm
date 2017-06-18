@@ -173,6 +173,60 @@
                             <goal>run</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>echo</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <echo output="mttm.sh"><![CDATA[
+#!/usr/bin/env bash
+PIDFILE=./mttm.pid
+
+start () {
+    nohup java -jar ${project.name}-${project.version}.jar > ./log/$(date +%F).log 2>&1 & echo $! > "$$PIDFILE"
+}
+
+killanddelete () {
+    kill -9 $(cat "$$PIDFILE")
+    rm -d "$$PIDFILE"
+}
+
+if ["$$1" == "start"]
+then
+    if [ -f "$$PIDFILE" ]
+    then
+        echo "Program is already running!"
+    else
+        start
+    fi
+fi
+
+if ["$$1" == "stop"]
+then
+    if [ -f "$$PIDFILE" ]
+    then
+        killanddelete
+    else
+        echo "Program is not running!"
+    fi
+fi
+
+if ["$$1" == "restart"]
+then
+    if [ -f "$$PIDFILE" ]
+    then
+        killanddelete
+    fi
+
+    start
+fi]]>
+                                </echo>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
                 </executions>
                 <dependencies>
                     <dependency>

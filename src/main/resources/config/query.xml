@@ -6,4 +6,8 @@
     <password>ts20122012</password>
     <serverid>1</serverid>
     <name>Weronika</name>
+
+    <event-channel id="9097" />
+
+    <welcome-msg>Witaj!</welcome-msg>
 </query>

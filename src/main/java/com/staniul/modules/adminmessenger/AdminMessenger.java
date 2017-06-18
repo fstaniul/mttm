@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -120,6 +121,24 @@ public class AdminMessenger {
             }
 
             return new CommandResponse(retMsg);
+        }
+    }
+
+    @Teamspeak3Command("!msgshow")
+    @ClientGroupAccess("servergroups.admins")
+    public CommandResponse showCommands (Client client, String params) {
+        synchronized (messageLock) {
+            List<String> returnMsg = new LinkedList<>();
+
+            if (this.messages.size() == 0)
+                return new CommandResponse(config.getString("commands.msgshow[@no-msg]"));
+
+            for (int i = 0; i < messages.size(); i++) {
+                Message message = messages.get(i);
+                returnMsg.add(i + ": " + message.toString());
+            }
+
+            return new CommandResponse(returnMsg.toArray(new String[]{}));
         }
     }
 }

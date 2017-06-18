@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <core-commands>
     <command-list>
-        <cmd command="" description="" />
+        <cmd command="!help" description="Pokazuje tą listę dostępnych komend." />
+        <cmd command="!chso" description="Zmienia właściciela kanału o podanym numerze na użytkownika z podanym database id. [i](Przykład: !chso 12 19321)[/i]" />
+        <cmd command="!chdel" description="Usuwa kanał o podanym numerze. [i](Przykład: !chdel 12)[/i]" />
+        <cmd command="!msgadd" description="Dodaje wiadomość i wysyła ją do wszystkich administratorów online. Każdy administrator po dołączeniu na server otrzyma tą wiadomość." />
+        <cmd command="!msgdel" description="Usuwa wiadomość o podanym numerze lub wiadomość, która rozpoczyna się podanym ciągiem znaków." />
+        <cmd command="!refaotw" description="Odświerza administratora tygodnia na żądanie." />
     </command-list>
 </core-commands>
