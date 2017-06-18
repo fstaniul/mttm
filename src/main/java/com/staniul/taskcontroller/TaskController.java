@@ -1,6 +1,5 @@
 package com.staniul.taskcontroller;
 
-import org.aspectj.lang.annotation.Aspect;
 import org.joda.time.DateTime;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
@@ -10,6 +9,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.Timer;
@@ -27,7 +27,7 @@ public class TaskController implements ApplicationContextAware {
         timer = new Timer("Task's Timer");
     }
 
-//    @PostConstruct TODO: TURN THAT ON BEFORE DEPLOY
+    @PostConstruct
     private void init () {
         Set<Method> methods = reflections.getMethodsAnnotatedWith(Task.class);
         for (Method method : methods) {
@@ -41,6 +41,11 @@ public class TaskController implements ApplicationContextAware {
                 timer.scheduleAtFixedRate(mtt, dateTime.toDate(), ann.delay());
             }
         }
+    }
+
+    @PreDestroy
+    private void destroy() {
+        timer.cancel();
     }
 
     private DateTime getDateTimeFromTask (Task task) {

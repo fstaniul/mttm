@@ -1,5 +1,6 @@
 package com.staniul.modules.registerers;
 
+import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
@@ -14,6 +15,8 @@ import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -37,7 +40,7 @@ public class RegisterCounter {
         this.query = query;
     }
 
-//    @PostConstruct TODO: TURN THAT ON BEFORE DEPLOY
+    @PostConstruct
     private void init() {
         File file = new File(dataFile);
         if (file.exists() && file.isFile()) {
@@ -113,7 +116,7 @@ public class RegisterCounter {
 //        }
     }
 
-//    @PreDestroy TODO: TURN THAT ON BEFORE DEPLOY
+    @PreDestroy
     private void save() {
         try {
             SerializeUtil.serialize(dataFile, data);
@@ -122,7 +125,7 @@ public class RegisterCounter {
         }
     }
 
-//    @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 5, second = 0)
+    @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 5, second = 0)
     public void countRegisteredAtNoon () {
         File logFolder = new File(config.getString("log[@folder"));
         File[] logFiles = logFolder.listFiles();

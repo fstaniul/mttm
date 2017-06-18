@@ -13,8 +13,8 @@ public class ChannelFlagConstantsTest {
         String flags = ChannelFlagConstants.flagsToString(__DEFAULT_FLAGS);
         String expected = "channel_flag_permanent=1 " +
                 "channel_flag_semi_permanent=0 " +
-                "channel_flag_maxclients_unlimited=1 " +
-                "channel_flag_maxfamilyclients_unlimited=1 " +
+                "channel_flag_maxclients_unlimited=0 " +
+                "channel_flag_maxfamilyclients_unlimited=0 " +
                 "channel_flag_maxfamilyclients_inherited=0 " +
                 "channel_flag_default=0";
 

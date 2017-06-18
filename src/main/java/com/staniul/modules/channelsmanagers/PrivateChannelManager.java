@@ -19,6 +19,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -48,7 +50,7 @@ public class PrivateChannelManager {
         this.query = query;
     }
 
-//    @PostConstruct
+    @PostConstruct
     private void loadChannels() {
         File file = new File(fileName);
         if (file.exists() && file.isFile()) {
@@ -61,7 +63,7 @@ public class PrivateChannelManager {
         } else createChannelsFromTeamspeak3Server();
     }
 
-//    @PreDestroy
+    @PreDestroy
     private void saveChannels() {
         try {
             SerializeUtil.serialize(fileName, channels);

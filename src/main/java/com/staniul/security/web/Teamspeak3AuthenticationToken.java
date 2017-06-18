@@ -25,7 +25,7 @@ public class Teamspeak3AuthenticationToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        return client.getDatabaseId();
+        return this;
     }
 
     public int getDatabaseId() {

@@ -28,7 +28,7 @@ public class ConfigurationLoaderTest {
         System.out.println(configuration.getIntSet("groups.admins[@id]"));
     }
 
-    @Test
+//    @Test
     public void testConfigurationLaod () throws Exception {
         CustomXMLConfiguration configuration = ConfigurationLoader.load(AdminOnlineList.class);
         System.out.println(configuration.getString("groups.servergroup[@icon]"));
