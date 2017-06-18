@@ -163,11 +163,14 @@ public class Query {
     /**
      * Gets list of client information from teamspeak 3 database. These are all offline information stored about client.
      * Client database list is narrowed to one group.
+     *
      * @param servergroupId Servergroup id.
+     *
      * @return List of clients database info in this group.
+     *
      * @throws QueryException When query fails to get information from teamspeak 3 server.
      */
-    public List<ClientDatabase> getClientDatabaseListInServergroup (int servergroupId) throws QueryException {
+    public List<ClientDatabase> getClientDatabaseListInServergroup(int servergroupId) throws QueryException {
         List<Integer> clientDatabaseIds = servergroupClientList(servergroupId);
         List<ClientDatabase> clientDatabaseList = new ArrayList<>(clientDatabaseIds.size());
         for (Integer clientDatabaseId : clientDatabaseIds)
@@ -273,6 +276,33 @@ public class Query {
             jts3ServerQuery.kickClient(clientId, true, msg);
         } catch (TS3ServerQueryException e) {
             throwQueryException("Failed to kick client from channel.", e);
+        }
+    }
+
+    /**
+     * Pokes client with given id with given message.
+     *
+     * @param clientId Id of client.
+     * @param message  Message to sent in as poke.
+     * @param split    If {@code true} message will be split on space (" ") to not exceed 100 characters and send as
+     *                 multiple poke messages.
+     *
+     * @throws QueryException When query fails to poke client, message is too long or client disconnected.
+     */
+    public void pokeClient(int clientId, String message, boolean split) throws QueryException {
+        try {
+            if (split) {
+                String[] splitMessage = StringUtil.splitOnSize(message, " ", 100);
+                for (String msg : splitMessage)
+                    jts3ServerQuery.pokeClient(clientId, msg);
+            }
+            else {
+                if (message.length() > 100)
+                    message = message.substring(0, 100);
+                jts3ServerQuery.pokeClient(clientId, message);
+            }
+        } catch (TS3ServerQueryException e) {
+            throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, message), e);
         }
     }
 

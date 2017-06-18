@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<live-help>
+    <channel id="9098"/>
+    <admin-groups ids="" ignore=""/>
+    <client-groups ignore=""/>
+
+    <messages>
+        <admin poke="Użytkownik [b]$NICKNAME$[/b] potrzebuje pomocy!"
+               info="Użytkonwik $URL$ potrzebuje twojej pomocy!"/>
+        <client info="Administratorzy ([b]$COUNT$[/b])"
+                no-admins-online="Obecnie brak administratorów, którzy mogą udzielić tobie pomocy!"/>
+    </messages>
+</live-help>

@@ -189,4 +189,9 @@ public class Client {
         return obj instanceof Client &&
                 ((Client) obj).databaseId == databaseId;
     }
+
+    @Override
+    public int hashCode() {
+        return 37 ^ databaseId;
+    }
 }
