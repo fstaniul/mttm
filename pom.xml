@@ -178,6 +178,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
+                                <echo>Writing to mttm.sh ...</echo>
                                 <echo output="mttm.sh"><![CDATA[
 #!/usr/bin/env bash
 PIDFILE=./mttm.pid
@@ -221,6 +222,7 @@ then
     start
 fi]]>
                                 </echo>
+                                <echo>Done.</echo>
                             </tasks>
                         </configuration>
                         <goals>
@@ -235,10 +237,7 @@ fi]]>
                         <version>1.9.4</version>
                     </dependency>
                 </dependencies>
-
             </plugin>
         </plugins>
     </build>
-
-
 </project>

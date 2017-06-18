@@ -5,4 +5,6 @@
         <msgdel response="Usunęłam wiadomość: $MSG$" not-found="Nie znalazłam wiadomości!" />
         <msgshow no-msg="Brak wiadomości do pokazania!" />
     </commands>
+
+    <welcome-msg header="Wiadomości ([b]$COUNT$[/b]):" />
 </admin-messenger>

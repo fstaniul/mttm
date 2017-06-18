@@ -85,6 +85,10 @@ public class AdminMessenger {
     @ClientGroupAccess("servergroups.admins")
     public void sendMessagesToAdminAfterHeJoinedServer(Client client) throws QueryException {
         synchronized (messageLock) {
+            if (messages.size() > 0) {
+                query.sendTextMessageToClient(client.getId(),
+                        config.getString("welcome-msg[@header]").replace("$COUNT$", Integer.toString(messages.size())));
+            }
             for (int i = 0; i < messages.size(); i++) {
                 Message message = messages.get(i);
                 query.sendTextMessageToClient(client.getId(), i + ": " + message.toString());
