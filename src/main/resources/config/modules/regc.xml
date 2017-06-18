@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <registercounter>
-    <log folder="~/teamspeak3-electronicsports-amd64/logs" />
+    <log folder="/home/ts/teamspeak3-electronicsports-amd64/logs" />
 
     <register-groups>
         <group id="641" />

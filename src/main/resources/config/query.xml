@@ -7,7 +7,8 @@
     <serverid>1</serverid>
     <name>Weronika</name>
 
-    <event-channel id="9097" />
+    <event-channel id="9097"/>
 
-    <welcome-msg>Witaj!</welcome-msg>
+    <welcome msg="Witaj [b]$NICKNAME$[/b]!"
+             groups="647,6,787,679"/>
 </query>
