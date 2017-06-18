@@ -44,7 +44,7 @@ public class Teamspeak3AuthenticationProvider implements AuthenticationProvider 
             List<GrantedAuthority> grantedAuthorities = getAuthorities(client);
             grantedAuthorities.addAll(auth.getAuthorities());
 
-            return new Teamspeak3AuthenticationToken(auth.getDatabaseId(), auth.getIp(), grantedAuthorities);
+            return new Teamspeak3AuthenticationToken(auth.getDatabaseId(), auth.getIp(), client, grantedAuthorities);
         } catch (QueryException e) {
             return authentication;
         }

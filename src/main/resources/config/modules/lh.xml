@@ -7,7 +7,7 @@
     <messages>
         <admin poke="Użytkownik [b]$NICKNAME$[/b] potrzebuje pomocy!"
                info="Użytkonwik $URL$ potrzebuje twojej pomocy!"/>
-        <client info="Administratorzy ([b]$COUNT$[/b])"
+        <client info="Administratorzy ([b]$COUNT$[/b]) zostali poinformowani, że potrzebujesz pomocy."
                 no-admins-online="Obecnie brak administratorów, którzy mogą udzielić tobie pomocy!"/>
     </messages>
 </live-help>
