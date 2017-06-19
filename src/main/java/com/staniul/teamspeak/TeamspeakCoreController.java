@@ -1,10 +1,7 @@
 package com.staniul.teamspeak;
 
+import com.staniul.teamspeak.commands.*;
 import com.staniul.teamspeak.query.Client;
-import com.staniul.teamspeak.commands.CommandExecutionStatus;
-import com.staniul.teamspeak.commands.CommandMessengerAspect;
-import com.staniul.teamspeak.commands.CommandResponse;
-import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.util.reflection.MethodContainer;
@@ -30,16 +27,15 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
-    private CommandMessengerAspect commandMessenger;
+    private CommandMessenger commandMessenger;
     private Reflections reflections;
     private HashMap<String, MethodContainer> commands;
     private Set<MethodContainer> joinEvents;
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections, CommandMessengerAspect commandMessengerAspect) throws ConfigurationException {
+    public TeamspeakCoreController(Reflections reflections) throws ConfigurationException {
         this.reflections = reflections;
-        this.commandMessenger = commandMessengerAspect;
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
         leaveEvents = new HashSet<>();
@@ -98,10 +94,14 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
      * @param params  Parameters to pass to command.
      */
     public void callCommand(String command, Client client, String params) {
+        log.info(String.format("Client (%s, %d) called command (%s) with params (%s)", client.getNickname(), client.getDatabaseId(), command, params));
+
         MethodContainer mc = commands.get(command);
 
+        log.info(String.format("Found command: %s", mc));
+
         if (mc == null)
-            commandMessenger.sendMessageAfterCommandReturn(client, new CommandResponse(CommandExecutionStatus.NOT_FOUND, null));
+            commandMessenger.sendResponseToClient(client, new CommandResponse(CommandExecutionStatus.NOT_FOUND, null));
 
         else {
             mc.invoke(client, params);
@@ -147,7 +147,12 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (initialized) return;
 
-        initialized = false;
+        initialized = true;
         init();
+    }
+
+    @Autowired
+    public void setCommandMessenger(CommandMessenger commandMessenger) {
+        this.commandMessenger = commandMessenger;
     }
 }

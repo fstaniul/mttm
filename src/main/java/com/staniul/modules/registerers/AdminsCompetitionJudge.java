@@ -35,7 +35,7 @@ import java.util.Set;
 public class AdminsCompetitionJudge {
     private static Logger log = Logger.getLogger(AdminsCompetitionJudge.class);
 
-    private final String dataFile = ".data/aotw.data";
+    private final String dataFile = "./data/aotw.data";
 
     @WireConfig
     private CustomXMLConfiguration config;
@@ -54,7 +54,7 @@ public class AdminsCompetitionJudge {
         try {
             currentAdminOfTheWeek = SerializeUtil.deserialize(dataFile);
         } catch (IOException | ClassNotFoundException e) {
-            log.error("Failed to read admin of the week from data file " + dataFile, e);
+            log.error("Failed to read admin of the week from data file " + dataFile);
             currentAdminOfTheWeek = new AdminOfTheWeek(-1, -1);
         }
     }
@@ -65,7 +65,7 @@ public class AdminsCompetitionJudge {
             try {
                 SerializeUtil.serialize(dataFile, currentAdminOfTheWeek);
             } catch (IOException e) {
-                log.error("Failed to save admin of the week to file " + dataFile, e);
+                log.error("Failed to save admin of the week to file " + dataFile);
             }
         }
     }

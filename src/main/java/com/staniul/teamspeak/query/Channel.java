@@ -20,7 +20,7 @@ public class Channel implements ChannelFlagConstants {
 
     private long secondsEmpty;
 
-    private int totalClients;
+    private int totalClients; //Supported only on channel list
     private int totalFamilyClients;
 
     private int flags;
@@ -33,13 +33,15 @@ public class Channel implements ChannelFlagConstants {
         name = info.get("channel_name");
         topic = info.get("channel_topic");
 
-        codec = Integer.parseInt("channel_codec");
-        codecQuality = Integer.parseInt("channel_codec_quality");
+        codec = Integer.parseInt(info.get("channel_codec"));
+        codecQuality = Integer.parseInt(info.get("channel_codec_quality"));
 
-        secondsEmpty = Long.parseLong("seconds_empty");
+        secondsEmpty = Long.parseLong(info.get("seconds_empty"));
 
-        totalClients = Integer.parseInt(info.get("total_clients"));
-        totalFamilyClients = Integer.parseInt(info.get("total_clients_family"));
+        if (info.get("total_clients") != null) {
+            totalClients = Integer.parseInt(info.get("total_clients"));
+            totalFamilyClients = Integer.parseInt(info.get("total_clients_family"));
+        }
 
         flags = ChannelFlagConstants.parseFlags(info);
     }

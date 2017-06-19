@@ -7,6 +7,7 @@ import com.staniul.teamspeak.query.Client;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sun.misc.Cleaner;
 
@@ -19,12 +20,8 @@ public class CoreCommands {
     @WireConfig
     private CustomXMLConfiguration config;
 
-    @Teamspeak3Command("!stop")
-    @ClientGroupAccess("servergroups.headadmins")
-    public CommandResponse stopCommand(Client client, String params) {
-        System.exit(0);
-        return new CommandResponse("Stopping!");
-    }
+    @Autowired
+    public CoreCommands () {}
 
     @Teamspeak3Command("!help")
     @ClientGroupAccess("servergroups.admins")

@@ -1,14 +1,11 @@
 package com.staniul.teamspeak.commands;
 
-import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.teamspeak.query.Client;
-import com.staniul.teamspeak.query.Query;
-import com.staniul.teamspeak.query.QueryException;
-import com.staniul.xmlconfig.annotations.WireConfig;
-import org.apache.commons.configuration2.XMLConfiguration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,49 +14,29 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-@UseConfig("cmdmsg.xml")
 public class CommandMessengerAspect {
     private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
 
-    @WireConfig
-    private XMLConfiguration config;
-    private Query query;
+    private final CommandMessenger messenger;
 
     @Autowired
-    public CommandMessengerAspect(Query query) throws ConfigurationException {
-        this.query = query;
+    public CommandMessengerAspect(CommandMessenger messenger) {
+        this.messenger = messenger;
     }
 
     @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client,..)) && " +
             "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && " +
             "args(client,..)", argNames = "client")
-    public void commandExecution (Client client) {
-
-    }
+    public void commandExecution (Client client) {}
 
     @AfterReturning(value = "commandExecution(client)", returning = "response", argNames = "client,response")
     public void sendMessageAfterCommandReturn (Client client, CommandResponse response) {
-        if (response.getStatus() != CommandExecutionStatus.EXECUTED_SUCCESSFULLY) {
-            response.setMessage(new String[]{ config.getString(response.getStatus().toString().toLowerCase()) });
-        }
-
-        if (response.getMessage() == null)
-            return;
-
-        try {
-            query.sendTextMessageToClient(client.getId(), response.getMessage());
-        } catch (QueryException e) {
-            log.error("Failed to send message to client!", e);
-        }
+        messenger.sendResponseToClient(client, response);
     }
 
     @AfterThrowing(value = "commandExecution(client)", argNames = "client")
     public void sendMessageAfterCommandThrow (Client client) {
-        String message = config.getString(CommandExecutionStatus.EXECUTION_TERMINATED.toString().toLowerCase());
-        try {
-            query.sendTextMessageToClient(client.getId(), message);
-        } catch (QueryException e) {
-            log.error("Failed to send message to client!", e);
-        }
+        CommandResponse response = new CommandResponse(CommandExecutionStatus.EXECUTION_TERMINATED, null);
+        messenger.sendResponseToClient(client, response);
     }
 }

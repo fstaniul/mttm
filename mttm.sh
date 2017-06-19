@@ -3,14 +3,21 @@ PIDFILE=./mttm.pid
 
 start () {
     nohup java -jar mttm-1.0-SNAPSHOT.jar > ./log/$(date +%F).log 2>&1 & echo $! > "$PIDFILE"
+    echo "Started."
 }
 
 killanddelete () {
-    kill -9 $(cat "$PIDFILE")
-    rm -d "$PIDFILE"
+    kill -SIGTERM $(cat "$PIDFILE")
+    rm -r "$PIDFILE"
+    echo "Stopped."
 }
 
-if ["$1" == "start"]
+if [ "$#" == 0 ]
+then
+    echo "You need to specify parameter: start / stop / restart"
+else
+
+if [ "$1" == "start" ]
 then
     if [ -f "$PIDFILE" ]
     then
@@ -20,7 +27,7 @@ then
     fi
 fi
 
-if ["$1" == "stop"]
+if [ "$1" == "stop" ]
 then
     if [ -f "$PIDFILE" ]
     then
@@ -30,7 +37,7 @@ then
     fi
 fi
 
-if ["$1" == "restart"]
+if [ "$1" == "restart" ]
 then
     if [ -f "$PIDFILE" ]
     then
@@ -38,4 +45,6 @@ then
     fi
 
     start
+fi
+
 fi

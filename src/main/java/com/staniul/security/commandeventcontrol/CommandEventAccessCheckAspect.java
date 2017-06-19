@@ -1,9 +1,8 @@
 package com.staniul.security.commandeventcontrol;
 
+import com.staniul.teamspeak.CoreCommands;
+import com.staniul.teamspeak.commands.*;
 import com.staniul.teamspeak.query.Client;
-import com.staniul.teamspeak.commands.CommandExecutionStatus;
-import com.staniul.teamspeak.commands.CommandResponse;
-import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.security.clientaccesscheck.ClientGroupAccessCheck;
 import com.staniul.util.spring.AroundAspectUtil;
@@ -32,10 +31,12 @@ public class CommandEventAccessCheckAspect {
     private static Logger log = Logger.getLogger(CommandEventAccessCheckAspect.class);
 
     private Environment environment;
+    private CommandMessenger commandMessenger;
 
     @Autowired
-    public CommandEventAccessCheckAspect (Environment environment) {
+    public CommandEventAccessCheckAspect (Environment environment, CommandMessenger commandMessenger) {
         this.environment = environment;
+        this.commandMessenger = commandMessenger;
     }
 
     @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client, ..)) && " +
@@ -57,7 +58,10 @@ public class CommandEventAccessCheckAspect {
         if (access)
             return pjp.proceed();
 
-        return new CommandResponse(CommandExecutionStatus.ACCESS_DENIED, null);
+        CommandResponse response = new CommandResponse(CommandExecutionStatus.ACCESS_DENIED, null);
+        commandMessenger.sendResponseToClient(client, response);
+
+        return response;
     }
 
     @Around(value = "joinEvent(client)", argNames = "pjp,client")

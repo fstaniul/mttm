@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -33,8 +34,9 @@ public class AuthRestController {
 
     @RequestMapping(value = "/api/auth", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
-    public ResponseEntity<?> authenticateUser (WebRequest request) {
-        log.info(request.getRemoteUser());
+    public ResponseEntity<?> authenticateUser (HttpServletRequest request) {
+        log.info("X-FORWARDED-FOR: " + request.getHeader("X-FORWARDED-FOR"));
+        log.info("REMOTE USER: " + request.getRemoteUser());
 
         String clientIp = request.getRemoteUser();
         try {
@@ -48,7 +50,7 @@ public class AuthRestController {
                 return ResponseEntity.ok(tokenContainer);
             }
         } catch (QueryException e) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }

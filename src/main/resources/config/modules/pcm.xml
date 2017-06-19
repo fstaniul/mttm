@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <privatechannelmanager>
+    <eventchannel id="9158" />
+
     <parentchannel id="737"/>
     <clientchannel name="Kanał: $NICKNAME$"
-                   description="Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.\n[i]Ta wiadomość może zostać usunięta.[/i]"
+                   description="Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału. [i]Ta wiadomość może zostać usunięta.[/i]"
                    invalidnumbername="Nie zmieniaj numeru kanału!"
                    movedname="Przeniesiony z $FROM$"/>
 
@@ -23,4 +25,6 @@
         <owner id="96"/>
         <guest id="8"/>
     </channelgroups>
+
+    <servergroups ignore="647,787,6,679" />
 </privatechannelmanager>

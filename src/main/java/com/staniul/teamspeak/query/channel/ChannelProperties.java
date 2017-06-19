@@ -133,12 +133,20 @@ public class ChannelProperties implements ChannelFlagConstants {
         if (!"".equals(topic)) sb.append("channel_topic=").append(JTS3ServerQuery.encodeTS3String(topic)).append(" ");
         if (maxClients >= 0) sb.append("channel_maxclients=").append(maxClients).append(" ");
         if (maxFamilyClients >= 0) sb.append("channel_maxfamilyclients=").append(maxFamilyClients).append(" ");
-        if (parent > 0) sb.append("pid=").append(parent).append(" ");
+        if (parent > 0) sb.append("cpid=").append(parent).append(" ");
         if (order > 0) sb.append("channel_order=").append(order).append(" ");
         if (codec > 0) sb.append("channel_codec=").append(codec).append(" ");
         if (codecQuality > 0) sb.append("channel_codec_quality=").append(codecQuality).append(" ");
         sb.append(ChannelFlagConstants.flagsToString(flags));
 
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + getName() + ", " +
+                "Topic: " + getTopic() + ", " +
+                "Parent: " + getParent() + ", " +
+                "Order: " + getOrder();
     }
 }

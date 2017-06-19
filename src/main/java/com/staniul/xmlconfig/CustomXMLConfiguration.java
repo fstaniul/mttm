@@ -24,7 +24,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         super(c);
     }
 
-    public Set<Integer> getIntSet (String key) {
+    public Set<Integer> getIntSet(String key) {
         try {
             return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
         } catch (Exception e) {
@@ -32,7 +32,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         }
     }
 
-    public Set<Integer> getIntSet (String key, Set<Integer> defaultValues) {
+    public Set<Integer> getIntSet(String key, Set<Integer> defaultValues) {
         try {
             return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
         } catch (Exception e) {
@@ -40,26 +40,26 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         }
     }
 
-    public <T> Set<T> getSet (Class<T> tClass, String entry) {
+    public <T> Set<T> getSet(Class<T> tClass, String entry) {
         return getSet(tClass, entry, new StringToTypeConverterFactory());
     }
 
-    public <T> Set<T> getSet (Class<T> tClass, String entry, StringToTypeConverter<T> typeConverter) {
+    public <T> Set<T> getSet(Class<T> tClass, String entry, StringToTypeConverter<T> typeConverter) {
         return getSet(tClass, entry, new StringToTypeConverterFactory().add(tClass, typeConverter));
     }
 
-    private <T> Set<T> getSet (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+    private <T> Set<T> getSet(Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
         List<String> strings = Arrays.stream(getString(entry).split(",")).collect(Collectors.toList());
         Set<T> tSet = new HashSet<>();
         strings.forEach(s -> tSet.add(converterFactory.convert(tClass, s)));
         return tSet;
     }
 
-    public <T> T getClass (Class<T> tClass, String entry) {
+    public <T> T getClass(Class<T> tClass, String entry) {
         return getClass(tClass, entry, new StringToTypeConverterFactory());
     }
 
-    public <T> T getClass (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+    public <T> T getClass(Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
         Set<Field> fields = ReflectionUtil.getFields(tClass);
         Map<Field, String> valueMap = new HashMap<>();
         String template = entry + "[@%s]";
@@ -78,7 +78,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
             T t = tClass.newInstance();
             for (Field field : fields) {
                 if (field.isAnnotationPresent(ConfigField.class))
-                    addConverterToFactory (converterFactory, field.getType(), field.getAnnotation(ConfigField.class));
+                    addConverterToFactory(converterFactory, field.getType(), field.getAnnotation(ConfigField.class));
 
                 Object value = converterFactory.convert(field.getType(), valueMap.get(field));
                 ReflectionUtil.setField(field, t, value);
@@ -89,11 +89,11 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         }
     }
 
-    public <T> List<T> getClasses (Class<T> tClass, String entry) {
+    public <T> List<T> getClasses(Class<T> tClass, String entry) {
         return getClasses(tClass, entry, new StringToTypeConverterFactory());
     }
 
-    public <T> List<T> getClasses (Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
+    public <T> List<T> getClasses(Class<T> tClass, String entry, StringToTypeConverterFactory converterFactory) {
         Set<Field> fields = ReflectionUtil.getFields(tClass);
         Map<Field, List<String>> valueMap = new HashMap<>();
 
@@ -103,7 +103,8 @@ public class CustomXMLConfiguration extends XMLConfiguration {
 
             if (field.isAnnotationPresent(ConfigField.class)) {
                 fieldName = field.getAnnotation(ConfigField.class).value();
-            } else {
+            }
+            else {
                 fieldName = field.getName();
             }
 
@@ -111,7 +112,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
             valueMap.put(field, list);
         }
 
-        int count = valueMap.entrySet().stream().mapToInt(e -> e.getValue().size()).min().orElse(-1);
+        int count = valueMap.entrySet().stream().filter(e -> e.getValue() != null).mapToInt(e -> e.getValue().size()).min().orElse(-1);
 
         if (count == -1) return null;
 
@@ -123,7 +124,11 @@ public class CustomXMLConfiguration extends XMLConfiguration {
                 for (Field field : fields) {
                     if (field.isAnnotationPresent(ConfigField.class))
                         addConverterToFactory(converterFactory, field.getType(), field.getAnnotation(ConfigField.class));
-                    Object value = converterFactory.convert(field.getType(), valueMap.get(field).get(i));
+
+                    Object value;
+                    if (valueMap.get(field) != null)
+                        value = converterFactory.convert(field.getType(), valueMap.get(field).get(i));
+                    else value = null;
                     ReflectionUtil.setField(field, t, value);
                 }
 

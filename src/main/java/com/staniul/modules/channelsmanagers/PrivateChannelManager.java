@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class PrivateChannelManager {
     private static Logger log = Logger.getLogger(PrivateChannelManager.class);
 
-    private final String fileName = ".data/pcm.data";
+    private final String fileName = "./data/pcm.data";
 
     @WireConfig
     private CustomXMLConfiguration config;
@@ -57,10 +57,11 @@ public class PrivateChannelManager {
             try {
                 channels = SerializeUtil.deserialize(fileName);
             } catch (IOException | ClassNotFoundException e) {
-                log.error("Failed to read object from file!", e);
+                log.error("Failed to read private channels data from file!");
                 createChannelsFromTeamspeak3Server();
             }
-        } else createChannelsFromTeamspeak3Server();
+        }
+        else createChannelsFromTeamspeak3Server();
     }
 
     @PreDestroy
@@ -68,7 +69,7 @@ public class PrivateChannelManager {
         try {
             SerializeUtil.serialize(fileName, channels);
         } catch (IOException e) {
-            log.error("Failed to serialize channels data.", e);
+            log.error("Failed to serialize channels data.");
         }
     }
 
@@ -94,7 +95,7 @@ public class PrivateChannelManager {
                         ccil.size() > 0 ? ccil.get(ccil.size() - 1).getClientDatabaseId() : -1));
             }
         } catch (QueryException e) {
-            log.error("Failed to create channels list from teamspeak 3 server.");
+            log.error("Failed to create channels list from teamspeak 3 server.", e);
         }
     }
 
@@ -162,8 +163,11 @@ public class PrivateChannelManager {
     @Task(delay = 5000)
     public void checkForClientsTask() {
         try {
-            int channelId = config.getInt("eventChannelId[@id]");
-            List<Client> clients = query.getClientList().stream().filter(client -> client.getCurrentChannelId() == channelId).collect(Collectors.toList());
+            int channelId = config.getInt("eventchannel[@id]");
+            List<Client> clients = query.getClientList().stream()
+                    .filter(client -> client.getCurrentChannelId() == channelId)
+                    .filter(client -> !client.isInServergroup(config.getIntSet("servergroups[@ignore]")))
+                    .collect(Collectors.toList());
             clients.forEach(this::createChannelForClient);
         } catch (QueryException e) {
             log.error("Failed to create channel for clients!", e);
@@ -189,7 +193,7 @@ public class PrivateChannelManager {
                     }
 
                     int channelId = query.channelCreate(properties);
-                    createSubChannels (channelId);
+                    createSubChannels(channelId);
 
                     if (freeChannel != null)
                         query.channelDelete(freeChannel.getId());
@@ -284,14 +288,13 @@ public class PrivateChannelManager {
                 if (stillEmpty)
                     channels.remove(i);
 
-                if (!channel.isFree()) {
-                    try {
-                        Channel info = query.getChannelInfo(channel.getId());
+                try {
+                    Channel info = query.getChannelInfo(channel.getId());
+                    if (!channel.isFree())
                         checkIfShouldBeMoved(channel, info);
-                        checkChannelName(channel, info);
-                    } catch (QueryException e) {
-                        log.error("Failed to manage channels!", e);
-                    }
+                    checkChannelName(channel, info);
+                } catch (QueryException e) {
+                    log.error("Failed to manage channels!", e);
                 }
             }
         }
@@ -381,12 +384,12 @@ public class PrivateChannelManager {
     }
 
     @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 0, second = 0)
-    public void moveChannelsUp () {
+    public void moveChannelsUp() {
         synchronized (channelsLock) {
             for (int i = 0; i < channels.size(); i++) {
                 PrivateChannel channel = channels.get(i);
                 if (channel.isFree()) {
-                    PrivateChannel usedChannel = findNextUsedChannel(i+1);
+                    PrivateChannel usedChannel = findNextUsedChannel(i + 1);
                     if (usedChannel == null) break;
 
                     try {
@@ -413,7 +416,7 @@ public class PrivateChannelManager {
         }
     }
 
-    private PrivateChannel findNextUsedChannel (int index) {
+    private PrivateChannel findNextUsedChannel(int index) {
         for (int i = index; i < channels.size(); i++) {
             PrivateChannel channel = channels.get(i);
             if (!channel.isFree())

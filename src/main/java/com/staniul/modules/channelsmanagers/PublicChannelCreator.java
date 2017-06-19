@@ -53,13 +53,13 @@ public class PublicChannelCreator {
                 if (matcher.find()) {
 
                     int slotNumber = Integer.parseInt(matcher.group(1));
-                    ChannelProperties properties = publicChannelProperties(subs.size() + 1, slotNumber, "publicchannel");
+                    ChannelProperties properties = publicChannelProperties(subs.size() + 1, slotNumber, "publicchannel", parent.getId());
                     query.channelCreate(properties);
 
                 } else {
                     if (parent.getName().matches(".*UNLIMITED")) {
 
-                        ChannelProperties properties = publicChannelProperties(subs.size() + 1, -1, "unlimited");
+                        ChannelProperties properties = publicChannelProperties(subs.size() + 1, -1, "unlimited", parent.getId());
                         query.channelCreate(properties);
                     }
                 }
@@ -67,17 +67,17 @@ public class PublicChannelCreator {
         }
     }
 
-    private ChannelProperties publicChannelProperties(int channelNumber, int slotNumber, String type) {
+    private ChannelProperties publicChannelProperties(int channelNumber, int slotNumber, String type, int parentId) {
         String configTemplate = type + "[@%s]";
         String name = String.format(configTemplate, "name");
         String topic = String.format(configTemplate, "topic");
         String description = String.format(configTemplate, "description");
 
         ChannelProperties properties = new ChannelProperties()
-                .setName(config.getString(name).replace("$SLOTS$", formatSlots(slotNumber)))
+                .setName(config.getString(name).replace("$SLOTS$", formatSlots(slotNumber)).replace("$NUMBER$", Integer.toString(channelNumber)))
                 .setTopic(config.getString(topic).replace("$NUMBER$", Integer.toString(channelNumber)))
                 .setDescription(config.getString(description).replace("$SLOTS$", Integer.toString(slotNumber)))
-                .setParent(config.getInt("parentchannel[@id]"));
+                .setParent(parentId);
 
         if (slotNumber == -1)
             properties.setFlag(ChannelFlagConstants.MAXCLIENTS_UNLIMITED | ChannelFlagConstants.MAXFAMILYCLIENTS_UNLIMITED);

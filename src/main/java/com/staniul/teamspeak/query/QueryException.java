@@ -20,24 +20,25 @@ public class QueryException extends Exception {
     }
 
     public QueryException(int errorId, String errorMsg) {
+        super(errorMsg + "(" + errorId + ")");
         this.errorId = errorId;
         this.errorMsg = errorMsg;
     }
 
     public QueryException(String message, int errorId, String errorMsg) {
-        super(message);
+        super(message + ", " + errorMsg + "(" + errorId + ")");
         this.errorId = errorId;
         this.errorMsg = errorMsg;
     }
 
     public QueryException(String message, Throwable cause, int errorId, String errorMsg) {
-        super(message, cause);
+        super(message + ", " + errorMsg + "(" + errorId + ")", cause);
         this.errorId = errorId;
         this.errorMsg = errorMsg;
     }
 
     public QueryException(Throwable cause, int errorId, String errorMsg) {
-        super(cause);
+        super(errorMsg + "(" + errorId + ")", cause);
         this.errorId = errorId;
         this.errorMsg = errorMsg;
     }

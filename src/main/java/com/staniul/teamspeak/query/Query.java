@@ -90,6 +90,7 @@ public class Query {
         jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_SERVER, 0);
         jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_TEXTPRIVATE, 0);
         jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_CHANNEL, configuration.getInt("event-channel[@id]"));
+        jts3ServerQuery.setDisplayName(configuration.getString("name"));
     }
 
     /**
@@ -452,7 +453,7 @@ public class Query {
      * @throws QueryException When messages are too long or teamspeak 3 query fails to send messages.
      */
     public void sendTextMessageToClient(int clientId, Collection<String> messages) throws QueryException {
-        sendTextMessageToClient(clientId, (String[]) messages.toArray());
+        sendTextMessageToClient(clientId, messages.toArray(new String[]{}));
     }
 
     /**
@@ -546,7 +547,9 @@ public class Query {
         String request = String.format("channelgroupclientlist cid=%d", channelId);
 
         Map<String, String> response = jts3ServerQuery.doCommand(request);
-        checkAndThrowQueryException("Failed to get channelgroup client list from teamspeak 3 server.", response);
+        //Error when there are no entries, so we just return empty array :)
+        if ("1281".equals(response.get("id"))) return new ArrayList<>();
+        checkAndThrowQueryException(String.format("Failed to get channelgroup client list for channel (%d) from teamspeak 3 server.", channelId), response);
 
         Vector<HashMap<String, String>> parsed = JTS3ServerQuery.parseRawData(response.get("response"));
         return parsed.stream().map(ClientChannelInfo::new).collect(Collectors.toList());
@@ -563,8 +566,9 @@ public class Query {
      */
     public int channelCreate(ChannelProperties properties) throws QueryException {
         String request = "channelcreate " + properties.toTeamspeak3QueryString();
+//        System.out.println(request);
         HashMap<String, String> response = jts3ServerQuery.doCommand(request);
-        checkAndThrowQueryException("Failed to create teamspeak 3 channel!", response);
+        checkAndThrowQueryException("Failed to create teamspeak 3 channel! " + properties, response);
         String channelId = JTS3ServerQuery.parseLine(response.get("response")).get("cid");
         return Integer.parseInt(channelId);
     }

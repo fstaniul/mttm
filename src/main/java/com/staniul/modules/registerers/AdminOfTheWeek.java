@@ -1,6 +1,8 @@
 package com.staniul.modules.registerers;
 
-public class AdminOfTheWeek {
+import java.io.Serializable;
+
+public class AdminOfTheWeek implements Serializable {
     private int clientDatabaseId;
     private int previousAdminGroup;
 

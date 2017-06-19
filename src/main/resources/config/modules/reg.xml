@@ -2,7 +2,7 @@
 <registerer>
     <groups>
         <guest id="8"/>
-        <new id="" timeconnected="1800000"/>
+        <new id="773" timeconnected="1800000"/>
         <admins id="647,786,6,679"/>
         <ignored id="930"/>
     </groups>

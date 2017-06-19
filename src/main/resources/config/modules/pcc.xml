@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <publicchannelcreator>
     <parentchannel id="741"/>
-    <publicchannel name="Publiczny ($SLOTS$)"
+    <publicchannel name="#$NUMBER$ Publiczny ($SLOTS$)"
                    topic="Publiczny #$NUMBER$"
                    description="Kanał publiczny z liczba slotów ogarniczona do [b]$SLOTS$[/b]."/>
     <unlimited name="Publiczny (∞ Slotów)"/>
