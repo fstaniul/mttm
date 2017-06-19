@@ -23,6 +23,19 @@ import java.util.stream.Collectors;
 public class AuthRestController {
     private static Logger log = Logger.getLogger(AuthRestController.class);
 
+    private static final String[] IP_HEADER_CANDIDATES = {
+            "X-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "HTTP_X_FORWARDED_FOR",
+            "HTTP_X_FORWARDED",
+            "HTTP_X_CLUSTER_CLIENT_IP",
+            "HTTP_CLIENT_IP",
+            "HTTP_FORWARDED_FOR",
+            "HTTP_FORWARDED",
+            "HTTP_VIA",
+            "REMOTE_ADDR"};
+
     private final Query query;
     private final JWTTokenProvider tokenProvider;
 
@@ -32,13 +45,21 @@ public class AuthRestController {
         this.tokenProvider = tokenProvider;
     }
 
+    public static String getClientIpAddress(HttpServletRequest request) {
+        for (String header : IP_HEADER_CANDIDATES) {
+            String ip = request.getHeader(header);
+            if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+                return ip;
+            }
+        }
+        return request.getRemoteAddr();
+    }
+
     @RequestMapping(value = "/api/auth", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
     public ResponseEntity<?> authenticateUser (HttpServletRequest request) {
-        log.info("X-FORWARDED-FOR: " + request.getHeader("X-FORWARDED-FOR"));
-        log.info("REMOTE USER: " + request.getRemoteUser());
-
-        String clientIp = request.getRemoteUser();
+        String clientIp = getClientIpAddress(request);
+        log.info("Called auth end point, ip address is: " + clientIp);
         try {
             List<Client> clients = query.getClientList().stream().filter(client -> client.getIp().equals(clientIp)).collect(Collectors.toList());
             if (clients.size() > 1)
