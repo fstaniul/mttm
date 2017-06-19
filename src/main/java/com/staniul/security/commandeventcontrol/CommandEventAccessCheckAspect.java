@@ -11,6 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
@@ -75,10 +76,14 @@ public class CommandEventAccessCheckAspect {
     }
 
     private boolean checkClientAccess (ProceedingJoinPoint pjp, Client client) {
+        log.info(String.format("Checking client (%d %s) access to method (%s)", client.getDatabaseId(), client.getNickname(),
+                ((MethodSignature) pjp.getSignature()).getMethod().getName()));
+
         List<ClientGroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, ClientGroupAccess.class);
         boolean access = true;
         for (ClientGroupAccess ann : anns) {
             Set<Integer> groups = Arrays.stream(environment.getProperty(ann.value()).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
+            log.info(String.format("Restricted by (%s), clients groups (%s)", groups, client.getServergroups()));
             ClientGroupAccessCheck check = ClientGroupAccessCheck.create(groups, ann.check());
             if (check == null || !check.apply(client))
                 access = false;

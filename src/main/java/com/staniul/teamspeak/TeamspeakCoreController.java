@@ -95,10 +95,7 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
      */
     public void callCommand(String command, Client client, String params) {
         log.info(String.format("Client (%s, %d) called command (%s) with params (%s)", client.getNickname(), client.getDatabaseId(), command, params));
-
         MethodContainer mc = commands.get(command);
-
-        log.info(String.format("Found command: %s", mc));
 
         if (mc == null)
             commandMessenger.sendResponseToClient(client, new CommandResponse(CommandExecutionStatus.NOT_FOUND, null));

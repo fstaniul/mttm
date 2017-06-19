@@ -219,6 +219,7 @@ public class PrivateChannelManager {
 
                     int channelId = query.channelCreate(properties);
                     createSubChannels(channelId);
+                    query.setChannelGroup(client.getDatabaseId(), channelId, config.getInt("channelgroups.owner[@id]"));
 
                     if (freeChannel != null)
                         query.channelDelete(freeChannel.getId());
@@ -377,7 +378,10 @@ public class PrivateChannelManager {
     private void checkChannelName(PrivateChannel privateChannel, Channel channel) throws QueryException {
         String nameTemplate = String.format("\\[%03d\\].*", privateChannel.getNumber());
         if (!channel.getName().matches(nameTemplate)) {
-            String newChannelName = String.format("[%03d]%s", privateChannel.getNumber(), channel.getName().substring(5));
+            String newChannelName;
+            if (channel.getName().matches("^[\\d*].*$"))
+                newChannelName = channel.getName().replaceFirst("[\\d*]", String.format("[%03d]", privateChannel.getNumber()));
+            else newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), channel.getName());
             query.channelRename(newChannelName, privateChannel.getId());
         }
     }
