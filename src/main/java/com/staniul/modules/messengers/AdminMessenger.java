@@ -67,7 +67,7 @@ public class AdminMessenger {
     @PreDestroy
     private void save () {
         log.info("Saving admin messages to file.");
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
             for (Message message : messages)
                 writer.printf("%s%s%s\n", message.getOwner(), delimiter, JTS3ServerQuery.encodeTS3String(message.getMessage()));
         } catch (IOException e) {

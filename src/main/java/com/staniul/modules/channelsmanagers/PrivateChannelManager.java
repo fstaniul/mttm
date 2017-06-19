@@ -86,7 +86,7 @@ public class PrivateChannelManager {
     @PreDestroy
     private void saveChannels() {
         log.info("Saving private channels data.");
-        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)), true)) {
             for (PrivateChannel channel : channels)
                 writer.printf("%d %d %d\n", channel.getNumber(), channel.getId(), channel.getNumber());
             log.info("Saved private channels data to file.");

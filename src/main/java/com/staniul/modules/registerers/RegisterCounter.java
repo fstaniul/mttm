@@ -139,7 +139,7 @@ public class RegisterCounter {
     private void save() {
         synchronized (dataLock) {
             log.info("Saving admin register data to file...");
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
                 for (Map.Entry<String, Map<Integer, Integer>> dataEntry : data.entrySet()) {
                     List<String> adminRegData = dataEntry.getValue().entrySet().stream()
                             .map(e -> e.getKey() + " " + e.getValue())

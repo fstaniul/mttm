@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -51,22 +51,36 @@ public class AdminsCompetitionJudge {
 
     @PostConstruct
     private void init() {
-        try {
-            currentAdminOfTheWeek = SerializeUtil.deserialize(dataFile);
-        } catch (IOException | ClassNotFoundException e) {
-            log.error("Failed to read admin of the week from data file " + dataFile);
+        log.info("Loading admin of the week data...");
+        File file = new File(dataFile);
+        if (file.exists() && file.isFile()) {
+            log.info("File exists, loading data...");
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line = reader.readLine();
+                String[] split = line.split("\\s+");
+                currentAdminOfTheWeek = new AdminOfTheWeek(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+            } catch (IOException e) {
+                log.error("Failed to load admin of the week from file, so there will be no admin of the week", e);
+                currentAdminOfTheWeek = new AdminOfTheWeek(-1, -1);
+            } catch (Exception e) {
+                log.error("Malformed admin of the week data!", e);
+                currentAdminOfTheWeek = new AdminOfTheWeek(-1, -1);
+            }
+        }
+        else {
+            log.info("Admin of the week data file does not exists, so there is no admin of the week.");
             currentAdminOfTheWeek = new AdminOfTheWeek(-1, -1);
         }
+
     }
 
     @PreDestroy
     private void save() {
-        if (currentAdminOfTheWeek != null) {
-            try {
-                SerializeUtil.serialize(dataFile, currentAdminOfTheWeek);
-            } catch (IOException e) {
-                log.error("Failed to save admin of the week to file " + dataFile);
-            }
+        log.info("Saving admin of the week data to file...");
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
+            writer.printf("%d %d\n", currentAdminOfTheWeek.getClientDatabaseId(), currentAdminOfTheWeek.getPreviousAdminGroup());
+        } catch (IOException e) {
+            log.error("Failed to write admin of the week data to a file.", e);
         }
     }
 

@@ -68,7 +68,7 @@ public class PrivateChannelClientMessenger {
     private void save() {
         synchronized (messageLock) {
             log.info("Saving private channel manager client messages to file...");
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
                 for (Map.Entry<Integer, String> entry : messageMap.entrySet()) {
                     writer.printf("%d%s%s\n", entry.getKey(), delimiter, entry.getValue());
                 }
