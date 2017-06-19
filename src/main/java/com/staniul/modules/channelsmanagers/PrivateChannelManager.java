@@ -379,8 +379,8 @@ public class PrivateChannelManager {
         String nameTemplate = String.format("\\[%03d\\].*", privateChannel.getNumber());
         if (!channel.getName().matches(nameTemplate)) {
             String newChannelName;
-            if (channel.getName().matches("^[\\d*].*$"))
-                newChannelName = channel.getName().replaceFirst("[\\d*]", String.format("[%03d]", privateChannel.getNumber()));
+            if (channel.getName().matches("^\\[\\d*\\].*$"))
+                newChannelName = channel.getName().replaceFirst("\\[\\d*\\]", String.format("[%03d]", privateChannel.getNumber()));
             else newChannelName = String.format("[%03d] %s", privateChannel.getNumber(), channel.getName());
             query.channelRename(newChannelName, privateChannel.getId());
         }

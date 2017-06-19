@@ -1,4 +1,4 @@
-package com.staniul.modules.adminmessenger;
+package com.staniul.modules.messengers;
 
 import com.staniul.util.validation.Validator;
 

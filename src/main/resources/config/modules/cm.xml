@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<client-messenger>
+    <groups>
+        <clients ids="8,641,789,773" />
+        <admins ids="787,679,6,647" />
+    </groups>
+
+    <responses>
+        <msg msg="Wiadomość została wysłana do użytkowników." />
+        <msgall msg="Wiadomość została wysłana do wszystkich użytkowników i administratorów." />
+        <msgadmin msg="Wiadomość została wysłana do administratorów." />
+    </responses>
+</client-messenger>

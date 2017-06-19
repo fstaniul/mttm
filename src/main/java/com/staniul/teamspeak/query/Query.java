@@ -138,7 +138,7 @@ public class Query {
             clientList.stream()
                     .map(c -> new Client(Integer.parseInt(c.get("clid")), c))
                     .forEach(result::add);
-            return result;
+            return result.stream().filter(c -> !c.isQuery()).collect(Collectors.toList());
         } catch (TS3ServerQueryException ex) {
             throwQueryException("Failed to get client list from teamspeak 3 server", ex);
             return null;
