@@ -4,7 +4,6 @@ import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
-import com.staniul.util.lang.SerializeUtil;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -44,12 +43,24 @@ public class RegisterCounter {
     @PostConstruct
     private void init() {
         synchronized (dataLock) {
+            log.info("Loading admin register data...");
             File file = new File(dataFile);
             if (file.exists() && file.isFile()) {
-                try {
-                    data = SerializeUtil.deserialize(dataFile);
-                } catch (IOException | ClassNotFoundException e) {
-                    log.error("Failed to load serialized data about admins registered clients count.");
+                log.info("File exists, loading from file...");
+                Map<String, Map<Integer, Integer>> load = new HashMap<>();
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        String[] split = line.split("\\s+");
+                        String date = split[0];
+                        Map<Integer, Integer> dateReg = new HashMap<>();
+                        for (int i = 1; i + 1 < split.length; i+=2)
+                            dateReg.put(Integer.parseInt(split[i]), Integer.parseInt(split[i + 1]));
+                        load.put(date, dateReg);
+                    }
+                    log.info("Finished loading reg data from file.");
+                } catch (IOException e) {
+                    log.error("Failed to load saved data about admins registered clients count, falling to read from teamspeak 3 logs.");
                     createDataFromLogs();
                 }
             }
@@ -59,6 +70,7 @@ public class RegisterCounter {
 
     private void createDataFromLogs() {
         synchronized (dataLock) {
+            log.info("Reading admin register data from teamspeak 3 log files...");
             File folder = new File(config.getString("log[@folder]"));
             if (!folder.exists() || !folder.isDirectory())
                 throw new IllegalStateException("Specified folder is not a log folder!");
@@ -74,6 +86,7 @@ public class RegisterCounter {
             Map<String, Map<Integer, Set<Integer>>> data = new HashMap<>();
 
             for (File file : logfiles) {
+                log.info(String.format("Scanning file %s", file));
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
@@ -109,6 +122,8 @@ public class RegisterCounter {
                 log.error("Failed to get admin list from teamspeak 3 server!", e);
             }
 
+            log.info("Finished loading data from teamspeak 3 server logs.");
+
 //        this.data = new HashMap<>();
 //        for (Map.Entry<String, Map<Integer, Set<Integer>>> entry : data.entrySet()) {
 //            this.data.putIfAbsent(entry.getKey(), new HashMap<>());
@@ -123,8 +138,16 @@ public class RegisterCounter {
     @PreDestroy
     private void save() {
         synchronized (dataLock) {
-            try {
-                SerializeUtil.serialize(dataFile, data);
+            log.info("Saving admin register data to file...");
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
+                for (Map.Entry<String, Map<Integer, Integer>> dataEntry : data.entrySet()) {
+                    List<String> adminRegData = dataEntry.getValue().entrySet().stream()
+                            .map(e -> e.getKey() + " " + e.getValue())
+                            .collect(Collectors.toList());
+                    String adminRegStringData = String.join(" ", adminRegData);
+                    writer.printf("%s %s\n", dataEntry.getKey(), adminRegData);
+                }
+                log.info("Finished saving admin register data to file.");
             } catch (IOException e) {
                 log.error("Failed to serialize file with data about admins registered clients count.");
             }
@@ -134,6 +157,7 @@ public class RegisterCounter {
     @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 5, second = 0)
     public void countRegisteredAtNoon () {
         synchronized (dataLock) {
+            log.info("Checking for admin registered clients yesterday.");
             File logFolder = new File(config.getString("log[@folder"));
             File[] logFiles = logFolder.listFiles();
 
@@ -155,6 +179,7 @@ public class RegisterCounter {
 
             Map<Integer, Set<Integer>> registeredYesterday = new HashMap<>();
 
+            log.info(String.format("Starting file checking, chosen files: %s", chosen));
             for (File file : chosen) {
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     String line;
@@ -168,6 +193,7 @@ public class RegisterCounter {
                             registeredYesterday.get(adminId).add(clintId);
                         }
                     }
+                    log.info("Finished checking files.");
                 } catch (IOException e) {
                     log.error(String.format("Failed to read log file %s", file), e);
                 }
@@ -184,6 +210,8 @@ public class RegisterCounter {
             }
 
             data.put(formatter.print(yesterday), countedReg);
+
+            log.info(String.format("Admins registered at %s: %s", formatter.print(yesterday), data.get(formatter.print(yesterday))));
 
             refreshDisplay(formatter.print(yesterday));
         }

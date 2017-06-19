@@ -1,18 +1,17 @@
 package com.staniul.modules.channelsmanagers;
 
-import com.staniul.teamspeak.commands.validators.TwoIntegerParamsValidator;
-import com.staniul.teamspeak.query.*;
-import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
-import com.staniul.teamspeak.query.channel.ChannelProperties;
+import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
+import com.staniul.teamspeak.commands.validators.TwoIntegerParamsValidator;
 import com.staniul.teamspeak.commands.validators.ValidateParams;
-import com.staniul.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.util.lang.SerializeUtil;
-import com.staniul.xmlconfig.annotations.UseConfig;
+import com.staniul.teamspeak.query.*;
+import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
+import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
+import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -51,13 +50,30 @@ public class PrivateChannelManager {
     }
 
     @PostConstruct
-    private void loadChannels() {
+    private void loadChannels() throws QueryException {
+        log.info("Loading private channels data...");
         File file = new File(fileName);
         if (file.exists() && file.isFile()) {
-            try {
-                channels = SerializeUtil.deserialize(fileName);
-            } catch (IOException | ClassNotFoundException e) {
-                log.error("Failed to read private channels data from file!");
+            log.info("File exists starting to load data.");
+            List<PrivateChannel> list = new ArrayList<>();
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] split = line.split("\\s+");
+                    int number = Integer.parseInt(split[0]);
+                    int id = Integer.parseInt(split[1]);
+                    int owner = Integer.parseInt(split[2]);
+
+                    list.add(new PrivateChannel(id, number, owner));
+                }
+                channels = list;
+                log.info(String.format("Loaded private channels: %s", channels));
+                log.info("Finished loading private channels data from files.");
+            } catch (IOException e) {
+                log.error("Failed to load private channels data from file, falling back to creating list from teamspeak 3 server.");
+                createChannelsFromTeamspeak3Server();
+            } catch (Exception e) {
+                log.error("Corrupted private channels data file, falling back to creating list from teamspeak 3 server.");
                 createChannelsFromTeamspeak3Server();
             }
         }
@@ -66,14 +82,19 @@ public class PrivateChannelManager {
 
     @PreDestroy
     private void saveChannels() {
-        try {
-            SerializeUtil.serialize(fileName, channels);
+        log.info("Saving private channels data.");
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+            for (PrivateChannel channel : channels)
+                writer.printf("%d %d %d\n", channel.getNumber(), channel.getId(), channel.getNumber());
+            log.info("Saved private channels data to file.");
         } catch (IOException e) {
-            log.error("Failed to serialize channels data.");
+            log.error("Failed to save channels data to file, duping content here:\n");
+            channels.forEach(c -> System.out.printf("%d %d %d\n", c.getNumber(), c.getId(), c.getOwner()));
         }
     }
 
-    private void createChannelsFromTeamspeak3Server() {
+    private void createChannelsFromTeamspeak3Server() throws QueryException {
+        log.info("Reading private channels data from teamspeak 3 server.");
         try {
             int parentChannelId = config.getInt("parentchannel[@id]");
             int ownerChannelgroup = config.getInt("channelgroups.owner[@id]");
@@ -94,8 +115,10 @@ public class PrivateChannelManager {
                 channels.add(new PrivateChannel(channel.getId(), i + 1,
                         ccil.size() > 0 ? ccil.get(ccil.size() - 1).getClientDatabaseId() : -1));
             }
+            log.info(String.format("Read channels from teamspeak 3 server: %s", channels));
         } catch (QueryException e) {
-            log.error("Failed to create channels list from teamspeak 3 server.", e);
+            log.fatal("Failed to create channels list from teamspeak 3 server, cannot proceed!", e);
+            throw e;
         }
     }
 
@@ -106,6 +129,7 @@ public class PrivateChannelManager {
         int channelNumber = Integer.parseInt(params);
         try {
             if (deleteChannel(channelNumber)) {
+                log.info(String.format("Deleted private channel (%d) on clients command (%d, %s)", channelNumber, client.getDatabaseId(), client.getNickname()));
                 return new CommandResponse(config.getString("messages.delete[@successful]").replace("$NUMBER$", Integer.toString(channelNumber)));
             }
             else
@@ -176,6 +200,7 @@ public class PrivateChannelManager {
 
     private void createChannelForClient(Client client) {
         synchronized (channelsLock) {
+            log.info(String.format("Creating channel for client (%d, %s)", client.getDatabaseId(), client.getNickname()));
             try {
                 PrivateChannel clientsChannel = getClientsChannel(client);
 
@@ -206,8 +231,9 @@ public class PrivateChannelManager {
 
                 moveClientToChannel(client, clientsChannel);
                 messageClientAboutSuccessfulCreation(client, clientsChannel);
+                log.info(String.format("Created channel for client (%d, %s)", client.getDatabaseId(), client.getNickname()));
             } catch (QueryException e) {
-                log.error("Failed to create channel for client!", e);
+                log.error(String.format("Failed to create channel for client (%d, %s)!", client.getDatabaseId(), client.getNickname()), e);
                 messageClientAboutFailedCreation(client);
             }
         }
@@ -294,7 +320,7 @@ public class PrivateChannelManager {
                         checkIfShouldBeMoved(channel, info);
                     checkChannelName(channel, info);
                 } catch (QueryException e) {
-                    log.error("Failed to manage channels!", e);
+                    log.error("Failed to manage channels! " + e.getMessage(), e);
                 }
             }
         }
