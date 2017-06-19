@@ -23,6 +23,7 @@ import javax.annotation.PreDestroy;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,8 +45,6 @@ public class PrivateChannelManager {
 
     private final Object channelsLock = new Object();
     private List<PrivateChannel> channels;
-
-    //TODO: ADD CHANNEL MESSENGER TO SEND MESSAGE TO CLIENT AFTER HIS CHANNEL WAS DELETED.
 
     @Autowired
     public PrivateChannelManager(Query query, PrivateChannelClientMessenger messenger) {
@@ -132,7 +131,7 @@ public class PrivateChannelManager {
     public CommandResponse deleteChannelCommand(Client client, String params) throws QueryException {
         int channelNumber = Integer.parseInt(params);
         try {
-            if (deleteChannel(channelNumber)) {
+            if (deleteChannel(channelNumber, client)) {
                 log.info(String.format("Deleted private channel (%d) on clients command (%d, %s)", channelNumber, client.getDatabaseId(), client.getNickname()));
                 return new CommandResponse(config.getString("messages.delete[@successful]").replace("$NUMBER$", Integer.toString(channelNumber)));
             }
@@ -144,7 +143,7 @@ public class PrivateChannelManager {
         }
     }
 
-    public boolean deleteChannel(int channelNumber) throws QueryException {
+    private boolean deleteChannel(int channelNumber, Client admin) throws QueryException {
         synchronized (channelsLock) {
             if (channelNumber < 0 || channelNumber > channels.size())
                 return false;
@@ -157,6 +156,8 @@ public class PrivateChannelManager {
             if (channelToDelete == null || channelToDelete.isFree()) return false;
 
             query.channelDelete(channelToDelete.getId());
+
+            messenger.addMessage(channelToDelete.getOwner(), config.getString("messages.deleted[@by-admin]").replace("$NICKNAME$", admin.getNickname()));
 
             if (channelNumber < channels.size()) {
                 ChannelProperties properties = createDefaultPropertiesForFreeChannel(channelNumber)
@@ -309,7 +310,6 @@ public class PrivateChannelManager {
     public void checkChannels() {
         synchronized (channelsLock) {
             boolean stillEmpty = true;
-
             for (int i = channels.size() - 1; i >= 0; i--) {
                 PrivateChannel channel = channels.get(i);
 
@@ -324,10 +324,33 @@ public class PrivateChannelManager {
                     if (!channel.isFree())
                         checkIfShouldBeMoved(channel, info);
                     checkChannelName(channel, info);
+
+                    if (!channel.isFree())
+                        checkIfShouldBeDeleted(channel, info);
                 } catch (QueryException e) {
                     log.error("Failed to manage channels! " + e.getMessage(), e);
                 }
             }
+        }
+    }
+
+    private void checkIfShouldBeDeleted(PrivateChannel channel, Channel info) {
+        try {
+            long emptyForDeletion = TimeUnit.DAYS.toSeconds(config.getLong("clientchannel[@max-empty-days]"));
+            if (info.getSecondsEmpty() > emptyForDeletion) {
+                ChannelProperties freeChannelProperties = createDefaultPropertiesForFreeChannel(channel.getNumber());
+                freeChannelProperties.setOrder(channel.getId());
+
+                int freeChannelId = query.channelCreate(freeChannelProperties);
+                query.channelDelete(channel.getId());
+
+                messenger.addMessage(channel.getOwner(), config.getString("messages.deleted[@msg]").replace("$DAYS$", config.getString("clientchannel[@max-empty-days]")));
+
+                channel.setId(freeChannelId);
+                channel.setOwner(PrivateChannel.FREE_CHANNEL_OWNER);
+            }
+        } catch (QueryException e) {
+            log.error("Failed to delete clients channel and make free channel in its place.", e);
         }
     }
 
@@ -364,9 +387,8 @@ public class PrivateChannelManager {
             query.channelDelete(freeChannel.getId());
 
             //Rename clients channel.
-            String newChannelName = String.format("[%03d] %s", freeChannel.getNumber(),
-                    config.getString("clientchannel[@movedname]")
-                            .replace("$FROM$", Integer.toString(privateChannel.getNumber())));
+            String newChannelName = String.format("[%03d]%s", freeChannel.getNumber(),
+                    channel.getName().substring(5));
             query.channelRename(newChannelName, privateChannel.getId());
 
             //Set client channel data in place of free:
@@ -433,6 +455,8 @@ public class PrivateChannelManager {
                         Channel channelInfo = query.getChannelInfo(usedChannel.getId());
                         String newName = String.format("[03%d]%s", channel.getNumber(), channelInfo.getName().substring(5));
                         query.channelRename(newName, usedChannel.getId());
+
+                        messenger.addMessage(usedChannel.getOwner(), config.getString("messages.moved[@msg]").replace("$NUMBER$", Integer.toString(channel.getNumber())));
 
                         channel.setId(usedChannel.getId());
                         channel.setOwner(usedChannel.getOwner());
