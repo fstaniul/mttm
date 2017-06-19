@@ -39,14 +39,18 @@ public class PrivateChannelManager {
 
     @WireConfig
     private CustomXMLConfiguration config;
-    private Query query;
+    private final Query query;
+    private final PrivateChannelClientMessenger messenger;
 
     private final Object channelsLock = new Object();
     private List<PrivateChannel> channels;
 
+    //TODO: ADD CHANNEL MESSENGER TO SEND MESSAGE TO CLIENT AFTER HIS CHANNEL WAS DELETED.
+
     @Autowired
-    public PrivateChannelManager(Query query) throws ConfigurationException {
+    public PrivateChannelManager(Query query, PrivateChannelClientMessenger messenger) {
         this.query = query;
+        this.messenger = messenger;
     }
 
     @PostConstruct

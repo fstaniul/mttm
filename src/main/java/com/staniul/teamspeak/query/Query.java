@@ -1,14 +1,13 @@
 package com.staniul.teamspeak.query;
 
-import com.staniul.teamspeak.TeamspeakCoreController;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
-import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.util.lang.StringUtil;
+import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
+import de.stefan1200.jts3serverquery.TeamspeakActionListener;
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -60,9 +59,8 @@ public class Query {
         connected = false;
     }
 
-    @Autowired
-    public void setTeamspeakActionListener(TeamspeakCoreController coreController) throws ConfigurationException {
-        this.jts3ServerQuery.setTeamspeakActionListener(new TeamspeakActionListenerImpl(this, coreController));
+    void setTeamspeakActionListener(TeamspeakActionListener actionListener) {
+        this.jts3ServerQuery.setTeamspeakActionListener(actionListener);
     }
 
     /**

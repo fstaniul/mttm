@@ -34,8 +34,9 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections) throws ConfigurationException {
+    public TeamspeakCoreController(Reflections reflections, CommandMessenger messenger) throws ConfigurationException {
         this.reflections = reflections;
+        this.commandMessenger = messenger;
         commands = new HashMap<>();
         joinEvents = new HashSet<>();
         leaveEvents = new HashSet<>();
@@ -146,10 +147,5 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
 
         initialized = true;
         init();
-    }
-
-    @Autowired
-    public void setCommandMessenger(CommandMessenger commandMessenger) {
-        this.commandMessenger = commandMessenger;
     }
 }
