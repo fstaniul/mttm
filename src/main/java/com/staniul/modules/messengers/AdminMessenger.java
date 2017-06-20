@@ -57,10 +57,14 @@ public class AdminMessenger {
                     String[] split = line.split(delimiter);
                     msg.add(new Message(split[0], JTS3ServerQuery.decodeTS3String(split[1])));
                 }
+                messages = new ArrayList<>();
             } catch (IOException e) {
                 log.error("Failed to load messages from file! Messages are cleaned.", e);
                 messages = new ArrayList<>();
             }
+        }
+        else {
+            messages = new ArrayList<>();
         }
     }
 
