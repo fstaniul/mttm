@@ -4,10 +4,12 @@ import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.util.spring.AroundAspectUtil;
 import com.staniul.util.validation.Validator;
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,8 @@ import java.lang.reflect.Method;
 @Component
 @Order(1)
 public class CommandParameterValidatorAspect {
+    private static Logger log = Logger.getLogger(CommandParameterValidatorAspect.class);
+
     private final CommandMessenger commandMessenger;
 
     @Autowired
@@ -36,9 +40,12 @@ public class CommandParameterValidatorAspect {
         Method method = AroundAspectUtil.getTargetMethodOfAspect(pjp);
         boolean valid = true;
 
+        log.info("Validating parameters of " + ((MethodSignature)pjp.getSignature()).getMethod() + ".");
+
         if (method.isAnnotationPresent(ValidateParams.class)) {
             ValidateParams[] anns = method.getAnnotationsByType(ValidateParams.class);
             for (ValidateParams ann : anns) {
+                log.info("Validator: " + ann.value() + ", parameters: " + params);
                 Validator<String> validator = ann.value().newInstance();
 
                 if (!validator.validate(params))

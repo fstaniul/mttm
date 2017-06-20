@@ -28,7 +28,7 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
     private final TeamspeakCoreController controller;
 
     @Autowired
-    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller) throws ConfigurationException {
+    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller) throws Exception {
         this.query = query;
         this.controller = controller;
         query.setTeamspeakActionListener(this);
@@ -94,7 +94,7 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
 
             String command, params;
             int splitIndex = msg.indexOf(" ");
-            if (splitIndex > 0 || splitIndex + 1 < msg.length()) {
+            if (splitIndex > 0 && splitIndex + 1 < msg.length()) {
                 command = msg.substring(0, splitIndex);
                 params = msg.substring(splitIndex + 1);
             }
@@ -108,6 +108,4 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
             log.error("Failed to get client info when text message event was fired!", e);
         }
     }
-
-
 }

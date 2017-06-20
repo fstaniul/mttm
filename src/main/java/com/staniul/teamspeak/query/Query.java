@@ -59,8 +59,11 @@ public class Query {
         connected = false;
     }
 
-    void setTeamspeakActionListener(TeamspeakActionListener actionListener) {
+    void setTeamspeakActionListener(TeamspeakActionListener actionListener) throws Exception {
         this.jts3ServerQuery.setTeamspeakActionListener(actionListener);
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_SERVER, 0);
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_TEXTPRIVATE, 0);
+        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_CHANNEL, configuration.getInt("event-channel[@id]"));
     }
 
     /**
@@ -85,9 +88,6 @@ public class Query {
         jts3ServerQuery.connectTS3Query(configuration.getString("ip"), configuration.getInt("port"));
         jts3ServerQuery.loginTS3(configuration.getString("login"), configuration.getString("password"));
         jts3ServerQuery.selectVirtualServer(configuration.getInt("serverid"));
-        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_SERVER, 0);
-        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_TEXTPRIVATE, 0);
-        jts3ServerQuery.addEventNotify(JTS3ServerQuery.EVENT_MODE_CHANNEL, configuration.getInt("event-channel[@id]"));
         jts3ServerQuery.setDisplayName(configuration.getString("name"));
     }
 

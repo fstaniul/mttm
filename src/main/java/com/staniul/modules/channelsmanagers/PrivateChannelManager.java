@@ -88,7 +88,7 @@ public class PrivateChannelManager {
         log.info("Saving private channels data.");
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName)), true)) {
             for (PrivateChannel channel : channels)
-                writer.printf("%d %d %d\n", channel.getNumber(), channel.getId(), channel.getNumber());
+                writer.printf("%d %d %d\n", channel.getNumber(), channel.getId(), channel.getOwner());
             log.info("Saved private channels data to file.");
         } catch (IOException e) {
             log.error("Failed to save channels data to file, duping content here:\n");
@@ -430,7 +430,8 @@ public class PrivateChannelManager {
                 return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", splParams[0]));
 
             query.setChannelGroup(clientDatabaseId, channel.getId(), config.getInt("channelgroups.owner[@id]"));
-            query.setChannelGroup(channel.getOwner(), channel.getId(), config.getInt("channelgroups.guest[@id]"));
+            if (channel.getOwner() != PrivateChannel.FREE_CHANNEL_OWNER)
+                query.setChannelGroup(channel.getOwner(), channel.getId(), config.getInt("channelgroups.guest[@id]"));
             channel.setOwner(clientDatabaseId);
 
             return new CommandResponse(config.getString("messages.chso[@success]")

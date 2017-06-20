@@ -119,7 +119,8 @@ public class AdminsCompetitionJudge {
 
         for (int i = 0; i < 7; i++) {
             Map<Integer, Integer> regData = registerCounter.getRegisteredAtDate(formatter.print(dateTime));
-            regData.forEach((k, v) -> data.compute(k, (a, b) -> b == null ? v : b + v));
+            if (regData != null)
+                regData.forEach((k, v) -> data.compute(k, (a, b) -> b == null ? v : b + v));
             dateTime = dateTime.minusDays(1);
         }
 

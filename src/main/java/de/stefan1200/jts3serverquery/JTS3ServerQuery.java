@@ -1,5 +1,7 @@
 package de.stefan1200.jts3serverquery;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -36,6 +38,8 @@ import java.util.Vector;
  */
 public class JTS3ServerQuery
 {
+    private static Logger log = Logger.getLogger(JTS3ServerQuery.class);
+
 	/**
 	 * Setting DEBUG to <code>true</code> will write every internal exception into an error log file and write the communication log file.
 	 * It is also possible to set the filename and path to the communication and error log file, see DEBUG_COMMLOG_PATH and DEBUG_ERRLOG_PATH.
@@ -1192,6 +1196,8 @@ public class JTS3ServerQuery
 	 */
 	public HashMap<String, String> doCommand(String command)
 	{
+	    log.info("Command called: " + command);
+
 		if (command.startsWith("use ") || command.startsWith("clientmove ") || command.startsWith("channeldelete "))
 		{
 			throw new IllegalArgumentException("This commands are not allowed here. Please use deleteChannel(), moveClient() or selectVirtualServer()!");

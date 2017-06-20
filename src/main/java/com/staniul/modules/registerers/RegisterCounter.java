@@ -145,7 +145,7 @@ public class RegisterCounter {
                             .map(e -> e.getKey() + " " + e.getValue())
                             .collect(Collectors.toList());
                     String adminRegStringData = String.join(" ", adminRegData);
-                    writer.printf("%s %s\n", dataEntry.getKey(), adminRegData);
+                    writer.printf("%s %s\n", dataEntry.getKey(), adminRegStringData);
                 }
                 log.info("Finished saving admin register data to file.");
             } catch (IOException e) {
@@ -219,6 +219,8 @@ public class RegisterCounter {
 
     public Map<Integer, Integer> getRegisteredAtDate (String date) {
         synchronized (dataLock) {
+            Map<Integer, Integer> info = data.get(date);
+            if (info == null) return new HashMap<>();
             return Collections.unmodifiableMap(data.get(date));
         }
     }
