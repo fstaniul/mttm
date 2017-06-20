@@ -2,6 +2,8 @@ package com.staniul.modules.adminlists;
 
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.teamspeak.query.Client;
@@ -28,8 +30,9 @@ public class AdminOnlineList {
 
     @WireConfig
     private CustomXMLConfiguration config;
-    private Query query;
+    private final Query query;
     private List<Servergroup> servergroupList;
+    private final Object adminsLock = new Object();
     private List<Admin> admins;
 
     @Autowired
@@ -40,8 +43,10 @@ public class AdminOnlineList {
 
     @PostConstruct
     private void init() throws QueryException {
-        setServergroupList();
-        setCurrentlyOnlineAdmins();
+        synchronized (adminsLock) {
+            setServergroupList();
+            setCurrentlyOnlineAdmins();
+        }
     }
 
     private void setServergroupList () {
@@ -55,8 +60,10 @@ public class AdminOnlineList {
     @Teamspeak3Event(EventType.JOIN)
     @ClientGroupAccess("servergroups.admins")
     public void adminJoinedEvent (Client client) {
-        addAdminToList(client);
-        refreshDisplay();
+        synchronized (adminsLock) {
+            addAdminToList(client);
+            refreshDisplay();
+        }
     }
 
     private void addAdminToList (Client client) {
@@ -76,11 +83,13 @@ public class AdminOnlineList {
 
     @Teamspeak3Event(EventType.LEAVE)
     public void removeClientFromList (Integer id) {
-        int size = admins.size();
-        admins.removeIf(admin -> admin.getId() == id);
-        if (admins.size() != size) {
-            sortAdmins();
-            refreshDisplay();
+        synchronized (adminsLock) {
+            int size = admins.size();
+            admins.removeIf(admin -> admin.getId() == id);
+            if (admins.size() != size) {
+                sortAdmins();
+                refreshDisplay();
+            }
         }
     }
 
@@ -108,9 +117,20 @@ public class AdminOnlineList {
     }
 
     public void setCurrentlyOnlineAdmins() throws QueryException {
-        Set<Integer> adminGroups = servergroupList.stream().map(sg -> sg.getId()).collect(Collectors.toSet());
+        Set<Integer> adminGroups = servergroupList.stream().map(Servergroup::getId).collect(Collectors.toSet());
         List<Client> clients = query.getClientList().stream().filter(c -> c.isInServergroup(adminGroups)).collect(Collectors.toList());
         clients.forEach(this::addAdminToList);
         refreshDisplay();
+    }
+
+    @Teamspeak3Command("!refaol")
+    @ClientGroupAccess("servergroup.admins")
+    public CommandResponse refreshAdminOnlineList (Client client, String params) throws QueryException {
+        synchronized (adminsLock) {
+            admins = new ArrayList<>();
+            setCurrentlyOnlineAdmins();
+            refreshDisplay();
+            return new CommandResponse(config.getString("messages.refaol[@response]"));
+        }
     }
 }

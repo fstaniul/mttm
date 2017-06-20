@@ -1,6 +1,5 @@
 package com.staniul.security.commandeventcontrol;
 
-import com.staniul.teamspeak.CoreCommands;
 import com.staniul.teamspeak.commands.*;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;

@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <core-commands>
     <command-list>
-        <cmd command="!help" description="Pokazuje tą listę dostępnych komend." />
-        <cmd command="!chso" description="Zmienia właściciela kanału o podanym numerze na użytkownika z podanym database id. [i](Przykład: !chso 12 19321)[/i]" />
-        <cmd command="!chdel" description="Usuwa kanał o podanym numerze. [i](Przykład: !chdel 12)[/i]" />
-        <cmd command="!msgadd" description="Dodaje wiadomość i wysyła ją do wszystkich administratorów online. Każdy administrator po dołączeniu na server otrzyma tą wiadomość." />
-        <cmd command="!msgdel" description="Usuwa wiadomość o podanym numerze lub wiadomość, która rozpoczyna się podanym ciągiem znaków." />
-        <cmd command="!refaotw" description="Odświerza administratora tygodnia na żądanie." />
+        <cmd command="!help" scope="1" description="Pokazuje tą listę dostępnych komend." />
+        <cmd command="!reg" scope="3" description="Wysyła listę nowych użytkowników obecnych teraz na serwerze." />
+        <cmd command="!chso" scope="3" description="Zmienia właściciela kanału o podanym numerze na użytkownika z podanym database id. [i](Przykład: !chso 12 19321)[/i]" />
+        <cmd command="!chdel" scope="3" description="Usuwa kanał o podanym numerze. [i](Przykład: !chdel 12)[/i]" />
+        <cmd command="!msgadd" scope="3" description="Dodaje wiadomość i wysyła ją do wszystkich administratorów online. Każdy administrator po dołączeniu na server otrzyma tą wiadomość." />
+        <cmd command="!msgdel" scope="3" description="Usuwa wiadomość o podanym numerze lub wiadomość, która rozpoczyna się podanym ciągiem znaków." />
+        <cmd command="!msgshow" scope="3" description="Wysyła wiadomości zostawione przez administratorów." />
+        <cmd command="!msg" scope="3" description="Wysyła wiadomość do użytkowników." />
+        <cmd command="!msgadmin" scope="3" description="Wysyła wiadomość do administratorów." />
+        <cmd command="!msgall" scope="3" description="Wysyła wiadomość do użytkowników i administratorów." />
+        <cmd command="!refaol" scope="4" description="Odświerza listę administratorów online." />
+        <cmd command="!refafl" scope="4" description="Odświerza listę administracji (na górze teamspeaka)." />
+        <cmd command="!refaotw" scope="4" description="Odświerza administratora tygodnia na żądanie." />
+        <cmd command="!jl" scope="1" description="Wysyła link do natychmiastowego połączenia na ten kanał na którym się znajdujesz. Możesz podać jako parametr hasło do kanału." />
+        <cmd command="!m" scope="1" description="Przenosi klienta o nicku zaczynającym się od podanych znaków na kanał do Ciebie. [i](Przykład: !m wer - Przeniesie użytkownika o nicku Weronika do Ciebie na kanał). Musisz być właścicielem, administratorem lub moderatorem kanału!" />
     </command-list>
+
+    <scopes>
+        <scope id="1" groups="8,773,641,789,787,679,6,647" />
+        <scope id="2" groups="641,789,787,679,6,647" />
+        <scope id="3" groups="787,679,6,647" />
+        <scope id="4" groups="647" />
+    </scopes>
 </core-commands>

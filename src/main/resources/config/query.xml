@@ -9,6 +9,9 @@
 
     <event-channel id="9097"/>
 
-    <welcome msg="Witaj [b]$NICKNAME$[/b]!"
-             groups="647,6,787,679"/>
+    <messages>
+        <welcome
+                msg="Witaj na naszym serwerze teamspeak, [b]$NICKNAME$[/b]! Możesz wysyłać do mnie komendy! [b]!help[/b] pokaże Ci, aktualną listę dostępnych komend."
+                groups="647,6,679,787" />
+    </messages>
 </query>

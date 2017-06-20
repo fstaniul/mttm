@@ -1,4 +1,4 @@
-package com.staniul.teamspeak;
+package com.staniul.teamspeak.corecommands;
 
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.commands.CommandResponse;
@@ -9,8 +9,8 @@ import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.misc.Cleaner;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,28 +27,21 @@ public class CoreCommands {
     @ClientGroupAccess("servergroups.admins")
     public CommandResponse listCommands (Client client, String params) {
         List<Command> commands = config.getClasses(Command.class, "command-list.cmd");
-        List<String> messages = commands.stream().map(c -> "[b]" + c.command + "[/b] - " + c.description).collect(Collectors.toList());
+        List<Integer> clientScopes = getClientScopes (client);
+        List<String> messages = commands.stream()
+                .filter(c -> clientScopes.contains(c.getScope()))
+                .map(c -> "[b]" + c.getCommand() + "[/b] - " + c.getDescription()).collect(Collectors.toList());
         return new CommandResponse(messages.toArray(new String[]{}));
     }
 
-    public static class Command {
-        private String command;
-        private String description;
-
-        public Command() {
+    private List<Integer> getClientScopes(Client client) {
+        List<Scope> scopes = config.getClasses(Scope.class, "scopes.scope");
+        List<Integer> clientScopes = new ArrayList<>();
+        for (Scope scope : scopes) {
+            if (client.isInServergroup(scope.getGroups()))
+                clientScopes.add(scope.getId());
         }
 
-        public Command(String command, String description) {
-            this.command = command;
-            this.description = description;
-        }
-
-        public String getCommand() {
-            return command;
-        }
-
-        public String getDescription() {
-            return description;
-        }
+        return clientScopes;
     }
 }

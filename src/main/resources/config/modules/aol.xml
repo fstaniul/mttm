@@ -8,4 +8,8 @@
     </groups>
 
     <displaychannel id="9097"/>
+
+    <messages>
+        <refaol response="Odświerzyłam listę administratorów online!" />
+    </messages>
 </admin-online-list>
