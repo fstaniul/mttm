@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <adminoftheweek>
     <aotw-group id="787"/>
-    <admin-groups ids=""/>
+    <admin-groups ids="787,6,679"/>
 
     <display id="11192"
              name="[cspacer]$NICKNAME$"
@@ -11,8 +11,8 @@
     <no-display id="11192"
                 name="Brak!" />
 
-    <avatars origin="~/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
-             destination="~/www/teamspeak/$DATE$.gif"
+    <avatars origin="/home/ts/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
+             destination="/home/ts/www/teamspeak/$DATE$.gif"
              url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif"/>
 
     <commands>

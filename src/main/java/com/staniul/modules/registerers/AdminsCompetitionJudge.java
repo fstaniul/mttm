@@ -8,7 +8,6 @@ import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
-import com.staniul.util.lang.SerializeUtil;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -144,19 +143,22 @@ public class AdminsCompetitionJudge {
     }
 
     private void changeAdminGroups(int newAdminsId) throws QueryException {
-        if (currentAdminOfTheWeek.getClientDatabaseId() != -1) {
-            query.servergroupAddClient(currentAdminOfTheWeek.getClientDatabaseId(), currentAdminOfTheWeek.getPreviousAdminGroup());
-            query.servergroupDeleteClient(currentAdminOfTheWeek.getClientDatabaseId(), config.getInt("aotw-group[@id]"));
+        if (currentAdminOfTheWeek.getClientDatabaseId() != newAdminsId) {
+            if (currentAdminOfTheWeek.getClientDatabaseId() != -1) {
+                query.servergroupAddClient(currentAdminOfTheWeek.getClientDatabaseId(), currentAdminOfTheWeek.getPreviousAdminGroup());
+                query.servergroupDeleteClient(currentAdminOfTheWeek.getClientDatabaseId(), config.getInt("aotw-group[@id]"));
+            }
         }
 
         if (newAdminsId == -1)
             currentAdminOfTheWeek = new AdminOfTheWeek(-1, -1);
         else {
-            int previousAdminGroupId = getPreviousAdminGroupId(newAdminsId);
-            query.servergroupAddClient(newAdminsId, config.getInt("aotw-group[@id]"));
-            query.servergroupDeleteClient(newAdminsId, previousAdminGroupId);
-
-            currentAdminOfTheWeek = new AdminOfTheWeek(newAdminsId, previousAdminGroupId);
+            if (currentAdminOfTheWeek.getClientDatabaseId() != newAdminsId) {
+                int previousAdminGroupId = getPreviousAdminGroupId(newAdminsId);
+                query.servergroupAddClient(newAdminsId, config.getInt("aotw-group[@id]"));
+                query.servergroupDeleteClient(newAdminsId, previousAdminGroupId);
+                currentAdminOfTheWeek = new AdminOfTheWeek(newAdminsId, previousAdminGroupId);
+            }
         }
     }
 
@@ -190,12 +192,13 @@ public class AdminsCompetitionJudge {
         StringBuilder description = new StringBuilder("[CENTER][SIZE=13][COLOR=ORANGE]");
         description.append(config.getString("display[@header]")).append("[/COLOR]\n\n")
                 .append("[IMG]").append(config.getString("display[@icon]")).append("[/IMG]")
-                .append("[B]").append(adminDatabaseInfo.getNickname()).append("[/B]\n\n");
+                .append(" [B]").append(adminDatabaseInfo.getNickname()).append("[/B]\n\n");
 
         try {
             String avatar = moveAvatar(adminDatabaseInfo);
             description.append("[IMG]").append(avatar).append("[/IMG]");
         } catch (IOException e) {
+            log.error("Failed to move clients avatar.", e);
             //Avatar does not exists so we just skip adding it.
         }
 

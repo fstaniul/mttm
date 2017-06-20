@@ -117,7 +117,7 @@ public class RegisterCounter {
 
             try {
                 List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
-                this.data.forEach((k, v) -> v.keySet().removeIf(adminIds::contains));
+                this.data.forEach((k, v) -> v.keySet().removeIf(c -> !adminIds.contains(c)));
             } catch (QueryException e) {
                 log.error("Failed to get admin list from teamspeak 3 server!", e);
             }
@@ -204,7 +204,7 @@ public class RegisterCounter {
 
             try {
                 List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
-                countedReg.keySet().removeIf(adminIds::contains);
+                countedReg.keySet().removeIf(k -> !adminIds.contains(k));
             } catch (QueryException e) {
                 log.error("Failed to get admin list from teamspeak 3 server!", e);
             }
@@ -221,7 +221,7 @@ public class RegisterCounter {
         synchronized (dataLock) {
             Map<Integer, Integer> info = data.get(date);
             if (info == null) return new HashMap<>();
-            return Collections.unmodifiableMap(data.get(date));
+            return Collections.unmodifiableMap(info);
         }
     }
 
