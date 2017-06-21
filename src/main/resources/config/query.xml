@@ -7,11 +7,7 @@
     <serverid>1</serverid>
     <name>Weronika</name>
 
-    <event-channel id="9097"/>
+    <event-channel id="13733"/>
 
-    <messages>
-        <welcome
-                msg="Witaj na naszym serwerze teamspeak, [b]$NICKNAME$[/b]! Możesz wysyłać do mnie komendy! [b]!help[/b] pokaże Ci, aktualną listę dostępnych komend."
-                groups="647,6,679,787" />
-    </messages>
+    <welcome msg="Hej [b]$NICKNAME$[/b]! [b]!help[/b] pokaże Ci, aktualną listę dostępnych komend." />
 </query>

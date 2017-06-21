@@ -1,9 +1,12 @@
 package com.staniul.security.commandeventcontrol;
 
-import com.staniul.teamspeak.commands.*;
-import com.staniul.teamspeak.query.Client;
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.security.clientaccesscheck.ClientGroupAccessCheck;
+import com.staniul.teamspeak.commands.CommandExecutionStatus;
+import com.staniul.teamspeak.commands.CommandMessenger;
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.util.spring.AroundAspectUtil;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -68,16 +71,19 @@ public class CommandEventAccessCheckAspect {
     public Object checkEventClientAccess (ProceedingJoinPoint pjp, Client client) throws Throwable {
         boolean access = checkClientAccess(pjp, client);
 
-        if (access)
+        if (access) {
+            log.info(String.format("Client (%d %s) access to method (%s) approved.", client.getDatabaseId(), client.getNickname(),
+                    ((MethodSignature) pjp.getSignature()).getMethod().getName()));
             return pjp.proceed();
+        }
+
+        log.info(String.format("Client (%d %s) access to method (%s) revoked.", client.getDatabaseId(), client.getNickname(),
+                ((MethodSignature) pjp.getSignature()).getMethod().getName()));
 
         return null;
     }
 
     private boolean checkClientAccess (ProceedingJoinPoint pjp, Client client) {
-        log.info(String.format("Checking client (%d %s) access to method (%s)", client.getDatabaseId(), client.getNickname(),
-                ((MethodSignature) pjp.getSignature()).getMethod().getName()));
-
         List<ClientGroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, ClientGroupAccess.class);
         boolean access = true;
         for (ClientGroupAccess ann : anns) {

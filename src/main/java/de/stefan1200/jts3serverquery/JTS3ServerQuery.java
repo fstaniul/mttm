@@ -1,24 +1,12 @@
 package de.stefan1200.jts3serverquery;
 
-import org.apache.log4j.Logger;
-
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * JTS3ServerQuery library version 2.0.6
@@ -38,8 +26,6 @@ import java.util.Vector;
  */
 public class JTS3ServerQuery
 {
-    private static Logger log = Logger.getLogger(JTS3ServerQuery.class);
-
 	/**
 	 * Setting DEBUG to <code>true</code> will write every internal exception into an error log file and write the communication log file.
 	 * It is also possible to set the filename and path to the communication and error log file, see DEBUG_COMMLOG_PATH and DEBUG_ERRLOG_PATH.
@@ -1196,8 +1182,6 @@ public class JTS3ServerQuery
 	 */
 	public HashMap<String, String> doCommand(String command)
 	{
-	    log.info("Command called: " + command);
-
 		if (command.startsWith("use ") || command.startsWith("clientmove ") || command.startsWith("channeldelete "))
 		{
 			throw new IllegalArgumentException("This commands are not allowed here. Please use deleteChannel(), moveClient() or selectVirtualServer()!");

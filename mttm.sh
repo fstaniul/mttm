@@ -2,19 +2,26 @@
 PIDFILE=./mttm.pid
 
 start () {
-    nohup java -jar mttm-1.0-SNAPSHOT.jar > ./log/$(date +%F).log 2>&1 & echo $! > "$PIDFILE"
+    nohup java -jar mttm-1.0-SNAPSHOT.jar > /dev/null 2>&1 & echo $! > "$PIDFILE"
     echo "Started."
 }
 
-killanddelete () {
+stop () {
     kill -SIGTERM $(cat "$PIDFILE")
     rm -r "$PIDFILE"
     echo "Stopped."
 }
 
-if [ "$#" == 0 ]
-then
-    echo "You need to specify parameter: start / stop / restart"
+info () {
+    echo "Accepted parameters are: start / stop / restart or no parameters then depending on existence of pid file will be started or stopped."
+}
+
+if [ "$#" == 0 ]; then
+    if [ -f "$PIDFILE" ]; then
+        stop
+    else
+        start
+    fi
 else
 
 if [ "$1" == "start" ]
@@ -25,26 +32,25 @@ then
     else
         start
     fi
-fi
 
-if [ "$1" == "stop" ]
+elif [ "$1" == "stop" ]
 then
     if [ -f "$PIDFILE" ]
     then
-        killanddelete
+        stop
     else
         echo "Program is not running!"
     fi
-fi
-
-if [ "$1" == "restart" ]
+elif [ "$1" == "restart" ]
 then
     if [ -f "$PIDFILE" ]
     then
-        killanddelete
+        stop
     fi
 
     start
+else
+    info
 fi
 
 fi

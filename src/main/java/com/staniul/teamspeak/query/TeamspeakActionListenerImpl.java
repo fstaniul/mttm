@@ -1,7 +1,7 @@
 package com.staniul.teamspeak.query;
 
+import com.staniul.modules.messengers.WelcomeMessenger;
 import com.staniul.teamspeak.TeamspeakCoreController;
-import com.staniul.util.collections.SetUtil;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -10,10 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @UseConfig("query.xml")
@@ -24,11 +21,13 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
     private CustomXMLConfiguration config;
     private final Query query;
     private final TeamspeakCoreController controller;
+    private final WelcomeMessenger welcomeMessenger;
 
     @Autowired
-    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller) throws Exception {
+    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller, WelcomeMessenger welcomeMessenger) throws Exception {
         this.query = query;
         this.controller = controller;
+        this.welcomeMessenger = welcomeMessenger;
         query.setTeamspeakActionListener(this);
 //        config = ConfigurationLoader.load(TeamspeakActionListenerImpl.class);
     }
@@ -40,16 +39,7 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
         }
 
         else if ("notifycliententerview".equals(eventType) && !"serveradmin".equals("client_unique_identifier")) {
-            Set<Integer> servergroups = Arrays.stream(eventInfo.get("client_servergroups").split(",")).map(Integer::parseInt).collect(Collectors.toSet());
-            Set<Integer> admingroups = config.getIntSet("messages.welcome[@groups]");
-            if (SetUtil.countIntersection(servergroups, admingroups) > 0L) {
-                try {
-                    String msg = config.getString("welcome[@msg]").replace("$NICKNAME$", eventInfo.get("client_nickname"));
-                    query.sendTextMessageToClient(Integer.parseInt(eventInfo.get("clid")), msg);
-                } catch (QueryException e) {
-                    log.error("Failed to send welcome message to admin that joined server.");
-                }
-            }
+            welcomeMessenger.sendWelcomeMessageToClient(eventType, eventInfo);
             invokeJoinEvent(eventInfo);
         }
 

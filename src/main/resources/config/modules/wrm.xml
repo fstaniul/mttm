@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <wait-room-mover>
-    <channel id="119" />
+    <channel id="119"/>
     <messages>
-        <moved msg="Przeniosłam użytkownika [b]$NICKNAME$[/b] do Ciebie." />
-        <not-found msg="Nie znalazłam żadnego użytkownika, którego nick rozpoczynałby się od [b]$PARAMS$[/b]." />
-        <more msg="Jest więcej użytkowników, których nick rozpoczyna się od $PARAMS$: $OPTIONS$." />
+        <moved msg="Przeniosłam użytkownika [b]$NICKNAME$[/b] do Ciebie."
+               target="Zostałeś przeniesiony przez [b]$NICKNAME$[/b]."/>
+        <not-found msg="Nie znalazłam żadnego użytkownika, którego nick rozpoczynałby się od [b]$PARAMS$[/b]."/>
+        <more msg="Jest więcej użytkowników, których nick rozpoczyna się od $PARAMS$: $OPTIONS$."/>
     </messages>
 </wait-room-mover>

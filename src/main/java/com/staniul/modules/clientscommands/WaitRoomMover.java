@@ -67,7 +67,8 @@ public class WaitRoomMover {
 
         else if (matchedClients.size() == 1 || exactMatch != null) {
             if (exactMatch == null) exactMatch = matchedClients.get(0);
-            query.moveClient(exactMatch.getId(), client.getId());
+            query.moveClient(exactMatch.getId(), client.getCurrentChannelId());
+            query.sendTextMessageToClient(exactMatch.getId(), config.getString("messages.moved[@target]").replace("$NICKNAME$", client.getNickname()));
             return new CommandResponse(config.getString("messages.moved[@msg]").replace("$NICKNAME$", exactMatch.getNickname()));
         }
 

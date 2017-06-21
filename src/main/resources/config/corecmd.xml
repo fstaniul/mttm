@@ -14,6 +14,8 @@
         <cmd command="!refaol" scope="4" description="Odświerza listę administratorów online." />
         <cmd command="!refafl" scope="4" description="Odświerza listę administracji (na górze teamspeaka)." />
         <cmd command="!refaotw" scope="4" description="Odświerza administratora tygodnia na żądanie." />
+        <cmd command="!ignore" scope="1" description="Wyłącza wiadomość powitalną wysyłaną przy każdym połączeniu na serwer." />
+        <cmd command="!unignore" scope="1" description="Włącza wysyłanie wiadomości powitalnej, o ile wcześniej opcja została wyłączona." />
         <cmd command="!jl" scope="1" description="Wysyła link do natychmiastowego połączenia na ten kanał na którym się znajdujesz. Możesz podać jako parametr hasło do kanału." />
         <cmd command="!m" scope="1" description="Przenosi klienta o nicku zaczynającym się od podanych znaków na kanał do Ciebie. [i](Przykład: !m wer - Przeniesie użytkownika o nicku Weronika do Ciebie na kanał). Musisz być właścicielem, administratorem lub moderatorem kanału!" />
     </command-list>
