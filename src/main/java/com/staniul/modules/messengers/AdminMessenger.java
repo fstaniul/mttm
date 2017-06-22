@@ -13,6 +13,7 @@ import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import de.stefan1200.jts3serverquery.JTS3ServerQuery;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 @Component
 @UseConfig("modules/amsg.xml")
 public class AdminMessenger {
-    private static Logger log = Logger.getLogger(AdminMessenger.class);
+    private static Logger log = LogManager.getLogger(AdminMessenger.class);
 
     @WireConfig
     private CustomXMLConfiguration config;

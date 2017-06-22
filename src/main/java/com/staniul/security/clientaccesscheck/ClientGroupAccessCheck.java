@@ -2,6 +2,7 @@ package com.staniul.security.clientaccesscheck;
 
 import com.staniul.teamspeak.query.Client;
 import com.staniul.security.AccessCheck;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -14,7 +15,7 @@ import java.util.Set;
  * by system.
  */
 public abstract class ClientGroupAccessCheck implements AccessCheck<Client> {
-    private static Logger log = Logger.getLogger(ClientGroupAccessCheck.class);
+    private static Logger log = LogManager.getLogger(ClientGroupAccessCheck.class);
 
     /**
      * Creates {@code ClientGroupAccessCheck} based on a subclass of {@code ClientGroupAccessCheck} with groups that are allowed

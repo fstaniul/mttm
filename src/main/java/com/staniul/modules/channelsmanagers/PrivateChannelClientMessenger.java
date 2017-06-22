@@ -8,6 +8,7 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ import java.util.Map;
 @Component
 @UseConfig("modules/pcm.xml")
 public class PrivateChannelClientMessenger {
-    private static Logger log = Logger.getLogger(PrivateChannelClientMessenger.class);
+    private static Logger log = LogManager.getLogger(PrivateChannelClientMessenger.class);
 
     @WireConfig
     private CustomXMLConfiguration config;

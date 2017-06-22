@@ -1,11 +1,12 @@
 package com.staniul.teamspeak.query;
 
 import com.staniul.modules.messengers.WelcomeMessenger;
-import com.staniul.teamspeak.TeamspeakCoreController;
+import com.staniul.teamspeak.Teamspeak3CoreController;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import de.stefan1200.jts3serverquery.TeamspeakActionListener;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,16 +16,16 @@ import java.util.HashMap;
 @Component
 @UseConfig("query.xml")
 public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
-    private static Logger log = Logger.getLogger(TeamspeakActionListenerImpl.class);
+    private static Logger log = LogManager.getLogger(TeamspeakActionListenerImpl.class);
 
     @WireConfig
     private CustomXMLConfiguration config;
     private final Query query;
-    private final TeamspeakCoreController controller;
+    private final Teamspeak3CoreController controller;
     private final WelcomeMessenger welcomeMessenger;
 
     @Autowired
-    TeamspeakActionListenerImpl(Query query, TeamspeakCoreController controller, WelcomeMessenger welcomeMessenger) throws Exception {
+    TeamspeakActionListenerImpl(Query query, Teamspeak3CoreController controller, WelcomeMessenger welcomeMessenger) throws Exception {
         this.query = query;
         this.controller = controller;
         this.welcomeMessenger = welcomeMessenger;

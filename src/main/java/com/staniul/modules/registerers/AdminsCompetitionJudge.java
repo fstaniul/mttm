@@ -11,6 +11,7 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -32,7 +33,7 @@ import java.util.Set;
 @Component
 @UseConfig("modules/aotw.xml")
 public class AdminsCompetitionJudge {
-    private static Logger log = Logger.getLogger(AdminsCompetitionJudge.class);
+    private static Logger log = LogManager.getLogger(AdminsCompetitionJudge.class);
 
     private final String dataFile = "./data/aotw.data";
 

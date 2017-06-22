@@ -9,14 +9,12 @@ import com.staniul.teamspeak.events.Teamspeak3Event;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.util.reflection.MethodContainer;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -28,8 +26,8 @@ import java.util.Set;
  * Controller of teamspeak 3 behaviour, that is events and commands.
  */
 @Component
-public class TeamspeakCoreController implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
-    private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
+public class Teamspeak3CoreController {
+    private static Logger log = LogManager.getLogger(Teamspeak3CoreController.class);
 
     private ApplicationContext applicationContext;
     private final CommandMessenger commandMessenger;
@@ -39,7 +37,7 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     private Set<MethodContainer> leaveEvents;
 
     @Autowired
-    public TeamspeakCoreController(Reflections reflections, CommandMessenger messenger) throws ConfigurationException {
+    public Teamspeak3CoreController(Reflections reflections, CommandMessenger messenger) throws ConfigurationException {
         this.reflections = reflections;
         this.commandMessenger = messenger;
         commands = new HashMap<>();
@@ -50,7 +48,7 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     /**
      * Finds methods that are events, commands and tasks.
      */
-    private void init() {
+    void init() {
         findCommands();
         findEvents();
     }
@@ -139,18 +137,7 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
         events.forEach(mc -> mc.invoke(param));
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-    }
-
-    private boolean initialized = false;
-
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (initialized) return;
-
-        initialized = true;
-        init();
     }
 }

@@ -8,6 +8,7 @@ import com.staniul.xmlconfig.convert.StringToTypeConverterFactory;
 import org.apache.commons.configuration2.HierarchicalConfiguration;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.tree.ImmutableNode;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.Field;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
  * Extended basic functionality of XMLConfiguration class.
  */
 public class CustomXMLConfiguration extends XMLConfiguration {
-    private static Logger log = Logger.getLogger(CustomXMLConfiguration.class);
+    private static Logger log = LogManager.getLogger(CustomXMLConfiguration.class);
 
     CustomXMLConfiguration(HierarchicalConfiguration<ImmutableNode> c) {
         super(c);

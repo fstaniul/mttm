@@ -1,5 +1,6 @@
 package com.staniul.util.reflection;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.annotation.Annotation;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  * Utility class to use with Reflection
  */
 public class ReflectionUtil {
-    private static Logger log = Logger.getLogger(ReflectionUtil.class);
+    private static Logger log = LogManager.getLogger(ReflectionUtil.class);
 
     /**
      * Returns set of methods in a class {@code aClass} that are annotated with {@code annotationClass}

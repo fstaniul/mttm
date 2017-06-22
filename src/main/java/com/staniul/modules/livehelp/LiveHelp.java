@@ -7,7 +7,6 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
@@ -17,8 +16,6 @@ import java.util.stream.Collectors;
 @Component
 @UseConfig("modules/lh.xml")
 public class LiveHelp {
-    private static Logger log = Logger.getLogger(LiveHelp.class);
-
     @WireConfig
     private CustomXMLConfiguration config;
     private final Query query;

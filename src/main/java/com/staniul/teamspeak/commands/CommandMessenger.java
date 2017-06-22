@@ -6,6 +6,7 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.apache.commons.configuration2.XMLConfiguration;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.Arrays;
 @Component
 @UseConfig("cmdmsg.xml")
 public class CommandMessenger {
-    private static Logger log = Logger.getLogger(CommandMessenger.class);
+    private static Logger log = LogManager.getLogger(CommandMessenger.class);
 
     @WireConfig
     private XMLConfiguration config;

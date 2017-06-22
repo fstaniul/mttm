@@ -13,7 +13,7 @@ import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @Component
 @UseConfig("modules/pcm.xml")
 public class PrivateChannelManager {
-    private static Logger log = Logger.getLogger(PrivateChannelManager.class);
+    private static Logger log = LogManager.getLogger(PrivateChannelManager.class);
 
     private final String fileName = "./data/pcm.data";
 

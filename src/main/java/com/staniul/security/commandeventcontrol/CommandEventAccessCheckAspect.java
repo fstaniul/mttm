@@ -8,6 +8,7 @@ import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.util.spring.AroundAspectUtil;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
 @Aspect
 @Order(0)
 public class CommandEventAccessCheckAspect {
-    private static Logger log = Logger.getLogger(CommandEventAccessCheckAspect.class);
+    private static Logger log = LogManager.getLogger(CommandEventAccessCheckAspect.class);
 
     private Environment environment;
     private CommandMessenger commandMessenger;

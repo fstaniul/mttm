@@ -4,6 +4,7 @@ import com.staniul.security.jwt.JWTTokenProvider;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 public class AuthRestController {
-    private static Logger log = Logger.getLogger(AuthRestController.class);
+    private static Logger log = LogManager.getLogger(AuthRestController.class);
 
     private static final String[] IP_HEADER_CANDIDATES = {
             "X-Forwarded-For",

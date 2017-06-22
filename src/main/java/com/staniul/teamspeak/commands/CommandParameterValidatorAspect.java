@@ -4,6 +4,7 @@ import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.util.spring.AroundAspectUtil;
 import com.staniul.util.validation.Validator;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -20,7 +21,7 @@ import java.lang.reflect.Method;
 @Component
 @Order(1)
 public class CommandParameterValidatorAspect {
-    private static Logger log = Logger.getLogger(CommandParameterValidatorAspect.class);
+    private static Logger log = LogManager.getLogger(CommandParameterValidatorAspect.class);
 
     private final CommandMessenger commandMessenger;
 

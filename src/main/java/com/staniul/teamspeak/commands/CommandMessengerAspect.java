@@ -1,6 +1,7 @@
 package com.staniul.teamspeak.commands;
 
 import com.staniul.teamspeak.query.Client;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Aspect
 public class CommandMessengerAspect {
-    private static Logger log = Logger.getLogger(CommandMessengerAspect.class);
+    private static Logger log = LogManager.getLogger(CommandMessengerAspect.class);
 
     private final CommandMessenger messenger;
 

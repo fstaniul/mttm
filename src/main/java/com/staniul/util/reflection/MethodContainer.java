@@ -1,12 +1,13 @@
 package com.staniul.util.reflection;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MethodContainer {
-    private static Logger log = Logger.getLogger(MethodContainer.class);
+    private static Logger log = LogManager.getLogger(MethodContainer.class);
 
     private Object target;
     private Method method;

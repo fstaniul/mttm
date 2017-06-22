@@ -7,6 +7,7 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 @Component
 @UseConfig("modules/regc.xml")
 public class RegisterCounter {
-    private static Logger log = Logger.getLogger(RegisterCounter.class);
+    private static Logger log = LogManager.getLogger(RegisterCounter.class);
 
     private final String dataFile = "./data/regc.data";
     private Map<String, Map<Integer, Integer>> data;

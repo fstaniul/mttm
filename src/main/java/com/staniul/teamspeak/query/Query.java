@@ -8,6 +8,7 @@ import de.stefan1200.jts3serverquery.JTS3ServerQuery;
 import de.stefan1200.jts3serverquery.TS3ServerQueryException;
 import de.stefan1200.jts3serverquery.TeamspeakActionListener;
 import org.apache.commons.configuration2.Configuration;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class Query {
     /**
      * Apache Log4j logger to log errors and activities.
      */
-    private static Logger log = Logger.getLogger(Query.class);
+    private static Logger log = LogManager.getLogger(Query.class);
 
     /**
      * Backed jts3serverquery object for communication with teamspeak 3 server query.
