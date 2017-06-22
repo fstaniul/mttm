@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <welcome-messenger>
-    <wm groups="8" msg="Witaj [b]$NICKNAME$[/b] na [b]ts.electronicsports.pl[/b]! Jeżeli masz pytania wejdź proszę na kanał [b]Live Help![/b], jeżeli natomiast chcesz kanał prywatny wejdź na [b]Chcesz kanał? Wejdź tutaj![/b]. Jeżeli nie chcesz tworzyć nowego kanału prywatnego, możesz skorzystać z dostępnych kanałów publicznych z ograniczoną liczbą slotów, aby nikt tobie nie przeszkadzał.\n\nPo 30 min przebywania na serwerze otrzymasz rangę NOWY i zgłosi się do Ciebie administrator, aby Cię zarejestrować.\n\nMożesz do mnie wysyłać różne komendy przez co łatwiej będzie Tobie korzystać z naszego teamspeak'a. [b]!help[/b] po wiecej informacji." />
-    <wm groups="641,789" msg="Witaj [b]$NICKNAME$[/b] ponownie na [b]ts.electronicsports.pl[/b]!\n\nMożesz do mnie wysyłać różne komendy przez co łatwiej będzie Tobie korzystać z naszego teamspeak'a. [b]!help[/b] po wiecej informacji.\n\nJeżeli nie chcesz widywać tej wiadomości napisz do mnie [b]!ignore[/b]." />
-    <wm groups="647,6,787,679" msg="Witaj [b]$NICKNAME$[/b]! [b]!help[/b] lista dostępnych komend." />
+    <messages>
+        <wm groups="8"
+            msg="Witaj [b]$NICKNAME$[/b] na [b]ts.electronicsports.pl[/b]! Jeżeli masz pytania wejdź proszę na kanał [b]Live Help![/b], jeżeli natomiast chcesz kanał prywatny wejdź na [b]Chcesz kanał? Wejdź tutaj![/b]. Jeżeli nie chcesz tworzyć nowego kanału prywatnego, możesz skorzystać z dostępnych kanałów publicznych z ograniczoną liczbą slotów, aby nikt tobie nie przeszkadzał.\n\nPo 30 min przebywania na serwerze otrzymasz rangę NOWY i zgłosi się do Ciebie administrator, aby Cię zarejestrować.\n\nMożesz do mnie wysyłać różne komendy przez co łatwiej będzie Tobie korzystać z naszego teamspeak'a. [b]!help[/b] po wiecej informacji."/>
+        <wm groups="641,789"
+            msg="Witaj ponownie [b]$NICKNAME$[/b] na [b]ts.electronicsports.pl[/b]!\n\nMożesz do mnie wysyłać różne komendy przez co łatwiej będzie Tobie korzystać z naszego teamspeak'a. [b]!help[/b] po wiecej informacji.\n\nJeżeli nie chcesz widywać tej wiadomości napisz do mnie [b]!ignore[/b]."/>
+        <wm groups="647,6,787,679"
+            msg="Witaj [b]$NICKNAME$[/b]! [b]!help[/b] lista dostępnych komend."/>
+    </messages>
 
     <commands>
-        <ignore response="Dodałam Cię do listy ignorowanych." />
-        <unignore response="Zostałeś usunięty z listy ignorowanych." />
+        <ignore response="Dodałam Cię do listy ignorowanych."/>
+        <unignore response="Zostałeś usunięty z listy ignorowanych."/>
     </commands>
 </welcome-messenger>

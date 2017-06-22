@@ -35,15 +35,18 @@ public class WelcomeMessenger {
     }
 
     @PostConstruct
-    private void init () {
-        welcomeMessages = config.getClasses(WelcomeMessage.class, "wm");
+    private void init() {
+        welcomeMessages = config.getClasses(WelcomeMessage.class, "messages.wm");
+        log.info("Loaded welcome messages: ");
+        welcomeMessages.forEach(log::info);
         loadIgnored();
     }
 
-    private void loadIgnored () {
+    private void loadIgnored() {
         try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
             Set<Integer> set = new HashSet<>();
-            String line; while ((line = reader.readLine()) != null) set.add(Integer.parseInt(line));
+            String line;
+            while ((line = reader.readLine()) != null) set.add(Integer.parseInt(line));
             ignored = Collections.synchronizedSet(set);
 
         } catch (FileNotFoundException e) {}
@@ -58,7 +61,7 @@ public class WelcomeMessenger {
     }
 
     @PreDestroy
-    private void save () {
+    private void save() {
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
             ignored.forEach(writer::println);
         } catch (IOException e) {
@@ -66,12 +69,12 @@ public class WelcomeMessenger {
         }
     }
 
-    public void sendWelcomeMessageToClient (String eventType, HashMap<String, String> eventInfo) {
+    public void sendWelcomeMessageToClient(HashMap<String, String> eventInfo) {
         try {
-            if (!"1".equals("client_type")) { // Client is not query client
-                int clientId = Integer.parseInt(eventInfo.get("clid"));
-                Client client = query.getClientInfo(clientId);
+            int clientId = Integer.parseInt(eventInfo.get("clid"));
+            Client client = query.getClientInfo(clientId);
 
+            if (!client.isQuery()) {
                 synchronized (ignored) {
                     if (!ignored.contains(client.getDatabaseId())) {
                         for (WelcomeMessage message : welcomeMessages) {
@@ -87,14 +90,14 @@ public class WelcomeMessenger {
     }
 
     @Teamspeak3Command("!ignore")
-    public CommandResponse addToIgnored (Client client, String params) {
+    public CommandResponse addToIgnored(Client client, String params) {
         ignored.add(client.getDatabaseId());
-        return new CommandResponse(config.getString("messages.ignore[@response]"));
+        return new CommandResponse(config.getString("commands.ignore[@response]"));
     }
 
     @Teamspeak3Command("!unignore")
-    public CommandResponse removeFromIgnored (Client client, String params) {
+    public CommandResponse removeFromIgnored(Client client, String params) {
         ignored.remove(client.getDatabaseId());
-        return new CommandResponse(config.getString("messages.unignore[@response]"));
+        return new CommandResponse(config.getString("commands.unignore[@response]"));
     }
 }

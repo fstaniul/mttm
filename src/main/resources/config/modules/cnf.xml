@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<client-nickname-filter>
+    <rules>
+        <rule regex=".*teamspeakuser.*" />
+        <rule regex=".*admin.*" />
+        <rule regex=".*kurwa.*" />
+    </rules>
+
+    <messages>
+        <kick>Twój nick nie jest dozwolony na serwerze!</kick>
+        <poke>[color=red][b]$NICKNAME$[/b] jest niedozwolony![/color]</poke>
+        <poke>[color=red]Zmień go, aby uniknąć wyrzucenia z serwera![/color]</poke>
+    </messages>
+</client-nickname-filter>

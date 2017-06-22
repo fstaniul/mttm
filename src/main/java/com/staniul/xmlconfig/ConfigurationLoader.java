@@ -26,6 +26,7 @@ public class ConfigurationLoader {
         String configFile = aClass.getAnnotation(UseConfig.class).value();
 
         XMLConfiguration xmlConfig = configurations.xml(ConfigurationLoader.class.getClassLoader().getResource("config/" + configFile));
+        xmlConfig.setThrowExceptionOnMissing(true);
 
         return new CustomXMLConfiguration(xmlConfig);
     }

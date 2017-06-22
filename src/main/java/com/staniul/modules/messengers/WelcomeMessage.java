@@ -12,7 +12,7 @@ public class WelcomeMessage {
     @ConfigField("msg")
     private String message;
 
-    private WelcomeMessage () {}
+    public WelcomeMessage () {}
 
     public WelcomeMessage(Set<Integer> groups, String message) {
         this.groups = groups;
@@ -29,5 +29,10 @@ public class WelcomeMessage {
 
     public String getMessage (Client client) {
         return message.replace("$NICKNAME$", client.getNickname());
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s %s", getGroups(), getMessage());
     }
 }

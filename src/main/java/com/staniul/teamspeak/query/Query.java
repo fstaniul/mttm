@@ -295,19 +295,54 @@ public class Query {
      * @throws QueryException When query fails to poke client, message is too long or client disconnected.
      */
     public void pokeClient(int clientId, String message, boolean split) throws QueryException {
-        try {
-            if (split) {
-                String[] splitMessage = StringUtil.splitOnSize(message, " ", 100);
-                for (String msg : splitMessage)
-                    jts3ServerQuery.pokeClient(clientId, msg);
-            }
-            else {
+        if (split) {
+            String[] splitMessage = StringUtil.splitOnSize(message, " ", 100);
+            pokeClient(clientId, splitMessage);
+        }
+        else {
+            try {
+
                 if (message.length() > 100)
                     message = message.substring(0, 100);
                 jts3ServerQuery.pokeClient(clientId, message);
+
+            } catch (TS3ServerQueryException e) {
+                throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, message), e);
+            }
+        }
+    }
+
+    /**
+     * Pokes client with messages given as parameter. Instead of invoking poke for each message in collection u can just
+     * pass messages as collection of strings that contain messages for client.
+     *
+     * @param clientId Client id.
+     * @param messages Collection of strings that are messages to sent.
+     *
+     * @throws QueryException When query fails to poke client.
+     */
+    public void pokeClient(int clientId, Collection<String> messages) throws QueryException {
+        pokeClient(clientId, messages.toArray(new String[]{}));
+    }
+
+    /**
+     * Pokes client with messages given as parameter. Instead of invoking poke for each message in array you can just
+     * pass array of strings as parameter.
+     *
+     * @param clientId Client id.
+     * @param messages Array of strings that are messages to sent.
+     *
+     * @throws QueryException When query fails to poke client.
+     */
+    public void pokeClient(int clientId, String[] messages) throws QueryException {
+        try {
+            for (String msg : messages) {
+                if (msg.length() > 100)
+                    msg = msg.substring(0, 100);
+                jts3ServerQuery.pokeClient(clientId, msg);
             }
         } catch (TS3ServerQueryException e) {
-            throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, message), e);
+            throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, Arrays.toString(messages)), e);
         }
     }
 

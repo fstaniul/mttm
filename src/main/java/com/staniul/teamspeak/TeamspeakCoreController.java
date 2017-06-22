@@ -1,9 +1,12 @@
 package com.staniul.teamspeak;
 
-import com.staniul.teamspeak.commands.*;
-import com.staniul.teamspeak.query.Client;
+import com.staniul.teamspeak.commands.CommandExecutionStatus;
+import com.staniul.teamspeak.commands.CommandMessenger;
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.util.reflection.MethodContainer;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -17,7 +20,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Controller of teamspeak 3 behaviour, that is events and commands.
@@ -27,8 +32,8 @@ public class TeamspeakCoreController implements ApplicationContextAware, Applica
     private static Logger log = Logger.getLogger(TeamspeakCoreController.class);
 
     private ApplicationContext applicationContext;
-    private CommandMessenger commandMessenger;
-    private Reflections reflections;
+    private final CommandMessenger commandMessenger;
+    private final Reflections reflections;
     private HashMap<String, MethodContainer> commands;
     private Set<MethodContainer> joinEvents;
     private Set<MethodContainer> leaveEvents;

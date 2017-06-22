@@ -39,7 +39,7 @@ public class TeamspeakActionListenerImpl implements TeamspeakActionListener {
         }
 
         else if ("notifycliententerview".equals(eventType) && !"serveradmin".equals("client_unique_identifier")) {
-            welcomeMessenger.sendWelcomeMessageToClient(eventType, eventInfo);
+            welcomeMessenger.sendWelcomeMessageToClient(eventInfo);
             invokeJoinEvent(eventInfo);
         }
 

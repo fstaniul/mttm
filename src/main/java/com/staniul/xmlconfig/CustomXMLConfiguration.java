@@ -137,6 +137,7 @@ public class CustomXMLConfiguration extends XMLConfiguration {
 
             return result;
         } catch (IllegalAccessException | InstantiationException e) {
+            log.error("Failed to instantiate class " + tClass, e);
             return null;
         }
     }
