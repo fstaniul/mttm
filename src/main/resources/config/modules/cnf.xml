@@ -8,7 +8,7 @@
 
     <messages>
         <kick>Twój nick nie jest dozwolony na serwerze!</kick>
-        <poke>[color=red][b]$NICKNAME$[/b] jest niedozwolony![/color]</poke>
+        <poke>[color=red]Nick [b]$NICKNAME$[/b] jest niedozwolony![/color]</poke>
         <poke>[color=red]Zmień go, aby uniknąć wyrzucenia z serwera![/color]</poke>
     </messages>
 </client-nickname-filter>
