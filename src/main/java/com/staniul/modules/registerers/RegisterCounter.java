@@ -159,7 +159,7 @@ public class RegisterCounter {
     public void countRegisteredAtNoon () {
         synchronized (dataLock) {
             log.info("Checking for admin registered clients yesterday.");
-            File logFolder = new File(config.getString("log[@folder"));
+            File logFolder = new File(config.getString("log[@folder]"));
             File[] logFiles = logFolder.listFiles();
 
             if (logFiles == null) throw new IllegalStateException("Log folder empty!");

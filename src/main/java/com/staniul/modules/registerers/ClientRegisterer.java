@@ -66,7 +66,7 @@ public class ClientRegisterer {
 
         List<Client> admins = clients.stream()
                 .filter(client -> client.isInServergroup(config.getIntSet("groups.admins[@id]")))
-                .filter(client -> !client.isInServergroup(config.getInt("groups.ignored[@id]")))
+                .filter(client -> !client.isInServergroup(config.getIntSet("groups.admins[@ignored]")))
                 .collect(Collectors.toList());
 
         for (Client client : admins) {

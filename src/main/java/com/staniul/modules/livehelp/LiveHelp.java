@@ -9,8 +9,9 @@ import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,11 +21,11 @@ public class LiveHelp {
     private CustomXMLConfiguration config;
     private final Query query;
     private final Object clientsLock = new Object();
-    private List<Client> clientsCalled;
+    private Set<Client> clientsCalled;
 
     public LiveHelp(Query query) {
         this.query = query;
-        clientsCalled = new LinkedList<>();
+        clientsCalled = new HashSet<>();
     }
 
     @Task(delay = 5 * 1000)
@@ -34,6 +35,7 @@ public class LiveHelp {
 
             List<Client> clientsInHelp = clientList.stream()
                     .filter(c -> c.getCurrentChannelId() == config.getInt("channel[@id]"))
+                    .filter(c -> !c.isAway() && !c.getHeadphones().isMuted() && c.getHeadphones().isConnected())
                     .filter(c -> !c.isInServergroup(config.getIntSet("client-groups[@ignore]")))
                     .collect(Collectors.toList());
             clientsInHelp.removeIf(c -> clientsCalled.contains(c));

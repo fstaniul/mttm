@@ -3,8 +3,7 @@
     <groups>
         <guest id="8"/>
         <new id="773" timeconnected="1800000"/>
-        <admins id="647,786,6,679"/>
-        <ignored id="930"/>
+        <admins id="647,786,6,679" ignored="775,930"/>
     </groups>
 
     <messages>

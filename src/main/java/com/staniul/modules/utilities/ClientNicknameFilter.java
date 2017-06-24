@@ -50,7 +50,7 @@ public class ClientNicknameFilter {
                 accept = false;
 
                 try {
-                    query.kickClient(client.getId(), config.getString("messages.kick[@reason]"));
+                    query.kickClient(client.getId(), config.getString("messages.kick"));
                 } catch (QueryException e) {
                     log.error(String.format("Failed to kick client (%d %s) from teamspeak 3 server, client nickname is prohibited!", client.getDatabaseId(), client.getNickname()), e);
                 }
@@ -71,7 +71,7 @@ public class ClientNicknameFilter {
                 if (pattern.matcher(lowerCaseNickname).matches()) {
                     if (warnedClients.contains(client)) {
                         warnedClients.remove(client);
-                        query.kickClient(client.getId(), config.getString("messages.kick[@reason]"));
+                        query.kickClient(client.getId(), config.getString("messages.kick"));
                     }
                     else {
                         warnedClients.add(client);
