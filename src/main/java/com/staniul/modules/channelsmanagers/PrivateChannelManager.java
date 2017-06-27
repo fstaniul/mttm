@@ -155,8 +155,6 @@ public class PrivateChannelManager {
 
             if (channelToDelete == null || channelToDelete.isFree()) return false;
 
-            query.channelDelete(channelToDelete.getId());
-
             messenger.addMessage(channelToDelete.getOwner(), config.getString("messages.deleted[@by-admin]").replace("$NICKNAME$", admin.getNickname()));
 
             if (channelNumber < channels.size()) {
@@ -164,10 +162,13 @@ public class PrivateChannelManager {
                         .setOrder(channelToDelete.getId());
                 int channelId = query.channelCreate(properties);
 
+                query.channelDelete(channelToDelete.getId());
+
                 channelToDelete.setOwner(PrivateChannel.FREE_CHANNEL_OWNER);
                 channelToDelete.setId(channelId);
             }
             else {
+                query.channelDelete(channelToDelete.getId());
                 channels.remove(channelToDelete);
             }
 
