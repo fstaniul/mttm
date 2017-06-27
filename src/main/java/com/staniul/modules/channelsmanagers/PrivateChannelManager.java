@@ -133,7 +133,7 @@ public class PrivateChannelManager {
         try {
             if (deleteChannel(channelNumber, client)) {
                 log.info(String.format("Deleted private channel (%d) on clients command (%d, %s)", channelNumber, client.getDatabaseId(), client.getNickname()));
-                return new CommandResponse(config.getString("messages.delete[@successful]").replace("$NUMBER$", Integer.toString(channelNumber)));
+                return new CommandResponse(config.getString("messages.delete[@success]").replace("$NUMBER$", Integer.toString(channelNumber)));
             }
             else
                 return new CommandResponse(config.getString("messages.delete[@fail]").replace("$NUMBER$", Integer.toString(channelNumber)));
