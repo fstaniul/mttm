@@ -1,6 +1,6 @@
 package com.staniul.modules.messengers;
 
-import com.staniul.security.web.provider.StringToIntegerSetConverter;
+import com.staniul.xmlconfig.convert.StringToIntegerSetConverter;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.xmlconfig.annotations.ConfigField;
 

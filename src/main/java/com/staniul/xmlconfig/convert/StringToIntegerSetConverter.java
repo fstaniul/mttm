@@ -1,6 +1,4 @@
-package com.staniul.security.web.provider;
-
-import com.staniul.xmlconfig.convert.StringToTypeConverter;
+package com.staniul.xmlconfig.convert;
 
 import java.util.Arrays;
 import java.util.Set;

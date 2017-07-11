@@ -1,6 +1,6 @@
 package com.staniul.teamspeak.corecommands;
 
-import com.staniul.security.web.provider.StringToIntegerSetConverter;
+import com.staniul.xmlconfig.convert.StringToIntegerSetConverter;
 import com.staniul.xmlconfig.annotations.ConfigField;
 
 import java.util.Set;

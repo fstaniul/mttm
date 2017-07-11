@@ -7,12 +7,13 @@ import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -28,15 +29,16 @@ import java.util.stream.Collectors;
 public class RegisterCounter {
     private static Logger log = LogManager.getLogger(RegisterCounter.class);
 
-    private final String dataFile = "./data/regc.data";
-    private Map<String, Map<Integer, Integer>> data;
-    private final Object dataLock = new Object();
-
     @WireConfig
     private CustomXMLConfiguration config;
-    private final Query query;
 
-    @Autowired
+    private final Query query;
+    private final String dataFile = "./data/regc.data";
+    private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+    private HashMap<String, HashMap<Integer, Integer>> data;
+    private final Object dataLock = new Object();
+
     public RegisterCounter(Query query) {
         this.query = query;
     }
@@ -44,217 +46,236 @@ public class RegisterCounter {
     @PostConstruct
     private void init() {
         synchronized (dataLock) {
-            log.info("Loading admin register data...");
+            log.info("Loading data for Register Counter...");
             File file = new File(dataFile);
             if (file.exists() && file.isFile()) {
-                log.info("File exists, loading from file...");
-                Map<String, Map<Integer, Integer>> load = new HashMap<>();
+                log.info("File exists loading data from file...");
+                HashMap<String, HashMap<Integer, Integer>> data = new HashMap<>();
+
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                     String line;
+
                     while ((line = reader.readLine()) != null) {
-                        String[] split = line.split("\\s+");
-                        String date = split[0];
-                        Map<Integer, Integer> dateReg = new HashMap<>();
-                        for (int i = 1; i + 1 < split.length; i+=2)
-                            dateReg.put(Integer.parseInt(split[i]), Integer.parseInt(split[i + 1]));
-                        load.put(date, dateReg);
+                        String[] spl = line.split("\\s+");
+                        data.putIfAbsent(spl[0], new HashMap<>());
+
+                        HashMap<Integer, Integer> adminRegs = data.get(spl[0]);
+                        for (int i = 1; i + 1 < spl.length; i++) {
+                            int adminId = Integer.parseInt(spl[i]);
+                            int regCount = Integer.parseInt(spl[i + 1]);
+                            adminRegs.put(adminId, regCount);
+                        }
                     }
-                    log.info("Finished loading reg data from file.");
+
+                    log.info("Done.");
                 } catch (IOException e) {
-                    log.error("Failed to load saved data about admins registered clients count, falling to read from teamspeak 3 logs.");
-                    createDataFromLogs();
+                    log.error("Error occurred while loading from file, falling back to reading from teamspeak 3 logs.");
+                    loadFromTeamspeak3ServerLogs();
                 }
+
+                this.data = data;
             }
-            else createDataFromLogs();
+            else loadFromTeamspeak3ServerLogs();
         }
     }
 
-    private void createDataFromLogs() {
-        synchronized (dataLock) {
-            log.info("Reading admin register data from teamspeak 3 log files...");
-            File folder = new File(config.getString("log[@folder]"));
-            if (!folder.exists() || !folder.isDirectory())
-                throw new IllegalStateException("Specified folder is not a log folder!");
+    private void loadFromTeamspeak3ServerLogs() {
+        List<File> logFiles = getLogFiles();
 
-            List<File> logfiles = Arrays.stream(folder.listFiles())
-                    .filter(f -> f.getName().matches("ts3server_.*_1.log"))
-                    .collect(Collectors.toList());
+        HashMap<String, HashMap<Integer, Integer>> data = new HashMap<>();
+        Pattern regPattern = Pattern.compile(getMatcherStringWithoutDeclaredDate());
 
-            String regGroupsRegex = String.join("|", config.getList(String.class, "register-groups.group[@id]"));
-            //2016-02-01 18:06:53.904660|INFO    |VirtualServer |  1| client (id:27010) was added to servergroup 'Zarejestrowany'(id:641) by client 'Markus'(id:25767)
-            Pattern regPattern = Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}).*client \\(id:(\\d+)\\) was added to servergroup .*\\(id:(" + regGroupsRegex + ")\\) by client .*\\(id:(\\d+)\\)");
-
-            Map<String, Map<Integer, Set<Integer>>> data = new HashMap<>();
-
-            for (File file : logfiles) {
-                log.info(String.format("Scanning file %s", file));
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        Matcher match = regPattern.matcher(line);
-                        if (match.find()) {
-                            String date = match.group(1);
-                            int clientId = Integer.parseInt(match.group(2));
-                            int adminId = Integer.parseInt(match.group(4));
+        for (File file : logFiles) {
+            log.info("Counting admin reg in file " + file.getName() + ".");
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Matcher matcher = regPattern.matcher(line);
+                    if (matcher.find()) {
+                        try {
+                            String date = matcher.group(1);
+                            int adminId = Integer.parseInt(matcher.group(5));
 
                             data.putIfAbsent(date, new HashMap<>());
-                            Map<Integer, Set<Integer>> dataAtDate = data.get(date);
-                            dataAtDate.putIfAbsent(adminId, new HashSet<>());
-                            Set<Integer> regClients = dataAtDate.get(adminId);
-                            regClients.add(clientId);
+                            HashMap<Integer, Integer> adminRegs = data.get(date);
+                            adminRegs.putIfAbsent(adminId, 0);
+                            adminRegs.put(adminId, adminRegs.get(adminId) + 1);
+                        } catch (NumberFormatException e) {
+                            log.error("Admin id is not an integer number! SOMETHING WENT WRONG!", e);
                         }
                     }
-                } catch (IOException e) {
-                    log.error(String.format("Failed to read from log file %s", file), e);
                 }
+            } catch (IOException e) {
+                log.error("Failed to read log file while reading registered clients from teamspeak 3 server logs.", e);
             }
-
-            this.data = new HashMap<>();
-            data.forEach((k, v) -> {
-                HashMap<Integer, Integer> inner = new HashMap<>();
-                v.forEach((a, b) -> inner.put(a, b.size()));
-                this.data.put(k, inner);
-            });
-
-            try {
-                List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
-                this.data.forEach((k, v) -> v.keySet().removeIf(c -> !adminIds.contains(c)));
-            } catch (QueryException e) {
-                log.error("Failed to get admin list from teamspeak 3 server!", e);
-            }
-
-            log.info("Finished loading data from teamspeak 3 server logs.");
-
-//        this.data = new HashMap<>();
-//        for (Map.Entry<String, Map<Integer, Set<Integer>>> entry : data.entrySet()) {
-//            this.data.putIfAbsent(entry.getKey(), new HashMap<>());
-//            for (Map.Entry<Integer, Set<Integer>> inEntry : entry.getValue().entrySet()) {
-//                this.data.get(entry.getKey())
-//                        .putIfAbsent(inEntry.getKey(), inEntry.getValue().size());
-//            }
-//        }
         }
+
+        this.data = data;
     }
 
     @PreDestroy
-    private void save() {
+    private void save () {
         synchronized (dataLock) {
-            log.info("Saving admin register data to file...");
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
-                for (Map.Entry<String, Map<Integer, Integer>> dataEntry : data.entrySet()) {
-                    List<String> adminRegData = dataEntry.getValue().entrySet().stream()
-                            .map(e -> e.getKey() + " " + e.getValue())
-                            .collect(Collectors.toList());
-                    String adminRegStringData = String.join(" ", adminRegData);
-                    writer.printf("%s %s\n", dataEntry.getKey(), adminRegStringData);
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
+                for (Map.Entry<String, HashMap<Integer, Integer>> dateEntry : data.entrySet()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Map.Entry<Integer, Integer> adminRegEntry : dateEntry.getValue().entrySet()) {
+                        sb.append(adminRegEntry.getKey()).append(" ").append(adminRegEntry.getValue()).append(" ");
+                    }
+                    sb.delete(sb.length() - 1, sb.length());
+                    writer.printf("%s %s\n", dateEntry.getKey(), sb.toString());
                 }
-                log.info("Finished saving admin register data to file.");
             } catch (IOException e) {
-                log.error("Failed to serialize file with data about admins registered clients count.");
+                log.error("Failed to registered data to a file!", e);
             }
         }
     }
 
-    @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 5, second = 0)
-    public void countRegisteredAtNoon () {
+    private List<File> getLogFiles() {
+        String folderPath = config.getString("logs.folder");
+        File folder = new File(folderPath);
+
+        if (!folder.exists() && !folder.isDirectory())
+            throw new IllegalStateException("Incorrect config entry for teamspeak 3 log folder!");
+
+        File[] files = folder.listFiles();
+
+        if (files == null)
+            throw new IllegalStateException("There are no files in the folder! This folder is not teamspeak 3 log folder!");
+
+        int serverId = config.getInt("logs.serverid");
+        String matcherStr = "ts3server_.*_" + serverId + "\\.log";
+
+        return Arrays.stream(files)
+                .filter(f -> f.getName().matches(matcherStr))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a matcher string for a log file line to check for registered clients by admins.
+     * Groups:
+     * 1: Date
+     * 2: Client Id
+     * 3: Servergroup Id
+     * 4: Admins Nickname
+     * 5: Admins Id
+     *
+     * @param date Date for which this string will match
+     *
+     * @return A string that is matcher for log file line for registering client.
+     */
+
+    private String getMatcherStringAtDate(ReadablePartial date) {
+        String dateStr = dateFormatter.print(date);
+        return getMatcherStringAtDate(dateStr);
+    }
+
+    private String getMatcherStringAtDate (String date) {
+        String registeredGroups = config.getString("groups.registered").replace(",", "|");
+        return String.format("(%s) .*client \\(id:(\\d+)\\) was added to servergroup '.*'\\(id:(%s)\\) by client '(.*)'\\(id:(\\d+)\\)", date, registeredGroups);
+    }
+
+
+    /**
+     * Returns a matcher string for a log file line to check for registered clients by admins.
+     * Any date will be valid for this.
+     * Groups:
+     * 1: Date
+     * 2: Client Id
+     * 3: Servergroup Id
+     * 4: Admins Nickname
+     * 5: Admins Id
+     *
+     * @return A string that is matcher for log file line for registering client.
+     */
+    private String getMatcherStringWithoutDeclaredDate() {
+        String registeredGroups = config.getString("groups.registered").replace(",", "|");
+        return String.format("(\\d{4}-\\d{2}-\\d{2}) .*client \\(id:(\\d+)\\) was added to servergroup '.*'\\(id:(%s)\\) by client '(.*)'\\(id:(\\d+)\\)", registeredGroups);
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDate (LocalDate date) {
+        return getRegisteredAtDate(dateFormatter.print(date));
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDate(DateTime date) {
+        String dateStr = dateFormatter.print(date);
+        return getRegisteredAtDate(dateStr);
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDate(String date) {
+        HashMap<Integer, Integer> atDate = data.get(date);
+        return atDate == null ? new HashMap<>() : atDate;
+    }
+
+    @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 0, second = 10)
+    public void countRegisteredAtNoon () throws QueryException {
         synchronized (dataLock) {
-            log.info("Checking for admin registered clients yesterday.");
-            File logFolder = new File(config.getString("log[@folder]"));
-            File[] logFiles = logFolder.listFiles();
-
-            if (logFiles == null) throw new IllegalStateException("Log folder empty!");
-
-            DateTime yesterday = DateTime.now().minusDays(1);
-            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-
-            List<File> files = Arrays.stream(logFiles).filter(f -> f.getName().matches("ts3server_.*_1.log")).collect(Collectors.toList());
+            List<File> files = getLogFiles();
             files.sort(Comparator.comparing(File::getName));
 
-            Pattern pattern = Pattern.compile("ts3server_" + formatter.print(yesterday) + ".*_1.log");
-            List<File> chosen = new ArrayList<>(10);
-            chosen.addAll(files.stream().filter(f -> pattern.matcher(f.getName()).matches()).collect(Collectors.toList()));
-            chosen.add(files.get(chosen.size()));
+            HashMap<Integer, Integer> registeredYesterday = new HashMap<>();
 
-            String regGroupsRegex = String.join("|", config.getList(String.class, "register-groups.group[@id]"));
-            Pattern regPattern = Pattern.compile(formatter.print(yesterday) + ".*client \\(id:(\\d+)\\) was added to servergroup .*\\(id:(" + regGroupsRegex + ")\\) by client .*\\(id:(\\d+)\\)");
+            LocalDate yesterdayDate = LocalDate.now().minusDays(1);
 
-            Map<Integer, Set<Integer>> registeredYesterday = new HashMap<>();
+            Pattern fileDatePattern = Pattern.compile("ts3server_(\\d{4}-\\d{2}-\\d{2})__.*\\.log");
+            Pattern registeredLinePattern = Pattern.compile(getMatcherStringAtDate(yesterdayDate));
 
-            log.info(String.format("Starting file checking, chosen files: %s", chosen));
-            for (File file : chosen) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        Matcher matcher = regPattern.matcher(line);
-                        if (matcher.find()) {
-                            int clintId = Integer.parseInt(matcher.group(1));
-                            int adminId = Integer.parseInt(matcher.group(3));
+            for (int i = files.size() - 1; i >= 0; i--) {
+                File file = files.get(i);
+                Matcher fileDateMatcher = fileDatePattern.matcher(file.getName());
+                if (fileDateMatcher.find()) {
 
-                            registeredYesterday.putIfAbsent(adminId, new HashSet<>());
-                            registeredYesterday.get(adminId).add(clintId);
+                    //Read the file and get info from it:
+                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            Matcher lineMatcher = registeredLinePattern.matcher(line);
+                            if (lineMatcher.find()) {
+                                int adminId = Integer.parseInt(lineMatcher.group(5));
+                                registeredYesterday.putIfAbsent(adminId, 0);
+                                registeredYesterday.put(adminId, registeredYesterday.get(adminId) + 1);
+                            }
                         }
+                    } catch (IOException e) {
+                        log.error("Failed to read the info from log file " + file.getName(), e);
                     }
-                    log.info("Finished checking files.");
-                } catch (IOException e) {
-                    log.error(String.format("Failed to read log file %s", file), e);
+
+                    LocalDate fileDate = dateFormatter.parseLocalDate(fileDateMatcher.group(1));
+                    if (fileDate.isBefore(yesterdayDate)) break;
                 }
             }
 
-            Map<Integer, Integer> countedReg = new HashMap<>();
-            registeredYesterday.forEach((k, v) -> countedReg.put(k, v.size()));
-
-            try {
-                List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
-                countedReg.keySet().removeIf(k -> !adminIds.contains(k));
-            } catch (QueryException e) {
-                log.error("Failed to get admin list from teamspeak 3 server!", e);
-            }
-
-            data.put(formatter.print(yesterday), countedReg);
-
-            log.info(String.format("Admins registered at %s: %s", formatter.print(yesterday), data.get(formatter.print(yesterday))));
-
-            refreshDisplay(formatter.print(yesterday));
+            data.put(dateFormatter.print(yesterdayDate), registeredYesterday);
         }
+
+        refreshDisplay();
     }
 
-    public Map<Integer, Integer> getRegisteredAtDate (String date) {
-        synchronized (dataLock) {
-            Map<Integer, Integer> info = data.get(date);
-            if (info == null) return new HashMap<>();
-            return Collections.unmodifiableMap(info);
+    private void refreshDisplay() throws QueryException {
+        //Date that represents yesterday
+        String date = dateFormatter.print(LocalDate.now().minusDays(1));
+
+        //Get admins information from teamspeak 3 server.
+        Set<Integer> adminGroups = config.getIntSet("groups.admins");
+        List<ClientDatabase> admins = new LinkedList<>();
+        for (int adminGroupId : adminGroups)
+            admins.addAll(query.getClientDatabaseListInServergroup(adminGroupId));
+        admins.sort(Comparator.comparing(ClientDatabase::getNickname));
+
+        HashMap<Integer, Integer> regYesterday = data.get(date);
+
+        //Create description
+        StringBuilder desc = new StringBuilder();
+        desc.append(config.getString("display.header").replace("$DATE$", date)).append("\n");
+        for (ClientDatabase admin : admins) {
+            int ryCount = regYesterday.get(admin.getDatabaseId()) == null ? 0 : regYesterday.get(admin.getDatabaseId());
+            desc.append("[b]")
+                    .append(ryCount)
+                    .append("[\\b] | ")
+                    .append(admin.getNickname());
         }
-    }
 
-    private void refreshDisplay (String date) {
-        try {
-            Map<Integer, Integer> regAtDate = getRegisteredAtDate(date);
-//            List<ClientDatabase> adminList = new ArrayList<>();
-//            for (Map.Entry<Integer, Integer> e : regAtDate.entrySet()) {
-//                adminList.add(query.getClientDatabaseInfo(e.getKey()));
-//            }
-
-            List<Integer> adminIds = query.servergroupClientList(config.getIntSet("admin-groups[@ids]"));
-            List<ClientDatabase> adminList = new ArrayList<>();
-            for (Integer adminId : adminIds)
-                adminList.add(query.getClientDatabaseInfo(adminId));
-
-
-            StringBuilder sb = new StringBuilder();
-            sb.append(config.getString("registered-display[@header]").replace("$DATE$", date)).append("\n");
-            for (ClientDatabase admin : adminList) {
-                Integer regAtThisDate = regAtDate.get(admin.getDatabaseId());
-                sb.append("[B]")
-                        .append(String.format("%3d", regAtThisDate == null ? 0 : regAtThisDate))
-                        .append("[/B]")
-                        .append(" | ")
-                        .append(admin.getNickname())
-                        .append("\n");
-            }
-
-            query.channelChangeDescription(sb.toString(), config.getInt("registered-display[@id]"));
-        } catch (QueryException e) {
-            log.error("Failed to display registered clients by admins at date " + date, e);
-        }
+        //Update description
+        query.channelChangeDescription(desc.toString(), config.getInt("display.channel-id"));
     }
 }
