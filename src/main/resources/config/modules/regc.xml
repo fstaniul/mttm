@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <register-counter>
+    <logs>
+        <folder>/home/ts/teamspeak3-electronicsports-amd64/logs</folder>
+        <serverid>1</serverid>
+    </logs>
 
+    <groups>
+        <registered>641,789</registered>
+        <admins>6,679,787</admins>
+    </groups>
+
+    <display>
+        <header>Zarejestrowani dnia [b]$DATE$[/b]:</header>
+        <channel-id>10664</channel-id>
+    </display>
 </register-counter>

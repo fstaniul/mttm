@@ -28,7 +28,7 @@ public class AdminCommanderCheck {
     @Task(delay = 5 * 60 * 1000)
     public void checkChannelCommander () throws QueryException {
         List<Client> admins = query.getClientList().stream()
-                .filter(a -> a.isInServergroup(config.getIntSet("admins")))
+                .filter(a -> a.isInServergroup(config.getIntSet("groups")))
                 .filter(a -> !a.isCommander())
                 .collect(Collectors.toList());
 
