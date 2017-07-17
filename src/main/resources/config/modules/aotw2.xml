@@ -7,7 +7,7 @@
 
     <avatars origin="/home/ts/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
              destination="/home/ts/www/teamspeak/$DATE$.gif"
-             url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif"/>
+             url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif" />
 
     <display>
         <channel-id>11192</channel-id>
