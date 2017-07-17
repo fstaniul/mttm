@@ -14,12 +14,18 @@
 
         <none>
             <channel-name>[cspacer-aotw]</channel-name>
-            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]\n\n[IMG]http://ts.electronicsports.pl/teamspeak/NO-WINNER.jpg[/IMG]</channel-desc>
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]
+
+                [IMG]http://ts.electronicsports.pl/teamspeak/NO-WINNER.jpg[/IMG]</channel-desc>
         </none>
 
         <exist>
             <channel-name>[cspacer]$NAME$</channel-name>
-            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]\n\n[IMG]http://ts.electronicsports.pl/teamspeak/icon_aotw.png[/IMG] [B]$NAME$[/B]\n\n$AVATAR$</channel-desc>
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]
+
+[IMG]http://ts.electronicsports.pl/teamspeak/icon_aotw.png[/IMG] [B]$NAME$[/B]
+
+$AVATAR$</channel-desc>
         </exist>
     </display>
 </admin-competition-judge-2>

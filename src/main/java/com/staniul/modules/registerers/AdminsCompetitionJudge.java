@@ -2,9 +2,7 @@ package com.staniul.modules.registerers;
 
 import com.staniul.modules.registerers.adminoftheweek.AdminOfTheWeek;
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
-import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
@@ -84,7 +82,7 @@ public class AdminsCompetitionJudge {
         }
     }
 
-    @Teamspeak3Command("!refaotw")
+//    @Teamspeak3Command("!refaotw")
     @ClientGroupAccess("servergroups.headadmins")
     public CommandResponse refreshAdminOfTheWeekOnCall(Client client, String params) {
         try {
@@ -96,7 +94,7 @@ public class AdminsCompetitionJudge {
         }
     }
 
-    @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 5, second = 0)
+//    @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 5, second = 0)
     public void assignNewAdminOfTheWeekTask() {
         try {
             assignNewAdminOfTheWeek();

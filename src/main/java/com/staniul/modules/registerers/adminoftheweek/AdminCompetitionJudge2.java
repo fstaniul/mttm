@@ -101,8 +101,10 @@ public class AdminCompetitionJudge2 {
     }
 
     private void removeCurrent() throws QueryException {
-        query.servergroupDeleteClient(adminOfTheWeek.getClientDatabaseId(), config.getInt("groups.aotw"));
-        query.servergroupAddClient(adminOfTheWeek.getClientDatabaseId(), adminOfTheWeek.getPreviousAdminGroup());
+        if (!adminOfTheWeek.equals(AdminOfTheWeek.NONE)) {
+            query.servergroupDeleteClient(adminOfTheWeek.getClientDatabaseId(), config.getInt("groups.aotw"));
+            query.servergroupAddClient(adminOfTheWeek.getClientDatabaseId(), adminOfTheWeek.getPreviousAdminGroup());
+        }
     }
 
     private AdminInfo countBestAdmin() throws QueryException {
@@ -166,7 +168,12 @@ public class AdminCompetitionJudge2 {
         }
 
         int channelId = config.getInt("display.channel-id");
-        query.channelRename(channelName, channelId);
+        try {
+            query.channelRename(channelName, channelId);
+        } catch (QueryException e) {
+            //Ignore error that channel name is already in use, it happens when new aotw is same as last weeks one.
+            if (e.getErrorId() != 771) throw e;
+        }
         query.channelChangeDescription(description, channelId);
     }
 

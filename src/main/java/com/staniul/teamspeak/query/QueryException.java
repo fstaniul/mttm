@@ -48,4 +48,8 @@ public class QueryException extends Exception {
         String msg = getLocalizedMessage();
         return String.format("%s: %d, %s. %s", getClass().getName(), errorId, errorMsg, (msg == null ? "" : msg));
     }
+
+    public int getErrorId() {
+        return errorId;
+    }
 }

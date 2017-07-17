@@ -4,7 +4,9 @@
 
     <parentchannel id="737"/>
     <clientchannel name="Kanał: $NICKNAME$"
-                   description="Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału. [i]Ta wiadomość może zostać usunięta.[/i]"
+                   description="Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.
+
+[i]Ta wiadomość może zostać usunięta.[/i]"
                    invalidnumbername="Nie zmieniaj numeru kanału!"
                    max-empty-days="7"/>
 
@@ -22,7 +24,11 @@
 
     <freechannel name="WOLNY"
                  topic="WOLNY"
-                 description="Wolny kanał o numerze [b]$NUMBER$[/b].\n\nJeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny. Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.\n\nJeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]WOLNY $NUMBER$[/b]"/>
+                 description="Wolny kanał o numerze [b]$NUMBER$[/b].
+
+Jeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny. Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.
+
+Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]WOLNY $NUMBER$[/b]"/>
 
     <channelgroups>
         <owner id="96"/>
