@@ -1,24 +1,30 @@
 package com.staniul.modules.registerers;
 
+import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.taskcontroller.Task;
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.ReadablePartial;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,46 +43,46 @@ public class RegisterCounter {
     private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 
     private HashMap<String, HashMap<Integer, Integer>> data;
-    private final Object dataLock = new Object();
 
+    @Autowired
     public RegisterCounter(Query query) {
         this.query = query;
     }
 
     @PostConstruct
     private void init() {
-        synchronized (dataLock) {
-            log.info("Loading data for Register Counter...");
-            File file = new File(dataFile);
-            if (file.exists() && file.isFile()) {
-                log.info("File exists loading data from file...");
-                HashMap<String, HashMap<Integer, Integer>> data = new HashMap<>();
+        log.info("Loading data for Register Counter...");
+        File file = new File(dataFile);
+        if (file.exists() && file.isFile()) {
+            log.info("File exists loading data from file...");
+            HashMap<String, HashMap<Integer, Integer>> data = null;
 
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                int numberOfLines = Integer.parseInt(reader.readLine());
+                data = new HashMap<>(numberOfLines * 100 / 70);
 
-                    while ((line = reader.readLine()) != null) {
-                        String[] spl = line.split("\\s+");
-                        data.putIfAbsent(spl[0], new HashMap<>());
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] spl = line.split("\\s+");
+                    data.putIfAbsent(spl[0], new HashMap<>());
 
-                        HashMap<Integer, Integer> adminRegs = data.get(spl[0]);
-                        for (int i = 1; i + 1 < spl.length; i++) {
-                            int adminId = Integer.parseInt(spl[i]);
-                            int regCount = Integer.parseInt(spl[i + 1]);
-                            adminRegs.put(adminId, regCount);
-                        }
+                    HashMap<Integer, Integer> adminRegs = data.get(spl[0]);
+                    for (int i = 1; i + 1 < spl.length; i++) {
+                        int adminId = Integer.parseInt(spl[i]);
+                        int regCount = Integer.parseInt(spl[i + 1]);
+                        adminRegs.put(adminId, regCount);
                     }
-
-                    log.info("Done.");
-                } catch (IOException e) {
-                    log.error("Error occurred while loading from file, falling back to reading from teamspeak 3 logs.");
-                    loadFromTeamspeak3ServerLogs();
                 }
 
-                this.data = data;
+                log.info("Done.");
+            } catch (Exception e) {
+                log.error("Error occurred while loading from file, falling back to reading from teamspeak 3 logs.");
+                loadFromTeamspeak3ServerLogs();
             }
-            else loadFromTeamspeak3ServerLogs();
+
+            this.data = data;
         }
+        else loadFromTeamspeak3ServerLogs();
     }
 
     private void loadFromTeamspeak3ServerLogs() {
@@ -114,20 +120,22 @@ public class RegisterCounter {
     }
 
     @PreDestroy
-    private void save () {
-        synchronized (dataLock) {
-            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)))) {
-                for (Map.Entry<String, HashMap<Integer, Integer>> dateEntry : data.entrySet()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Map.Entry<Integer, Integer> adminRegEntry : dateEntry.getValue().entrySet()) {
-                        sb.append(adminRegEntry.getKey()).append(" ").append(adminRegEntry.getValue()).append(" ");
-                    }
-                    sb.delete(sb.length() - 1, sb.length());
-                    writer.printf("%s %s\n", dateEntry.getKey(), sb.toString());
+    private void save() {
+        List<Map.Entry<String, HashMap<Integer, Integer>>> dataEntrySet = new LinkedList<>(data.entrySet());
+        dataEntrySet.sort(Comparator.comparing(Map.Entry::getKey));
+
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dataFile, false), StandardCharsets.UTF_8)), true)) {
+            writer.printf("%d\n", dataEntrySet.size());
+            for (Map.Entry<String, HashMap<Integer, Integer>> dateEntry : dataEntrySet) {
+                writer.print(dateEntry.getKey());
+                for (Map.Entry<Integer, Integer> adminRegEntry : dateEntry.getValue().entrySet()) {
+                    writer.printf(" %d %d", adminRegEntry.getKey(), adminRegEntry.getValue());
                 }
-            } catch (IOException e) {
-                log.error("Failed to registered data to a file!", e);
+                writer.print("\n");
             }
+            writer.flush();
+        } catch (IOException e) {
+            log.error("Failed to registered data to a file!", e);
         }
     }
 
@@ -170,7 +178,7 @@ public class RegisterCounter {
         return getMatcherStringAtDate(dateStr);
     }
 
-    private String getMatcherStringAtDate (String date) {
+    private String getMatcherStringAtDate(String date) {
         String registeredGroups = config.getString("groups.registered").replace(",", "|");
         return String.format("(%s) .*client \\(id:(\\d+)\\) was added to servergroup '.*'\\(id:(%s)\\) by client '(.*)'\\(id:(\\d+)\\)", date, registeredGroups);
     }
@@ -193,7 +201,7 @@ public class RegisterCounter {
         return String.format("(\\d{4}-\\d{2}-\\d{2}) .*client \\(id:(\\d+)\\) was added to servergroup '.*'\\(id:(%s)\\) by client '(.*)'\\(id:(\\d+)\\)", registeredGroups);
     }
 
-    public HashMap<Integer, Integer> getRegisteredAtDate (LocalDate date) {
+    public HashMap<Integer, Integer> getRegisteredAtDate(LocalDate date) {
         return getRegisteredAtDate(dateFormatter.print(date));
     }
 
@@ -208,45 +216,43 @@ public class RegisterCounter {
     }
 
     @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 0, second = 10)
-    public void countRegisteredAtNoon () throws QueryException {
-        synchronized (dataLock) {
-            List<File> files = getLogFiles();
-            files.sort(Comparator.comparing(File::getName));
+    public void countRegisteredAtNoon() throws QueryException {
+        List<File> files = getLogFiles();
+        files.sort(Comparator.comparing(File::getName));
 
-            HashMap<Integer, Integer> registeredYesterday = new HashMap<>();
+        HashMap<Integer, Integer> registeredYesterday = new HashMap<>();
 
-            LocalDate yesterdayDate = LocalDate.now().minusDays(1);
+        LocalDate yesterdayDate = LocalDate.now().minusDays(1);
 
-            Pattern fileDatePattern = Pattern.compile("ts3server_(\\d{4}-\\d{2}-\\d{2})__.*\\.log");
-            Pattern registeredLinePattern = Pattern.compile(getMatcherStringAtDate(yesterdayDate));
+        Pattern fileDatePattern = Pattern.compile("ts3server_(\\d{4}-\\d{2}-\\d{2})__.*\\.log");
+        Pattern registeredLinePattern = Pattern.compile(getMatcherStringAtDate(yesterdayDate));
 
             for (int i = files.size() - 1; i >= 0; i--) {
                 File file = files.get(i);
                 Matcher fileDateMatcher = fileDatePattern.matcher(file.getName());
                 if (fileDateMatcher.find()) {
 
-                    //Read the file and get info from it:
-                    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            Matcher lineMatcher = registeredLinePattern.matcher(line);
-                            if (lineMatcher.find()) {
-                                int adminId = Integer.parseInt(lineMatcher.group(5));
-                                registeredYesterday.putIfAbsent(adminId, 0);
-                                registeredYesterday.put(adminId, registeredYesterday.get(adminId) + 1);
-                            }
+                //Read the file and get info from it:
+                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        Matcher lineMatcher = registeredLinePattern.matcher(line);
+                        if (lineMatcher.find()) {
+                            int adminId = Integer.parseInt(lineMatcher.group(5));
+                            registeredYesterday.putIfAbsent(adminId, 0);
+                            registeredYesterday.put(adminId, registeredYesterday.get(adminId) + 1);
                         }
-                    } catch (IOException e) {
-                        log.error("Failed to read the info from log file " + file.getName(), e);
                     }
-
-                    LocalDate fileDate = dateFormatter.parseLocalDate(fileDateMatcher.group(1));
-                    if (fileDate.isBefore(yesterdayDate)) break;
+                } catch (IOException e) {
+                    log.error("Failed to read the info from log file " + file.getName(), e);
                 }
-            }
 
-            data.put(dateFormatter.print(yesterdayDate), registeredYesterday);
+                LocalDate fileDate = dateFormatter.parseLocalDate(fileDateMatcher.group(1));
+                if (fileDate.isBefore(yesterdayDate)) break;
+            }
         }
+
+        data.put(dateFormatter.print(yesterdayDate), registeredYesterday);
 
         refreshDisplay();
     }
@@ -263,6 +269,10 @@ public class RegisterCounter {
         admins.sort(Comparator.comparing(ClientDatabase::getNickname));
 
         HashMap<Integer, Integer> regYesterday = data.get(date);
+        if (regYesterday == null) {
+            countRegisteredAtNoon();
+            regYesterday = data.get(date);
+        }
 
         //Create description
         StringBuilder desc = new StringBuilder();
@@ -271,11 +281,19 @@ public class RegisterCounter {
             int ryCount = regYesterday.get(admin.getDatabaseId()) == null ? 0 : regYesterday.get(admin.getDatabaseId());
             desc.append("[b]")
                     .append(ryCount)
-                    .append("[\\b] | ")
-                    .append(admin.getNickname());
+                    .append("[/b] | ")
+                    .append(admin.getNickname())
+                    .append("\n");
         }
 
         //Update description
         query.channelChangeDescription(desc.toString(), config.getInt("display.channel-id"));
+    }
+
+    @Teamspeak3Command("!refregc")
+    @ClientGroupAccess("servergroups.headadmins")
+    public CommandResponse refreshRegisterCounterDisplay(Client client, String params) throws QueryException {
+        refreshDisplay();
+        return new CommandResponse("Refreshed Register Counter display.");
     }
 }

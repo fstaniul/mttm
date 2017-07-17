@@ -1,6 +1,6 @@
 package com.staniul.teamspeak.query;
 
-import com.staniul.modules.messengers.WelcomeMessenger;
+import com.staniul.modules.messengers.welcomemessanger.WelcomeMessenger;
 import com.staniul.teamspeak.Teamspeak3CoreController;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;

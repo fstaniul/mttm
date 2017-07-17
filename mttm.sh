@@ -2,7 +2,7 @@
 PIDFILE=./mttm.pid
 
 start () {
-    nohup java -jar mttm-1.0-SNAPSHOT.jar > /dev/null 2>&1 & echo $! > "$PIDFILE"
+    nohup java -jar mttm-1.1.jar > /dev/null 2>&1 & echo $! > "$PIDFILE"
     echo "Started."
 }
 

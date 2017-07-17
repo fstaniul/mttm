@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<admin-competition-judge-2>
+    <groups>
+        <aotw>787</aotw>
+        <admins>6,679,787</admins>
+    </groups>
+
+    <avatars origin="/home/ts/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
+             destination="/home/ts/www/teamspeak/$DATE$.gif"
+             url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif"/>
+
+    <display>
+        <channel-id>11192</channel-id>
+
+        <none>
+            <channel-name>[cspacer-aotw]</channel-name>
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]\n\n[IMG]http://ts.electronicsports.pl/teamspeak/NO-WINNER.jpg[/IMG]</channel-desc>
+        </none>
+
+        <exist>
+            <channel-name>[cspacer]$NAME$</channel-name>
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]\n\n[IMG]http://ts.electronicsports.pl/teamspeak/icon_aotw.png[/IMG] [B]$NAME$[/B]\n\n$AVATAR$</channel-desc>
+        </exist>
+    </display>
+</admin-competition-judge-2>

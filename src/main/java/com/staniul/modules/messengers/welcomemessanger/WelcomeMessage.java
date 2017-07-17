@@ -1,15 +1,11 @@
-package com.staniul.modules.messengers;
+package com.staniul.modules.messengers.welcomemessanger;
 
-import com.staniul.xmlconfig.convert.StringToIntegerSetConverter;
 import com.staniul.teamspeak.query.Client;
-import com.staniul.xmlconfig.annotations.ConfigField;
 
 import java.util.Set;
 
 public class WelcomeMessage {
-    @ConfigField(value = "groups", converter = StringToIntegerSetConverter.class)
     private Set<Integer> groups;
-    @ConfigField("msg")
     private String message;
 
     public WelcomeMessage () {}

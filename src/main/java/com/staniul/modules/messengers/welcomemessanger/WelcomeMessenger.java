@@ -1,4 +1,4 @@
-package com.staniul.modules.messengers;
+package com.staniul.modules.messengers.welcomemessanger;
 
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
@@ -16,7 +16,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 @UseConfig("modules/wm.xml")
@@ -28,6 +32,7 @@ public class WelcomeMessenger {
     private final Query query;
     private List<WelcomeMessage> welcomeMessages;
     private final String dataFile = "./data/wm.data";
+    private final String messagesFile = "./data/msg/wm.txt";
     private Set<Integer> ignored;
 
     @Autowired
@@ -37,10 +42,34 @@ public class WelcomeMessenger {
 
     @PostConstruct
     private void init() {
-        welcomeMessages = config.getClasses(WelcomeMessage.class, "messages.wm");
+        readMessagesFromFile();
         log.info("Loaded welcome messages: ");
         welcomeMessages.forEach(log::info);
         loadIgnored();
+    }
+
+    private void readMessagesFromFile () {
+        log.info("Reading messages from file...");
+        Pattern messagePattern = Pattern.compile("\\{(.*)}\\s(.*)");
+        File messageFile = new File(messagesFile);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(messageFile), StandardCharsets.UTF_8))) {
+            welcomeMessages = new ArrayList<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Matcher lineMatcher = messagePattern.matcher(line);
+                if (lineMatcher.find()) {
+                    Set<Integer> groups = Arrays.stream(lineMatcher.group(1).split(","))
+                            .map(Integer::parseInt)
+                            .collect(Collectors.toSet());
+                    String message = lineMatcher.group(2);
+
+                    welcomeMessages.add(new WelcomeMessage(groups, message));
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to load welcome messages from file!");
+        }
+        log.info("Finished reading messages.");
     }
 
     private void loadIgnored() {

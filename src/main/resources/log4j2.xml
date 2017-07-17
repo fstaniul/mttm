@@ -2,7 +2,7 @@
 <Configuration status="WARN" name="mttm" packages="">
     <Appenders>
         <RollingFile name="RollingFile" fileName="./logs/mttm.log"
-                     filePattern="./logs/%d{dd-MM-yyyy}_%i.log">
+                     filePattern="./logs/%d{yyyy-MM-dd}_%i.log">
             <PatternLayout>
                 <Pattern>%d{HH:mm:ss} [%10.10t] %-5p --- %c{1.} :: %m%n</Pattern>
             </PatternLayout>

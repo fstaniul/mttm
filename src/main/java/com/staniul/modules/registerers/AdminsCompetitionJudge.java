@@ -1,5 +1,6 @@
 package com.staniul.modules.registerers;
 
+import com.staniul.modules.registerers.adminoftheweek.AdminOfTheWeek;
 import com.staniul.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
@@ -9,7 +10,6 @@ import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
-import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +17,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -30,8 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
-@UseConfig("modules/aotw.xml")
+//@Component
+//@UseConfig("modules/aotw.xml")
+@Deprecated
 public class AdminsCompetitionJudge {
     private static Logger log = LogManager.getLogger(AdminsCompetitionJudge.class);
 
