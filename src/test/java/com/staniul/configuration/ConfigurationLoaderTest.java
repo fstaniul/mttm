@@ -1,8 +1,8 @@
 package com.staniul.configuration;
 
-import com.staniul.modules.adminlists.AdminOnlineList;
-import com.staniul.modules.adminlists.Servergroup;
-import com.staniul.modules.registerers.ClientRegisterer;
+import com.staniul.teamspeak.modules.adminlists.AdminOnlineList;
+import com.staniul.teamspeak.modules.adminlists.Servergroup;
+import com.staniul.teamspeak.modules.registerers.ClientRegisterer;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.xmlconfig.ConfigurationLoader;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
