@@ -216,41 +216,19 @@
 #!/usr/bin/env bash
 PIDFILE=./mttm.pid
 
-process_exist () {
-    [ ps -p $(cat "$$PIDFILE") ]
-}
-
 start () {
     nohup java -jar ${project.name}-${project.version}.jar > /dev/null 2>&1 & echo $! > "$$PIDFILE"
     echo "Started."
 }
 
 stop () {
-    if process_exist; then
-        kill -SIGTERM $(cat "$$PIDFILE")
-        echo "Stopped."
-    else
-        echo "Program crushed. PID found but no process is running."
-    fi
-
+    kill -SIGTERM $(cat "$$PIDFILE")
     rm -r "$$PIDFILE"
-}
-
-status () {
-    if [ -f "$$PIDFILE" ]; then
-        if process_exist; then
-            echo "Program is running."
-        else
-            echo "Program crushed, PID found but no process is active. Deleting pid file."
-            rm -r "$$PIDFILE"
-        fi
-    else
-        echo "Program is stopped."
-    fi
+    echo "Stopped."
 }
 
 info () {
-    echo "Accepted parameters are: start / stop / restart / status or no parameters, then depending on existence of pid file will be started or stopped."
+    echo "Accepted parameters are: start / stop / restart or no parameters then depending on existence of pid file will be started or stopped."
 }
 
 if [ "$$#" == 0 ]; then
@@ -286,11 +264,6 @@ then
     fi
 
     start
-
-elif [ "$$1" == "status" ]
-then
-    status
-
 else
     info
 fi

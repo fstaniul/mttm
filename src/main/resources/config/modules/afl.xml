@@ -8,7 +8,7 @@
 
     <aotw id="787"/>
 
-    <display channel-id="7710"
+    <display id="7710"
              listsign=" • "
              entry="[b]$ENTRY$[/b]"
              header="[size=13][color=blue] $HEADER$:[/color][/size]" />
