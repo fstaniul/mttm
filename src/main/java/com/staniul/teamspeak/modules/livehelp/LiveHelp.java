@@ -47,7 +47,7 @@ public class LiveHelp {
                     .collect(Collectors.toList());
 
             List<Client> adminsWhoCanHelp = admins.stream()
-                    .filter(c -> !c.isAway() && c.getHeadphones().isConnected() && !c.getHeadphones().isMuted())
+                    .filter(c -> !c.isAway() && c.getHeadphones().isConnected())
                     .collect(Collectors.toList());
 
             String message;
@@ -62,7 +62,7 @@ public class LiveHelp {
 
                 String url = String.format("[URL=client://%d/%s][B]%s[/B][/URL]", clientInNeed.getId(), clientInNeed.getUniqueId(), clientInNeed.getNickname());
                 String msg = config.getString("messages.admin[@info]").replace("$URL$", url);
-                for (Client admin : admins)
+                for (Client admin : adminsWhoCanHelp)
                     query.sendTextMessageToClient(admin.getId(), msg);
 
                 query.sendTextMessageToClient(clientInNeed.getId(), message);

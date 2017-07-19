@@ -2,7 +2,7 @@
 <admin-competition-judge-2>
     <groups>
         <aotw>787</aotw>
-        <admins>6,679,787</admins>
+        <admins>679,787</admins>
     </groups>
 
     <avatars origin="/home/ts/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
@@ -14,14 +14,14 @@
 
         <none>
             <channel-name>[cspacer-aotw]</channel-name>
-            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Moderator tygodnia:[/COLOR]
 
                 [IMG]http://ts.electronicsports.pl/teamspeak/NO-WINNER.jpg[/IMG]</channel-desc>
         </none>
 
         <exist>
             <channel-name>[cspacer]$NAME$</channel-name>
-            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Administrator tygodnia:[/COLOR]
+            <channel-desc>[CENTER][SIZE=13][COLOR=ORANGE]Moderator tygodnia:[/COLOR]
 
 [IMG]http://ts.electronicsports.pl/teamspeak/icon_aotw.png[/IMG] [B]$NAME$[/B]
 

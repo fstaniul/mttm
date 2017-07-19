@@ -215,6 +215,38 @@ public class RegisterCounter {
         return atDate == null ? new HashMap<>() : atDate;
     }
 
+    public HashMap<Integer, Integer> getRegisteredAtDateRange(Date from, Date to) {
+        return getRegisteredAtDateRange(LocalDate.fromDateFields(from), LocalDate.fromDateFields(to));
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDateRange(String from, String to) {
+        return getRegisteredAtDateRange(dateFormatter.parseLocalDate(from), dateFormatter.parseLocalDate(to));
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDateRange (DateTime from, DateTime to) {
+        return getRegisteredAtDateRange(from.toLocalDate(), to.toLocalDate());
+    }
+
+    public HashMap<Integer, Integer> getRegisteredAtDateRange (LocalDate from, LocalDate to) {
+        if (to.isBefore(from)) {
+            LocalDate tmp = from;
+            to = from;
+            from = tmp;
+        }
+
+        HashMap<Integer, Integer> ret = new HashMap<>();
+
+        for (LocalDate now = from; now.isBefore(to); now = now.plusDays(1)) {
+            String date = dateFormatter.print(now);
+            HashMap<Integer, Integer> regMap = getRegisteredAtDate(date);
+            for (Map.Entry<Integer, Integer> reg : regMap.entrySet())
+                ret.compute(reg.getKey(),
+                        (k, v) -> v == null ? reg.getValue() : v + reg.getValue());
+        }
+
+        return ret;
+    }
+
     @Task(delay = 24 * 60 * 60 * 1000, hour = 0, minute = 0, second = 10)
     public void countRegisteredAtNoon() throws QueryException {
         List<File> files = getLogFiles();

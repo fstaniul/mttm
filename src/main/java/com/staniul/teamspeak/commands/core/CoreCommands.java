@@ -1,6 +1,5 @@
 package com.staniul.teamspeak.commands.core;
 
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
@@ -24,7 +23,6 @@ public class CoreCommands {
     public CoreCommands () {}
 
     @Teamspeak3Command("!help")
-    @ClientGroupAccess("servergroups.admins")
     public CommandResponse listCommands (Client client, String params) {
         List<Command> commands = config.getClasses(Command.class, "command-list.cmd");
         List<Integer> clientScopes = getClientScopes (client);

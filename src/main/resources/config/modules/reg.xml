@@ -2,12 +2,12 @@
 <registerer>
     <groups>
         <guest id="8"/>
-        <new id="773" timeconnected="1800000"/>
-        <admins id="647,786,6,679" ignored="775,930"/>
+        <new id="773" timeconnected="1800000" />
+        <admins id="647,786,6,679" ignored="775,930" />
     </groups>
 
     <messages>
         <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | "
-                    no="Brak nowych użytkowników."/>
+                    no="Brak nowych użytkowników." />
     </messages>
 </registerer>
