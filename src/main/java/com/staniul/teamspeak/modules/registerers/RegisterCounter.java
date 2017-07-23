@@ -405,14 +405,15 @@ public class RegisterCounter {
     }
 
     private CommandResponse computeRat (String params) throws QueryException {
-        String responseHeader = config.getString("messages.rat[@header]")
-                .replace("$DATE$", params);
-        StringBuilder sb = new StringBuilder("\n").append(responseHeader).append("\n");
-
         Matcher matcher = correctRange.matcher(params);
         if (matcher.find()) {
             String from = matcher.group(1);
             String to = matcher.group(2);
+
+            String responseHeader = config.getString("messages.rat[@header]")
+                    .replace("$FROM$", from)
+                    .replace("$TO$", to);
+            StringBuilder sb = new StringBuilder("\n").append(responseHeader).append("\n");
 
             HashMap<Integer, Integer> regData = getRegisteredAtDateRange(from, to);
             appendOutput(regData, sb);
