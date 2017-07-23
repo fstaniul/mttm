@@ -16,6 +16,6 @@
     </display>
 
     <messages>
-        <rat header="Zarejestrowani $DATE$: " error="Nieprawidłowe parametry!"/>
+        <rat header="Zarejestrowani [b]$DATE$[/b]: " error="Nieprawidłowe parametry!"/>
     </messages>
 </register-counter>

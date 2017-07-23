@@ -360,20 +360,15 @@ public class RegisterCounter {
     @Teamspeak3Command("!rat")
     @ClientGroupAccess("servergroups.admins")
     public CommandResponse showRegisteredAtDate (Client client, String params) throws QueryException {
-
         String year = LocalDate.now().year().getAsString();
         String month = String.format("%02d", LocalDate.now().monthOfYear().get());
-
-        String responseHeader = config.getString("messages.rat[@header]")
-                .replace("$DATE$", params);
-        StringBuilder sb = new StringBuilder(responseHeader).append("\n");
 
         //Only one day (1 date)
         if (Pattern.compile("\\d{2}").matcher(params).matches()) {
             params = String.format("%s-%s-%s", year, month, params);
             params = params + " "  + params;
 
-            return computeRat(params, sb);
+            return computeRat(params);
         }
 
         //Only month and day (1 date):
@@ -381,13 +376,13 @@ public class RegisterCounter {
             params = LocalDate.now().year().getAsString() + "-" + params;
             params = params + " " + params;
 
-            return computeRat(params, sb);
+            return computeRat(params);
         }
 
         //Whole one date:
         if (Pattern.compile("\\d{4}-\\d{2}-\\d{2}").matcher(params).matches()) {
             params = params + " " + params;
-            return computeRat(params, sb);
+            return computeRat(params);
         }
 
         //Only day (2 dates)
@@ -396,7 +391,7 @@ public class RegisterCounter {
             params = String.format("%s-%s-%s %s-%s-%s",
                     year, month, matcher.group(1),
                     year, month, matcher.group(2));
-            return computeRat(params, sb);
+            return computeRat(params);
         }
 
         //Only month and day (2 dates)
@@ -406,10 +401,14 @@ public class RegisterCounter {
                     year, matcher.group(2));
         }
 
-        return computeRat(params, sb);
+        return computeRat(params);
     }
 
-    private CommandResponse computeRat (String params, StringBuilder sb) throws QueryException {
+    private CommandResponse computeRat (String params) throws QueryException {
+        String responseHeader = config.getString("messages.rat[@header]")
+                .replace("$DATE$", params);
+        StringBuilder sb = new StringBuilder("\n").append(responseHeader).append("\n");
+
         Matcher matcher = correctRange.matcher(params);
         if (matcher.find()) {
             String from = matcher.group(1);
