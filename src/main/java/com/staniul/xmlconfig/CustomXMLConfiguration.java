@@ -25,6 +25,14 @@ public class CustomXMLConfiguration extends XMLConfiguration {
         super(c);
     }
 
+    public List<Integer> getIntList (String key) {
+        try {
+            return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toList());
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
     public Set<Integer> getIntSet(String key) {
         try {
             return Arrays.stream(getString(key).split(",")).map(Integer::parseInt).collect(Collectors.toSet());

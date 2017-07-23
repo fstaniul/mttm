@@ -225,7 +225,7 @@ public class RegisterCounter {
 
         HashMap<Integer, Integer> ret = new HashMap<>();
 
-        for (LocalDate now = from; now.isBefore(to); now = now.plusDays(1)) {
+        for (LocalDate now = from; !now.isAfter(to); now = now.plusDays(1)) {
             String date = dateFormatter.print(now);
             HashMap<Integer, Integer> regMap = getRegisteredAtDate(date);
             for (Map.Entry<Integer, Integer> reg : regMap.entrySet())
@@ -330,7 +330,7 @@ public class RegisterCounter {
     }
 
     private void appendOutput(HashMap<Integer, Integer> regMap, StringBuilder sb) throws QueryException {
-        Set<Integer> adminGroups = config.getIntSet("groups.admins");
+        List<Integer> adminGroups = config.getIntList("groups.admins");
         for (int adminGroup : adminGroups) {
             List<ClientDatabase> admins = query.getClientDatabaseListInServergroup(adminGroup);
             admins.sort(Comparator.comparing(ClientDatabase::getNickname));
@@ -355,37 +355,63 @@ public class RegisterCounter {
         return new CommandResponse("Refreshed Register Counter display.");
     }
 
+    private Pattern correctRange = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})[ \\t]+(\\d{4}-\\d{2}-\\d{2})");
+
     @Teamspeak3Command("!rat")
     @ClientGroupAccess("servergroups.admins")
     public CommandResponse showRegisteredAtDate (Client client, String params) throws QueryException {
-        Pattern oneDateWithYear = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
-        Pattern oneDateWithoutYear = Pattern.compile("\\d{2}-\\d{2}");
-        Pattern twoDatesWithoutYear = Pattern.compile("(\\d{2}-\\d{2})[ \\t]+(\\d{2}-\\d{2})");
-        Pattern twoDatesWithYear = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})[ \\t]+(\\d{4}-\\d{2}-\\d{2})");
+
+        String year = LocalDate.now().year().getAsString();
+        String month = String.format("%02d", LocalDate.now().monthOfYear().get());
 
         String responseHeader = config.getString("messages.rat[@header]")
                 .replace("$DATE$", params);
         StringBuilder sb = new StringBuilder(responseHeader).append("\n");
 
-        Matcher matcher;
+        //Only one day (1 date)
+        if (Pattern.compile("\\d{2}").matcher(params).matches()) {
+            params = String.format("%s-%s-%s", year, month, params);
+            params = params + " "  + params;
 
-        if (oneDateWithoutYear.matcher(params).matches()) {
+            return computeRat(params, sb);
+        }
+
+        //Only month and day (1 date):
+        if (Pattern.compile("\\d{2}-\\d{2}").matcher(params).matches()) {
             params = LocalDate.now().year().getAsString() + "-" + params;
             params = params + " " + params;
+
+            return computeRat(params, sb);
         }
 
-        if (oneDateWithYear.matcher(params).matches()) {
+        //Whole one date:
+        if (Pattern.compile("\\d{4}-\\d{2}-\\d{2}").matcher(params).matches()) {
             params = params + " " + params;
+            return computeRat(params, sb);
         }
 
-        if ((matcher = twoDatesWithoutYear.matcher(params)).find()) {
-            String year = LocalDate.now().year().getAsString();
+        //Only day (2 dates)
+        Matcher matcher;
+        if ((matcher = Pattern.compile("(\\d{2})[ \\t]+(\\d{2})").matcher(params)).find()) {
+            params = String.format("%s-%s-%s %s-%s-%s",
+                    year, month, matcher.group(1),
+                    year, month, matcher.group(2));
+            return computeRat(params, sb);
+        }
+
+        //Only month and day (2 dates)
+        if ((matcher = Pattern.compile("(\\d{2}-\\d{2})[ \\t]+(\\d{2}-\\d{2})").matcher(params)).find()) {
             params = String.format("%s-%s %s-%s",
                     year, matcher.group(1),
                     year, matcher.group(2));
         }
 
-        if ((matcher = twoDatesWithYear.matcher(params)).find()) {
+        return computeRat(params, sb);
+    }
+
+    private CommandResponse computeRat (String params, StringBuilder sb) throws QueryException {
+        Matcher matcher = correctRange.matcher(params);
+        if (matcher.find()) {
             String from = matcher.group(1);
             String to = matcher.group(2);
 
@@ -397,7 +423,7 @@ public class RegisterCounter {
 
         else {
             log.fatal("Params at the end: " + params);
-            return new CommandResponse("ERROR!");
+            return new CommandResponse(config.getString("messages.rat[@error]"));
         }
     }
 }

@@ -23,6 +23,6 @@ public class TimesTests {
 
     @Test
     public void test3 () throws Exception {
-        System.out.println(LocalDate.now().year().getAsText());
+        System.out.println(LocalDate.now().monthOfYear().get());
     }
 }

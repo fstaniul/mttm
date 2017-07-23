@@ -18,6 +18,7 @@
         <cmd command="!unignore" scope="1" description="Włącza wysyłanie wiadomości powitalnej, o ile wcześniej opcja została wyłączona." />
         <cmd command="!jl" scope="1" description="Wysyła link do natychmiastowego połączenia na ten kanał na którym się znajdujesz. Możesz podać jako parametr hasło do kanału." />
         <cmd command="!m" scope="1" description="Przenosi klienta o nicku zaczynającym się od podanych znaków na kanał do Ciebie. [i](Przykład: !m wer - Przeniesie użytkownika o nicku Weronika do Ciebie na kanał). Musisz być właścicielem, administratorem lub moderatorem kanału!" />
+        <cmd command="!rat" scope="3" description="Wysyła informacje o zarejestrowanych użytkownikach przez administracje w dniach podanych jako parametr. Możesz podac 2 daty lub jedną, możesz pominąć rok lub miesiac i rok. Format daty: RRRR-MM-DD. Format zapytania: !rat DATA DATA" />
     </command-list>
 
     <scopes>
