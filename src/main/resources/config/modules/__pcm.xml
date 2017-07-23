@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<privatechannelmanager>
+    <eventchannel id="9158"/>
+
+    <parentchannel id="737"/>
+    <clientchannel name="Kanał: $NICKNAME$"
+                   description="Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.
+
+[i]Ta wiadomość może zostać usunięta.[/i]"
+                   invalidnumbername="Nie zmieniaj numeru kanału!"
+                   max-empty-days="7"/>
+
+    <messages>
+        <create success="Twój nowy kanał ma numer [b]$NUMBER$[/b]. Pamiętaj, aby nie zmieniać numeru kanału. Jeżeli zauważysz, że wolny jest kanał o niższym numerze, możesz zmienić nazwę swojego kanału na [b]MOVE[/b] i kanał zostanie przeniesiony wyżej."
+                fail="Wystąpił błąd podczas tworzenia twojego nowego kanału! Proszę skontaktuj się z administracją w celu jego rozwiązania. Przepraszamy za utrudnienia."/>
+        <delete success="Kanał o numerze [b]$NUMBER$[/b] został usunięty."
+                fail="Nie można było usnąć kanału o numerze [b]$NUMBER$[/b]. Możliwe, że jest to wolny kanał, bądź kanał o podanym numerze nie istnieje."/>
+        <chso notfound="Nie znalazłam kanału o numerze [b]$NUMBER$[/b]."
+              success="Zmieniłam właściciela kanału o numerze [b]$NUMBER$[/b] na użytkownika o id [b]$CLDBID$[/b]"/>
+        <moved msg="Twój kanał prywatny został przeniesiony, jego nowy numer to [b]$NUMBER$[/b]."/>
+        <deleted msg="Twój kanał prywatny został usunięty, ponieważ był nieużywany przez ponad $DAYS$"
+                 by-admin="Twój kanał prywatny został usunięty przez administratora [b]$NICKNAME$[/b]."/>
+    </messages>
+
+    <freechannel name="WOLNY"
+                 topic="WOLNY"
+                 description="Wolny kanał o numerze [b]$NUMBER$[/b].
+
+Jeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny. Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.
+
+Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]WOLNY $NUMBER$[/b]"/>
+
+    <channelgroups>
+        <owner id="96"/>
+        <guest id="8"/>
+    </channelgroups>
+
+    <servergroups ignore="647,787,6,679"/>
+</privatechannelmanager>
