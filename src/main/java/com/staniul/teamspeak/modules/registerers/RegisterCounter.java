@@ -1,13 +1,13 @@
 package com.staniul.teamspeak.modules.registerers;
 
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
+import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -160,13 +160,8 @@ public class RegisterCounter {
     }
 
     /**
-     * Returns a matcher string for a log file line to check for registered clients by admins.
-     * Groups:
-     * 1: Date
-     * 2: Client Id
-     * 3: Servergroup Id
-     * 4: Admins Nickname
-     * 5: Admins Id
+     * Returns a matcher string for a log file line to check for registered clients by admins. Groups: 1: Date 2: Client
+     * Id 3: Servergroup Id 4: Admins Nickname 5: Admins Id
      *
      * @param date Date for which this string will match
      *
@@ -185,14 +180,8 @@ public class RegisterCounter {
 
 
     /**
-     * Returns a matcher string for a log file line to check for registered clients by admins.
-     * Any date will be valid for this.
-     * Groups:
-     * 1: Date
-     * 2: Client Id
-     * 3: Servergroup Id
-     * 4: Admins Nickname
-     * 5: Admins Id
+     * Returns a matcher string for a log file line to check for registered clients by admins. Any date will be valid
+     * for this. Groups: 1: Date 2: Client Id 3: Servergroup Id 4: Admins Nickname 5: Admins Id
      *
      * @return A string that is matcher for log file line for registering client.
      */
@@ -223,11 +212,11 @@ public class RegisterCounter {
         return getRegisteredAtDateRange(dateFormatter.parseLocalDate(from), dateFormatter.parseLocalDate(to));
     }
 
-    public HashMap<Integer, Integer> getRegisteredAtDateRange (DateTime from, DateTime to) {
+    public HashMap<Integer, Integer> getRegisteredAtDateRange(DateTime from, DateTime to) {
         return getRegisteredAtDateRange(from.toLocalDate(), to.toLocalDate());
     }
 
-    public HashMap<Integer, Integer> getRegisteredAtDateRange (LocalDate from, LocalDate to) {
+    public HashMap<Integer, Integer> getRegisteredAtDateRange(LocalDate from, LocalDate to) {
         if (to.isBefore(from)) {
             LocalDate tmp = from;
             to = from;
@@ -259,10 +248,10 @@ public class RegisterCounter {
         Pattern fileDatePattern = Pattern.compile("ts3server_(\\d{4}-\\d{2}-\\d{2})__.*\\.log");
         Pattern registeredLinePattern = Pattern.compile(getMatcherStringAtDate(yesterdayDate));
 
-            for (int i = files.size() - 1; i >= 0; i--) {
-                File file = files.get(i);
-                Matcher fileDateMatcher = fileDatePattern.matcher(file.getName());
-                if (fileDateMatcher.find()) {
+        for (int i = files.size() - 1; i >= 0; i--) {
+            File file = files.get(i);
+            Matcher fileDateMatcher = fileDatePattern.matcher(file.getName());
+            if (fileDateMatcher.find()) {
 
                 //Read the file and get info from it:
                 try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -289,37 +278,74 @@ public class RegisterCounter {
         refreshDisplay();
     }
 
+//    private void refreshDisplay() throws QueryException {
+//        //Date that represents yesterday
+//        String date = dateFormatter.print(LocalDate.now().minusDays(1));
+//
+//        //Get admins information from teamspeak 3 server.
+//        Set<Integer> adminGroups = config.getIntSet("groups.admins");
+//        List<ClientDatabase> admins = new LinkedList<>();
+//        for (int adminGroupId : adminGroups)
+//            admins.addAll(query.getClientDatabaseListInServergroup(adminGroupId));
+//        admins.sort(Comparator.comparing(ClientDatabase::getNickname));
+//
+//        HashMap<Integer, Integer> regYesterday = data.get(date);
+//        if (regYesterday == null) {
+//            countRegisteredAtNoon();
+//            regYesterday = data.get(date);
+//        }
+//
+//        //Create description
+//        StringBuilder desc = new StringBuilder();
+//        desc.append(config.getString("display.header").replace("$DATE$", date)).append("\n");
+//        for (ClientDatabase admin : admins) {
+//            int ryCount = regYesterday.get(admin.getDatabaseId()) == null ? 0 : regYesterday.get(admin.getDatabaseId());
+//            desc.append("[b]")
+//                    .append(ryCount)
+//                    .append("[/b] | ")
+//                    .append(admin.getNickname())
+//                    .append("\n");
+//        }
+//
+//        //Update description
+//        query.channelChangeDescription(desc.toString(), config.getInt("display.channel-id"));
+//    }
+
     private void refreshDisplay() throws QueryException {
         //Date that represents yesterday
         String date = dateFormatter.print(LocalDate.now().minusDays(1));
 
-        //Get admins information from teamspeak 3 server.
-        Set<Integer> adminGroups = config.getIntSet("groups.admins");
-        List<ClientDatabase> admins = new LinkedList<>();
-        for (int adminGroupId : adminGroups)
-            admins.addAll(query.getClientDatabaseListInServergroup(adminGroupId));
-        admins.sort(Comparator.comparing(ClientDatabase::getNickname));
-
         HashMap<Integer, Integer> regYesterday = data.get(date);
         if (regYesterday == null) {
             countRegisteredAtNoon();
-            regYesterday = data.get(date);
+            regYesterday = getRegisteredAtDate(date);
         }
 
-        //Create description
         StringBuilder desc = new StringBuilder();
         desc.append(config.getString("display.header").replace("$DATE$", date)).append("\n");
-        for (ClientDatabase admin : admins) {
-            int ryCount = regYesterday.get(admin.getDatabaseId()) == null ? 0 : regYesterday.get(admin.getDatabaseId());
-            desc.append("[b]")
-                    .append(ryCount)
-                    .append("[/b] | ")
-                    .append(admin.getNickname())
-                    .append("\n");
-        }
 
-        //Update description
+        appendOutput(regYesterday, desc);
+
         query.channelChangeDescription(desc.toString(), config.getInt("display.channel-id"));
+    }
+
+    private void appendOutput(HashMap<Integer, Integer> regMap, StringBuilder sb) throws QueryException {
+        Set<Integer> adminGroups = config.getIntSet("groups.admins");
+        for (int adminGroup : adminGroups) {
+            List<ClientDatabase> admins = query.getClientDatabaseListInServergroup(adminGroup);
+            admins.sort(Comparator.comparing(ClientDatabase::getNickname));
+
+            for (ClientDatabase admin : admins) {
+                int ryCount = regMap.get(admin.getDatabaseId()) == null ? 0 : regMap.get(admin.getDatabaseId());
+                sb.append("[b]")
+                        .append(ryCount)
+                        .append("[/b] | ")
+                        .append(admin.getNickname())
+                        .append("\n");
+            }
+
+            sb.append("\n");
+        }
     }
 
     @Teamspeak3Command("!refregc")
@@ -327,5 +353,51 @@ public class RegisterCounter {
     public CommandResponse refreshRegisterCounterDisplay(Client client, String params) throws QueryException {
         refreshDisplay();
         return new CommandResponse("Refreshed Register Counter display.");
+    }
+
+    @Teamspeak3Command("!rat")
+    @ClientGroupAccess("servergroups.admins")
+    public CommandResponse showRegisteredAtDate (Client client, String params) throws QueryException {
+        Pattern oneDateWithYear = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+        Pattern oneDateWithoutYear = Pattern.compile("\\d{2}-\\d{2}");
+        Pattern twoDatesWithoutYear = Pattern.compile("(\\d{2}-\\d{2})[ \\t]+(\\d{2}-\\d{2})");
+        Pattern twoDatesWithYear = Pattern.compile("(\\d{4}-\\d{2}-\\d{2})[ \\t]+(\\d{4}-\\d{2}-\\d{2})");
+
+        String responseHeader = config.getString("messages.rat[@header]")
+                .replace("$DATE$", params);
+        StringBuilder sb = new StringBuilder(responseHeader).append("\n");
+
+        Matcher matcher;
+
+        if (oneDateWithoutYear.matcher(params).matches()) {
+            params = LocalDate.now().year().getAsString() + "-" + params;
+            params = params + " " + params;
+        }
+
+        if (oneDateWithYear.matcher(params).matches()) {
+            params = params + " " + params;
+        }
+
+        if ((matcher = twoDatesWithoutYear.matcher(params)).find()) {
+            String year = LocalDate.now().year().getAsString();
+            params = String.format("%s-%s %s-%s",
+                    year, matcher.group(1),
+                    year, matcher.group(2));
+        }
+
+        if ((matcher = twoDatesWithYear.matcher(params)).find()) {
+            String from = matcher.group(1);
+            String to = matcher.group(2);
+
+            HashMap<Integer, Integer> regData = getRegisteredAtDateRange(from, to);
+            appendOutput(regData, sb);
+
+            return new CommandResponse(sb.toString());
+        }
+
+        else {
+            log.fatal("Params at the end: " + params);
+            return new CommandResponse("ERROR!");
+        }
     }
 }
