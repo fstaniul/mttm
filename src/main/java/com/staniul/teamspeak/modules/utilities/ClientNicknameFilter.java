@@ -49,7 +49,7 @@ public class ClientNicknameFilter {
     @PostConstruct
     private void init() {
         patterns = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(regexFile)))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(regexFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null)
                 patterns.add(Pattern.compile(".*" + line.toLowerCase() + ".*"));
@@ -59,7 +59,7 @@ public class ClientNicknameFilter {
     }
 
     @PreDestroy
-    private void save () {
+    private void save() {
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(regexFile, false), StandardCharsets.UTF_8)), true)) {
             for (Pattern pattern : patterns) {
                 writer.println(patternToString(pattern));
@@ -70,7 +70,7 @@ public class ClientNicknameFilter {
         }
     }
 
-    private String patternToString (Pattern pattern) {
+    private String patternToString(Pattern pattern) {
         return pattern.pattern().substring(2, pattern.pattern().length() - 2);
     }
 
@@ -119,13 +119,15 @@ public class ClientNicknameFilter {
 
     @Teamspeak3Command("!cnfadd")
     @ClientGroupAccess("servergroups.headadmins")
-    public CommandResponse addNewNicknameFilter (Client client, String params) {
-        return new CommandResponse(config.getString("commands.add"));
+    @ValidateParams(NotEmptyParamsValidator.class)
+    public CommandResponse addNewNicknameFilter(Client client, String params) {
+        patterns.add(Pattern.compile(".*" + params + ".*"));
+        return new CommandResponse(config.getString("commands.add").replace("$FILTER$", params));
     }
 
     @Teamspeak3Command("!cnfshow")
     @ClientGroupAccess("servergroups.headadmins")
-    public CommandResponse showNicknameFilters (Client client, String params) {
+    public CommandResponse showNicknameFilters(Client client, String params) {
         StringBuilder sb = new StringBuilder(config.getString("commands.show"));
         for (Pattern pattern : patterns) sb.append(" ").append(patternToString(pattern)).append(",");
         if (patterns.size() > 0) sb.delete(sb.length() - 1, sb.length());
@@ -135,10 +137,21 @@ public class ClientNicknameFilter {
     @Teamspeak3Command("!cnfdel")
     @ClientGroupAccess("servergroups.headadmins")
     @ValidateParams(NotEmptyParamsValidator.class)
-    public CommandResponse deleteNicknameFilter (Client client, String params) {
+    public CommandResponse deleteNicknameFilter(Client client, String params) {
         List<Pattern> pps = patterns.stream()
                 .filter(p -> patternToString(p).startsWith(params))
                 .collect(Collectors.toList());
+
+        Pattern exact = pps.stream().filter(p -> patternToString(p).equals(params)).findAny().orElse(null);
+
+
+        if (pps.size() == 1 || exact != null) {
+            if (exact == null) exact = pps.get(0);
+
+            patterns.remove(exact);
+            return new CommandResponse(config.getString("commands.delete")
+                    .replace("$FILTER$", patternToString(exact)));
+        }
 
         if (pps.size() > 1) {
             StringBuilder response = new StringBuilder(config.getString("commands.delete[@more]"));
@@ -148,10 +161,6 @@ public class ClientNicknameFilter {
             return new CommandResponse(response.toString());
         }
 
-        if (pps.size() == 0)
-            return new CommandResponse(config.getString("commands.delete[@none]"));
-
-        return new CommandResponse(config.getString("commands.delete")
-                .replace("$FILTER$", patternToString(pps.get(0))));
+        return new CommandResponse(config.getString("commands.delete[@none]"));
     }
 }

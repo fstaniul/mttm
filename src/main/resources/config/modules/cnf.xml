@@ -7,8 +7,8 @@
     </messages>
 
     <commands>
-        <add>Dodałam filter.</add>
+        <add>Dodałam filter [b]$FILTER$[/b].</add>
         <show>Obecne filtry:</show>
-        <delete more="Jest więcej niż jeden pasujący filter: " none="Żaden filtr nie pasuje do podanych kryteriów.">Usunęłam filter [b]$FILTER$[/b]</delete>
+        <delete more="Jest więcej niż jeden pasujący filter: " none="Żaden filtr nie pasuje do podanych kryteriów.">Usunęłam filter [b]$FILTER$[/b].</delete>
     </commands>
 </client-nickname-filter>
