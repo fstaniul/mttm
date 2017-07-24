@@ -7,5 +7,7 @@
         <wmadd response="Dodałam wiadomość powitalna dla grup [b]{$GROUPS$}[/b]: $MESSAGE$" />
         <wmswap outofrange="Podane numery wiadomości wykraczają poza zakres!" response="Zamieniłam wiadomości miejscami!" />
         <wmdel outofrange="Podany numer wiadomości wykracza poza zakres!" respnse="Usunęłam wiadomość $ID$: [b]$MESSAGE$[/b]" />
+        <wmmoveup outofrange="Nie można przenieść wiadomości o podanym numerze!" response="Przeniosłam wiadomość wyżej." />
+        <wmmovedown outofrange="Nie można przenieść wiadomości o podanym numerze!" response="Przeniosłam wiadomość niżej." />
     </commands>
 </welcome-messenger>

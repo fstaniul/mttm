@@ -190,22 +190,19 @@ public class WelcomeMessenger {
     @ClientGroupAccess("servergroups.headadmins")
     @ValidateParams(TwoIntegerParamsValidator.class)
     public CommandResponse swapWelcomeMessages(Client client, String params) {
-            Matcher matcher = TwoIntegerParamsValidator.getPattern().matcher(params);
-            int message1 = Integer.parseInt(matcher.group(1));
-            int message2 = Integer.parseInt(matcher.group(2));
+        Matcher matcher = TwoIntegerParamsValidator.getPattern().matcher(params);
+        int message1 = Integer.parseInt(matcher.group(1));
+        int message2 = Integer.parseInt(matcher.group(2));
 
-            if (message1 < 0 || message1 >= welcomeMessages.size() || message2 < 0 || message2 >= welcomeMessages.size()) {
-                return new CommandResponse(config.getString("commands.wmswap[@outofrange]"));
-            }
-
-        synchronized (welcomeMessages) {
-            WelcomeMessage tmp = welcomeMessages.get(message1);
-            welcomeMessages.set(message1, welcomeMessages.get(message2));
-            welcomeMessages.set(message2, tmp);
+        if (message1 < 0 || message1 >= welcomeMessages.size() || message2 < 0 || message2 >= welcomeMessages.size()) {
+            return new CommandResponse(config.getString("commands.wmswap[@outofrange]"));
         }
+
+        swapMessages(message1, message2);
 
         return new CommandResponse(config.getString("commands.wmswap[@response]"));
     }
+
 
     @Teamspeak3Command("!wmdel")
     @ClientGroupAccess("servergroups.headadmins")
@@ -225,5 +222,43 @@ public class WelcomeMessenger {
                 .replace("$MESSAGE$", message.toString());
 
         return new CommandResponse(response);
+    }
+
+    @Teamspeak3Command("!wmmoveup")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse moveUpWelcomeMessage(Client client, String params) {
+        int msg = Integer.parseInt(params);
+
+        if (msg < 1 || msg >= welcomeMessages.size()) {
+            return new CommandResponse(config.getString("commands.wmmoveup[@outofrange]"));
+        }
+
+        swapMessages(msg, msg-1);
+
+        return new CommandResponse(config.getString("commands.wmmoveup[@response]"));
+    }
+
+    @Teamspeak3Command("!wmmovedown")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse moveDownWelcomeMessage(Client client, String params) {
+        int msgNumber = Integer.parseInt(params);
+
+        if (msgNumber < 0 || msgNumber >= welcomeMessages.size() - 1) {
+            return new CommandResponse(config.getString("commands.wmmovedown[@outofrange]"));
+        }
+
+        swapMessages(msgNumber, msgNumber + 1);
+
+        return new CommandResponse(config.getString("commands.wmmovedown[@response]"));
+    }
+
+    private void swapMessages(int msg1, int msg2) {
+        synchronized (welcomeMessages) {
+            WelcomeMessage tmp = welcomeMessages.get(msg1);
+            welcomeMessages.set(msg1, welcomeMessages.get(msg2));
+            welcomeMessages.set(msg2, tmp);
+        }
     }
 }
