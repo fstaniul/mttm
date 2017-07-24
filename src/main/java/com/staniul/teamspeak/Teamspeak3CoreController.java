@@ -140,4 +140,8 @@ public class Teamspeak3CoreController {
     void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
+
+    public HashMap<String, MethodContainer> getCommands() {
+        return commands;
+    }
 }

@@ -27,4 +27,8 @@
         <scope id="3" groups="787,679,6,647" />
         <scope id="4" groups="647" />
     </scopes>
+
+    <commands>
+        <help not-found="Nie znalazłam komendy. o którą pytasz." access-denied="Nie masz dostępu do tej komendy!" />
+    </commands>
 </core-commands>
