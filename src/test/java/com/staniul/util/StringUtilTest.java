@@ -3,7 +3,7 @@ package com.staniul.util;
 import com.staniul.util.lang.StringUtil;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 public class StringUtilTest {
     @Test
@@ -20,6 +20,11 @@ public class StringUtilTest {
         String[] actual = StringUtil.splitOnSize(test, " ", 1);
         //System.out.println(Arrays.toString(actual));
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testIntegerParse () throws Exception {
+        System.out.println(Integer.parseInt("002"));
     }
 
 }

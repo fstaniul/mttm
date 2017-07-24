@@ -1,19 +1,52 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <private-channel-manager>
     <create-channel>
-        <parent>737</parent>
+        <channel-ids>
+            <parent>737</parent>
+            <event>9158</event>
+        </channel-ids>
         <number-format>%03d</number-format>
         <client>
             <name>[$NUMBER$] Kanał $NICKNAME$</name>
             <desc>Prywatny kanał [b]$NICKNAME$[/b]. Proszę pamiętać, aby nie zmieniać numeru kanału.
 
-                [i]Ta wiadomość może zostać usunięta.[/i]</desc>
+                [i]Ta wiadomość może zostać usunięta.[/i]
+            </desc>
         </client>
+        <free>
+            <name>[$NUMBER$] WOLNY</name>
+            <desc>Wolny kanał o numerze [b]$NUMBER$[/b].
+
+                Jeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny.
+                Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a) stanie się twoim kanałem prywatnym w
+                kilka chwil. Kanały tworzone są automatycznie!
+
+                Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału
+                na [b]MOVE $NUMBER$[/b]
+            </desc>
+            <topic>Wolny kanał o numerze $NUMBER$.</topic>
+        </free>
     </create-channel>
+
+    <delete-channel>
+        <seconds-empty></seconds-empty>
+    </delete-channel>
 
     <groups>
         <channel>
             <owner>96</owner>
         </channel>
     </groups>
+
+    <messages>
+        <channel-create>
+            <failed>Wystąpił błąd przy tworzeniu twojego kanału prywatnego, proszę wejdź na [b]Live Help![/b] i
+                skontaktuj się z administracją, aby poinformować o błędzie!
+            </failed>
+        </channel-create>
+        <channel-delete>
+            <msg>Kanał o numerze [b]$NUMBER$[/b] został usunięty!</msg>
+            <error>Nie można usnąć tego kanału!</error>
+        </channel-delete>
+    </messages>
 </private-channel-manager>

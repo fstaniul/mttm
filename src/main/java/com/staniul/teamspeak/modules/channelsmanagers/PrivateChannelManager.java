@@ -6,8 +6,8 @@ import com.staniul.teamspeak.query.QueryException;
 
 public interface PrivateChannelManager {
     PrivateChannel createChannel (Client client) throws QueryException;
-    boolean deleteChannel (int channelId);
-    boolean changeChannelOwner (int channelId, int newOwnerId) throws QueryException;
+    boolean deleteChannel (int channelNumber) throws QueryException;
+    boolean changeChannelOwner (int channelNumber, int ownerDatabaseId) throws QueryException;
     PrivateChannel getFreeChannel ();
     PrivateChannel getClientsChannel (Client client);
     PrivateChannel getClientsChannel (int clientDatabaseId);
