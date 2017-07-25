@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.modules.channelsmanagers;
+package com.staniul.teamspeak.modules.channelsmanagers.privatechannels;
 
 import com.staniul.teamspeak.events.EventType;
 import com.staniul.teamspeak.events.Teamspeak3Event;
@@ -19,8 +19,8 @@ import java.util.List;
 
 @Component
 @UseConfig("modules/pcim.xml")
-public class PrivateChannelInfoMessenger {
-    private static Logger log = LogManager.getLogger(PrivateChannelInfoMessenger.class);
+public class PrivateChannelInfoMessengerImpl implements PrivateChannelInfoMessenger {
+    private static Logger log = LogManager.getLogger(PrivateChannelInfoMessengerImpl.class);
 
     @WireConfig
     private CustomXMLConfiguration config;
@@ -28,7 +28,7 @@ public class PrivateChannelInfoMessenger {
     private final JdbcTemplate database;
 
     @Autowired
-    public PrivateChannelInfoMessenger(Query query, JdbcTemplate database) {
+    public PrivateChannelInfoMessengerImpl(Query query, JdbcTemplate database) {
         this.query = query;
         this.database = database;
     }
@@ -63,7 +63,8 @@ public class PrivateChannelInfoMessenger {
         }
     }
 
-    public synchronized void addMessageToClient(int clientDatabaseId, String message) {
+    @Override
+    public synchronized void addMessage(int clientDatabaseId, String message) {
         try {
             Client clientOnline = query.getClientList().stream()
                     .filter(client -> client.getDatabaseId() == clientDatabaseId)

@@ -29,7 +29,8 @@
     </create-channel>
 
     <delete-channel>
-        <seconds-empty></seconds-empty>
+        <!-- ONE WEEK EMPTY -->
+        <seconds-empty>604800</seconds-empty>
     </delete-channel>
 
     <groups>

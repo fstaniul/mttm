@@ -1,6 +1,6 @@
-package com.staniul.teamspeak.modules.channelsmanagers;
+package com.staniul.teamspeak.modules.channelsmanagers.privatechannels;
 
-import com.staniul.teamspeak.modules.channelsmanagers.dao.PrivateChannel;
+import com.staniul.teamspeak.modules.channelsmanagers.privatechannels.dao.PrivateChannel;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.QueryException;
 

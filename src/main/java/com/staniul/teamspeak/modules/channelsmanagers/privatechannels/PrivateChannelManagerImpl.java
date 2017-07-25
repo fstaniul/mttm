@@ -1,10 +1,10 @@
-package com.staniul.teamspeak.modules.channelsmanagers;
+package com.staniul.teamspeak.modules.channelsmanagers.privatechannels;
 
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
 import com.staniul.teamspeak.commands.validators.ValidateParams;
-import com.staniul.teamspeak.modules.channelsmanagers.dao.PrivateChannel;
+import com.staniul.teamspeak.modules.channelsmanagers.privatechannels.dao.PrivateChannel;
 import com.staniul.teamspeak.query.Channel;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
