@@ -18,6 +18,9 @@ import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,14 +39,17 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
 
     private final JdbcTemplate database;
     private final Query query;
+    private final PrivateChannelInfoMessenger messenger;
+    private final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("dd-MM-yyyy hh:mm");
 
     @WireConfig
     private CustomXMLConfiguration config;
 
     @Autowired
-    public PrivateChannelManagerImpl(JdbcTemplate database, Query query) {
+    public PrivateChannelManagerImpl(JdbcTemplate database, Query query, PrivateChannelInfoMessenger messenger) {
         this.database = database;
         this.query = query;
+        this.messenger = messenger;
     }
 
     @Override
@@ -98,15 +104,15 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     }
 
     @Override
-    public synchronized boolean deleteChannel(int channelNumber) throws QueryException {
+    public synchronized PrivateChannel deleteChannel(int channelNumber) throws QueryException {
         int numberOfChannels = database.queryForObject("SELECT count(*) FROM private_channels", Integer.class);
 
         if (channelNumber < 1 || channelNumber > numberOfChannels) {
-            return false;
+            return null;
         }
 
         PrivateChannel channelToDelete = queryForPrivateChannel("SELECT * FROM private_channels WHERE number = ?", channelNumber);
-        if (channelToDelete == null || channelToDelete.isFree()) return false;
+        if (channelToDelete == null || channelToDelete.isFree()) return null;
 
         if (channelNumber == numberOfChannels) {
             query.channelDelete(channelToDelete.getId());
@@ -118,7 +124,7 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
             database.update("UPDATE private_channels SET owner = '-1', id = ? WHERE number = ?", free.getId(), channelNumber);
         }
 
-        return true;
+        return channelToDelete;
     }
 
     private PrivateChannel createFreeChannel(PrivateChannel channelToReplace) throws QueryException {
@@ -259,7 +265,15 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     @ValidateParams(IntegerParamsValidator.class)
     public synchronized CommandResponse deletePrivateChannelCommand(Client client, String params) throws QueryException {
         int channelNumber = Integer.parseInt(params);
-        if (deleteChannel(channelNumber)) {
+        PrivateChannel deletedChannel = deleteChannel(channelNumber);
+        if (deletedChannel != null) {
+            messenger.addMessage(
+                    deletedChannel.getOwner(),
+                    config.getString("messages.channel-delete.deleted-by-admin")
+                            .replace("$DATE$", dateFormat.print(DateTime.now()))
+                            .replace("$NUMBER$", Integer.toString(deletedChannel.getNumber()))
+                            .replace("$ADMIN_NICKNAME$", client.getNickname())
+            );
             return new CommandResponse(
                     config.getString("messages.channel-delete.msg")
                             .replace("$NUMBER$", Integer.toString(channelNumber))
@@ -327,6 +341,13 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
                                 free.getId(),
                                 privateChannel.getNumber()
                         );
+
+                        messenger.addMessage(
+                                privateChannel.getOwner(),
+                                config.getString("messages.moved")
+                                        .replace("$FROM$", Integer.toString(privateChannel.getNumber()))
+                                        .replace("$TO$", Integer.toString(channelToSwapWith.getNumber()))
+                        );
                     } catch (QueryException e) {
                         log.error("Failed to swap channels in place! ", e);
                     }
@@ -362,7 +383,15 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
 
             try {
                 if (channel.getSecondsEmpty() >= secondsEmptyBeforeDeletion) {
-                    deleteChannel(privateChannel.getNumber());
+                    PrivateChannel deletedChannel = deleteChannel(privateChannel.getNumber());
+                    if (deletedChannel != null) {
+                        messenger.addMessage(
+                                deletedChannel.getOwner(),
+                                config.getString("messages.channel-delete.deleted-cause-empty")
+                                .replace("$NUMBER$", Integer.toString(deletedChannel.getNumber()))
+                                .replace("$DATE$", dateFormat.print(DateTime.now()))
+                        );
+                    }
                 }
             } catch (QueryException e) {
                 log.error("Failed to delete channel with number " + privateChannel.getNumber(), e);

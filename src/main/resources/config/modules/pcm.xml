@@ -48,6 +48,10 @@
         <channel-delete>
             <msg>Kanał o numerze [b]$NUMBER$[/b] został usunięty!</msg>
             <error>Nie można usnąć tego kanału!</error>
+
+            <deleted-by-admin>Twój kanał o numerze [b]$NUMBER$[/b] został usunięty [b]$DATE$[/b] przez administratora [b]$ADMIN_NICKNAME$[/b] .</deleted-by-admin>
+            <deleted-cause-empty>Twój kanał o numerze [b]$NUMBER$[/b] został usunięty [b]$DATE$[/b], ponieważ był nieużywany przez dłużej niż tydzień.</deleted-cause-empty>
         </channel-delete>
+        <moved>Twój kanał prywatny został przeniesiony z numeru [b]$FROM$[/b] na numer [b]$TO$[/b]</moved>
     </messages>
 </private-channel-manager>
