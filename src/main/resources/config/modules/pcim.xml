@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<private-channel-info-messenger>
+    <messages>
+        <info-messages header="Informacje odnośnie kanału prywatnego ([b]$NUMBER$[/b]):" />
+    </messages>
+</private-channel-info-messenger>
