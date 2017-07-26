@@ -126,7 +126,7 @@ public class AdminMessenger {
             Message delMessage = null;
             if (params.matches("\\d+")) {
                 int msgId = Integer.parseInt(params);
-                if (msgId > 0 && msgId < messages.size())
+                if (msgId >= 0 && msgId < messages.size())
                     delMessage = messages.get(msgId);
             }
             else {
