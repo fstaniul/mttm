@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scopes>
+    <scope groups="8,773,641,789,679,787,6,647" role="ROLE_GUEST" />
+    <scope groups="641,789,679,787,6,647" role="ROLE_USER" />
+    <scope groups="679,787,6,647" role="ROLE_MOD" />
+    <scope groups="6,647" role="ROLE_ADMIN" />
+    <scope groups="647" role="ROLE_OWNER" />
+</scopes>

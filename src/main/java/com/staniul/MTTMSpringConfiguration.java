@@ -1,6 +1,6 @@
 package com.staniul;
 
-import com.staniul.web.config.SpringMVCConfiguration;
+import com.staniul.api.config.SpringRESTApiConfiguration;
 import com.staniul.xmlconfig.di.ConfigInjectionPostProcessor;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 @EnableAspectJAutoProxy
 @Configuration
 @ComponentScan("com.staniul")
-@Import({ConfigInjectionPostProcessor.class, SpringMVCConfiguration.class})
+@Import({ConfigInjectionPostProcessor.class, SpringRESTApiConfiguration.class})
 public class MTTMSpringConfiguration {
     @Bean
     public Reflections reflections() {
@@ -35,7 +35,7 @@ public class MTTMSpringConfiguration {
 
     @Bean
     @Primary
-    public DataSource teamspeakDatabase (@Value("db.username") String username, @Value("db.password") String password) {
+    public DataSource teamspeakDatabase (@Value("${db.username}") String username, @Value("${db.password}") String password) {
         DriverManagerDataSource source = new DriverManagerDataSource("jdbc:mysql://localhost:3306/teamspeak", username, password);
         source.setDriverClassName("com.mysql.jdbc.Driver");
         return source;
