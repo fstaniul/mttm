@@ -1,5 +1,10 @@
 package com.staniul.teamspeak.modules.utilities;
 
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.commands.validators.ValidateParams;
+import com.staniul.teamspeak.modules.messengers.NotEmptyParamsValidator;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
@@ -13,6 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +39,8 @@ public class ClientNicknameFilter {
     private List<Pattern> patterns;
     private Set<Client> warnedClients = new HashSet<>();
 
+    private final String regexFile = "./data/nickname-filters.txt";
+
     @Autowired
     public ClientNicknameFilter(Query query) {
         this.query = query;
@@ -37,9 +48,30 @@ public class ClientNicknameFilter {
 
     @PostConstruct
     private void init() {
-        patterns = config.getList(String.class, "rules.rule[@regex]").stream()
-                .map(Pattern::compile)
-                .collect(Collectors.toList());
+        patterns = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(regexFile), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null)
+                patterns.add(Pattern.compile(".*" + line.toLowerCase() + ".*"));
+        } catch (IOException e) {
+            log.error("Failed to load file with nickname filters", e);
+        }
+    }
+
+    @PreDestroy
+    private void save() {
+        try (PrintWriter writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(regexFile, false), StandardCharsets.UTF_8)), true)) {
+            for (Pattern pattern : patterns) {
+                writer.println(patternToString(pattern));
+            }
+            writer.flush();
+        } catch (IOException e) {
+            log.error("Failed to save nickname filters to file.", e);
+        }
+    }
+
+    private String patternToString(Pattern pattern) {
+        return pattern.pattern().substring(2, pattern.pattern().length() - 2);
     }
 
     public boolean filterClientNicknameOnJoin(Client client) {
@@ -83,5 +115,52 @@ public class ClientNicknameFilter {
                 }
             }
         }
+    }
+
+    @Teamspeak3Command("!cnfadd")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(NotEmptyParamsValidator.class)
+    public CommandResponse addNewNicknameFilter(Client client, String params) {
+        patterns.add(Pattern.compile(".*" + params + ".*"));
+        return new CommandResponse(config.getString("commands.add").replace("$FILTER$", params));
+    }
+
+    @Teamspeak3Command("!cnfshow")
+    @ClientGroupAccess("servergroups.headadmins")
+    public CommandResponse showNicknameFilters(Client client, String params) {
+        StringBuilder sb = new StringBuilder(config.getString("commands.show"));
+        for (Pattern pattern : patterns) sb.append(" ").append(patternToString(pattern)).append(",");
+        if (patterns.size() > 0) sb.delete(sb.length() - 1, sb.length());
+        return new CommandResponse(sb.toString());
+    }
+
+    @Teamspeak3Command("!cnfdel")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(NotEmptyParamsValidator.class)
+    public CommandResponse deleteNicknameFilter(Client client, String params) {
+        List<Pattern> pps = patterns.stream()
+                .filter(p -> patternToString(p).startsWith(params))
+                .collect(Collectors.toList());
+
+        Pattern exact = pps.stream().filter(p -> patternToString(p).equals(params)).findAny().orElse(null);
+
+
+        if (pps.size() == 1 || exact != null) {
+            if (exact == null) exact = pps.get(0);
+
+            patterns.remove(exact);
+            return new CommandResponse(config.getString("commands.delete")
+                    .replace("$FILTER$", patternToString(exact)));
+        }
+
+        if (pps.size() > 1) {
+            StringBuilder response = new StringBuilder(config.getString("commands.delete[@more]"));
+            for (Pattern pattern : pps)
+                response.append(patternToString(pattern)).append(", ");
+            response.delete(response.length() - 2, response.length());
+            return new CommandResponse(response.toString());
+        }
+
+        return new CommandResponse(config.getString("commands.delete[@none]"));
     }
 }

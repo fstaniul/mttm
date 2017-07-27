@@ -7,11 +7,15 @@
 
     <groups>
         <registered>641,789</registered>
-        <admins>6,679,787</admins>
+        <admins>6,787,679</admins>
     </groups>
 
     <display>
         <header>Zarejestrowani dnia [b]$DATE$[/b]:</header>
         <channel-id>10664</channel-id>
     </display>
+
+    <messages>
+        <rat header="Zarejestrowani od [b]$FROM$[/b] do [b]$TO$[/b]: " error="Nieprawidłowe parametry!"/>
+    </messages>
 </register-counter>

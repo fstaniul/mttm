@@ -38,5 +38,9 @@ public class MethodContainer {
             log.error("Error during method call: " + this, e);
         }
     }
+
+    public Method getMethod() {
+        return method;
+    }
 }
 

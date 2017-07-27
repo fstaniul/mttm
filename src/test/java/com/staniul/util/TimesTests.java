@@ -20,4 +20,9 @@ public class TimesTests {
 
         System.out.println(dateTime.isBefore(date1));
     }
+
+    @Test
+    public void test3 () throws Exception {
+        System.out.println(LocalDate.now().monthOfYear().get());
+    }
 }

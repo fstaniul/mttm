@@ -1,7 +1,5 @@
 package com.staniul.teamspeak.modules.channelsmanagers;
 
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
@@ -10,6 +8,8 @@ import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.query.*;
 import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
+import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -417,9 +417,9 @@ public class PrivateChannelManager {
     @ClientGroupAccess("servergroups.admins")
     @ValidateParams(TwoIntegerParamsValidator.class)
     public CommandResponse changeChannelOwnerCommand(Client client, String params) throws QueryException {
-        String[] splParams = params.split("\\s+");
-        int channelNumber = Integer.parseInt(splParams[0]);
-        int clientDatabaseId = Integer.parseInt(splParams[1]);
+        Matcher matcher = TwoIntegerParamsValidator.getPattern().matcher(params);
+        int channelNumber = Integer.parseInt(matcher.group(1));
+        int clientDatabaseId = Integer.parseInt(matcher.group(2));
 
         synchronized (channelsLock) {
             PrivateChannel channel = channels.stream()
@@ -428,7 +428,7 @@ public class PrivateChannelManager {
                     .orElse(null);
 
             if (channel == null)
-                return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", splParams[0]));
+                return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", matcher.group(1)));
 
             query.setChannelGroup(clientDatabaseId, channel.getId(), config.getInt("channelgroups.owner[@id]"));
             if (channel.getOwner() != PrivateChannel.FREE_CHANNEL_OWNER)

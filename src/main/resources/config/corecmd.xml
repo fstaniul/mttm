@@ -18,6 +18,13 @@
         <cmd command="!unignore" scope="1" description="Włącza wysyłanie wiadomości powitalnej, o ile wcześniej opcja została wyłączona." />
         <cmd command="!jl" scope="1" description="Wysyła link do natychmiastowego połączenia na ten kanał na którym się znajdujesz. Możesz podać jako parametr hasło do kanału." />
         <cmd command="!m" scope="1" description="Przenosi klienta o nicku zaczynającym się od podanych znaków na kanał do Ciebie. [i](Przykład: !m wer - Przeniesie użytkownika o nicku Weronika do Ciebie na kanał). Musisz być właścicielem, administratorem lub moderatorem kanału!" />
+        <cmd command="!rat" scope="3" description="Wysyła informacje o zarejestrowanych użytkownikach przez administracje w dniach podanych jako parametr. Możesz podac 2 daty lub jedną, możesz pominąć rok, lub miesiac i rok. Format daty: RRRR-MM-DD. Format zapytania: !rat DATA DATA" />
+        <cmd command="!wmadd" scope="4" description="Dodaje wiadomość do wiadomości powitalnych, format wiadomości: {GRUPY_SERWERA} WIADOMOSC. Grupy serwera to jakie grupy maja otrzymac wiadomosc." />
+        <cmd command="!wmswap" scope="4" description="Zamienia miejscami 2 wiadomosci, wplywa na to jak sa one wyswietlane do uzytkownika." />
+        <cmd command="!wmshow" scope="4" description="Pokazuje wiadomosci powitalne wraz z ich numerem porzadkowym." />
+        <cmd command="!wmdel" scope="4" description="Usuwa wiadomosc powitalna." />
+        <cmd command="!wmmoveup" scope="4" description="Przenosi wiadomość wyżej o ile to możliwe." />
+        <cmd command="!wmmovedown" scope="4" description="Przenosi wiadomość niżej o ile to możliwe." />
     </command-list>
 
     <scopes>
@@ -26,4 +33,8 @@
         <scope id="3" groups="787,679,6,647" />
         <scope id="4" groups="647" />
     </scopes>
+
+    <commands>
+        <help not-found="Nie znalazłam komendy, o którą pytasz." access-denied="Nie masz dostępu do tej komendy!" />
+    </commands>
 </core-commands>
