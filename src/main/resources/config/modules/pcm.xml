@@ -28,7 +28,7 @@
 
 Jeżeli wejdziesz na kanał w sekcji [b]Centrum Pomocy[/b] tam możesz otrzymać swój własny kanał prywatny. Wolny kanał z najmniejszym numerem (najbliżej góry teamspeak'a stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.
 
-Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]WOLNY $NUMBER$[/b]"/>
+Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem zmień nazwę swojego kanału na [b]MOVE $NUMBER$[/b]"/>
 
     <channelgroups>
         <owner id="96"/>
