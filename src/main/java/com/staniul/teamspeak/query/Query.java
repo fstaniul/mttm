@@ -1,6 +1,8 @@
 package com.staniul.teamspeak.query;
 
 import com.staniul.teamspeak.query.channel.ChannelProperties;
+import com.staniul.teamspeak.query.servergroups.Servergroup;
+import com.staniul.teamspeak.query.servergroups.ServergroupExtended;
 import com.staniul.util.lang.StringUtil;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -17,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -116,8 +119,7 @@ public class Query {
             HashMap<String, String> clientInfo = jts3ServerQuery.getInfo(JTS3ServerQuery.INFOMODE_CLIENTINFO, clientId);
             return new Client(clientId, clientInfo);
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to get client information from teamspeak 3 server.", e);
-            return null;
+            throw throwQueryException(e);
         }
     }
 
@@ -139,8 +141,7 @@ public class Query {
                     .forEach(result::add);
             return result.stream().filter(c -> !c.isQuery()).collect(Collectors.toList());
         } catch (TS3ServerQueryException ex) {
-            throwQueryException("Failed to get client list from teamspeak 3 server", ex);
-            return null;
+            throw throwQueryException(ex);
         }
     }
 
@@ -161,8 +162,7 @@ public class Query {
             HashMap<String, String> clientInfo = jts3ServerQuery.getInfo(JTS3ServerQuery.INFOMODE_CLIENTDBINFO, clientDatabaseId);
             return new ClientDatabase(clientDatabaseId, clientInfo);
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to get client database information from teamspeak 3 server.", e);
-            return null;
+            throw throwQueryException(e);
         }
     }
 
@@ -199,8 +199,7 @@ public class Query {
             HashMap<String, String> channelInfo = jts3ServerQuery.getInfo(JTS3ServerQuery.INFOMODE_CHANNELINFO, channelId);
             return new Channel(channelId, channelInfo);
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to get channel information from teamspeak 3 server.", e);
-            return null;
+            throw throwQueryException(e);
         }
     }
 
@@ -219,8 +218,7 @@ public class Query {
             channelList.stream().map(c -> new Channel(Integer.parseInt(c.get("cid")), c)).forEach(result::add);
             return result;
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to get channel list from teamspeak 3 server.", e);
-            return null;
+            throw throwQueryException(e);
         }
     }
 
@@ -264,7 +262,7 @@ public class Query {
         try {
             jts3ServerQuery.kickClient(clientId, false, msg);
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to kick client from server.", e);
+            throw throwQueryException(e);
         }
     }
 
@@ -281,7 +279,7 @@ public class Query {
         try {
             jts3ServerQuery.kickClient(clientId, true, msg);
         } catch (TS3ServerQueryException e) {
-            throwQueryException("Failed to kick client from channel.", e);
+            throw throwQueryException(e);
         }
     }
 
@@ -308,7 +306,7 @@ public class Query {
                 jts3ServerQuery.pokeClient(clientId, message);
 
             } catch (TS3ServerQueryException e) {
-                throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, message), e);
+                throw throwQueryException(e);
             }
         }
     }
@@ -343,7 +341,7 @@ public class Query {
                 jts3ServerQuery.pokeClient(clientId, msg);
             }
         } catch (TS3ServerQueryException e) {
-            throwQueryException(String.format("Failed to poke client (%d) with message (%s)", clientId, Arrays.toString(messages)), e);
+            throw throwQueryException(e);
         }
     }
 
@@ -361,6 +359,16 @@ public class Query {
         checkAndThrowQueryException(String.format("Failed to add client (%d) to servergroup (%d)", clientDatabaseId, servergroupId), response);
     }
 
+    public void servergroupAddClient (int clientDatabaseId, int... servergroups) throws QueryException {
+        for (int servergroup : servergroups)
+            servergroupAddClient(clientDatabaseId, servergroup);
+    }
+
+    public void servergroupAddClient (int clientDatabaseId, Integer... servergroups) throws QueryException {
+        for (int servergroup : servergroups)
+            servergroupAddClient(clientDatabaseId, servergroup);
+    }
+
     /**
      * Removes client from servergroup.
      *
@@ -373,6 +381,16 @@ public class Query {
         String request = String.format("servergroupdelclient cldbid=%d sgid=%d", clientDatabaseId, servergroupId);
         Map<String, String> response = jts3ServerQuery.doCommand(request);
         checkAndThrowQueryException(String.format("Failed to remove client (%d) from servergroup (%d)", clientDatabaseId, servergroupId), response);
+    }
+
+    public void servergroupDeleteClient (int clientDatabaseId, int... servergroups) throws QueryException {
+        for (int servergroup : servergroups)
+            servergroupDeleteClient(clientDatabaseId, servergroup);
+    }
+
+    public void servergroupDeleteClient (int clientDatabaseId, Integer... servergroups) throws QueryException {
+        for (int servergroup : servergroups)
+            servergroupDeleteClient(clientDatabaseId, servergroup);
     }
 
     /**
@@ -455,7 +473,7 @@ public class Query {
         try {
             jts3ServerQuery.moveClient(clientId, channelId, "");
         } catch (TS3ServerQueryException e) {
-            throwQueryException(String.format("Failed to move client (%d) to channel (%d)", clientId, channelId), e);
+            throw throwQueryException(e);
         }
     }
 
@@ -509,7 +527,7 @@ public class Query {
             try {
                 jts3ServerQuery.sendTextMessage(clientId, JTS3ServerQuery.TEXTMESSAGE_TARGET_CLIENT, msg);
             } catch (TS3ServerQueryException e) {
-                throwQueryException("Failed to send message to client!", e);
+                throw throwQueryException(e);
             }
         }
     }
@@ -563,7 +581,7 @@ public class Query {
             try {
                 jts3ServerQuery.sendTextMessage(channelId, JTS3ServerQuery.TEXTMESSAGE_TARGET_CHANNEL, msg);
             } catch (TS3ServerQueryException e) {
-                throwQueryException("Failed to send message to client!", e);
+                throw throwQueryException(e);
             }
         }
     }
@@ -618,7 +636,7 @@ public class Query {
         try {
             jts3ServerQuery.deleteChannel(id, true);
         } catch (TS3ServerQueryException e) {
-            throwQueryException(String.format("Failed to delete channel (%d).", id), e);
+            throw throwQueryException(e);
         }
     }
 
@@ -663,6 +681,55 @@ public class Query {
         checkAndThrowQueryException("Failed to change channel description!", response);
     }
 
+    public List<ServergroupExtended> getServergroupsList() throws QueryException {
+        try {
+            return jts3ServerQuery.getList(JTS3ServerQuery.LISTMODE_SERVERGROUPLIST)
+                    .stream()
+                    .map(ServergroupExtended::new)
+                    .collect(Collectors.toList());
+        } catch (TS3ServerQueryException e) {
+            throw throwQueryException(e);
+        }
+    }
+
+    public List<ServergroupExtended> getServergroupsListNarrowedBySortId (int min, int max) throws QueryException {
+        return getServergroupsListNarrowedBySortId(getServergroupsList(), min, max);
+    }
+
+    public List<ServergroupExtended> getServergroupsListNarrowedBySortId (List<ServergroupExtended> list, int min, int max) {
+        return list.stream()
+                .filter(s -> s.getSort() > min && s.getSort() < max)
+                .collect(Collectors.toList());
+    }
+
+    public Map<Integer, ServergroupExtended> getServergroupsMap () throws QueryException {
+        return getServergroupsMap(getServergroupsList());
+    }
+
+    public Map<Integer, ServergroupExtended> getServergroupsMap(List<ServergroupExtended> servergroups) {
+        return servergroups
+                .stream()
+                .collect(Collectors.toMap(ServergroupExtended::getId, Function.identity()));
+    }
+
+    public Map<Integer, ServergroupExtended> getServergroupsMapNarrowedBySortId (int min, int max) throws QueryException {
+        return getServergroupsMap(getServergroupsListNarrowedBySortId(min, max));
+    }
+
+    public Map<Integer, ServergroupExtended> getServergroupsMapNarrowedBySortId (List<ServergroupExtended> list, int min, int max) {
+        return getServergroupsMap(getServergroupsListNarrowedBySortId(list, min, max));
+    }
+
+    public List<Servergroup> getServergroupsOfClient(int clientDatabaseId) throws QueryException {
+        try {
+            return jts3ServerQuery.getList(JTS3ServerQuery.LISTMODE_SERVERGROUPSBYCLIENTID).stream()
+                    .map(Servergroup::new)
+                    .collect(Collectors.toList());
+        } catch (TS3ServerQueryException e) {
+            throw throwQueryException(e);
+        }
+    }
+
     /**
      * Throws {@link QueryException} based on {@link TS3ServerQueryException}. Used multiple times so its a helpful
      * method. You can specify message that will be added to exception.
@@ -670,22 +737,21 @@ public class Query {
      * @param msg Additional message added to exception.
      * @param ex  {@code TS3ServerQueryException} on which {@code QueryException} should be based.
      *
-     * @throws QueryException Created {@code QueryException} based on given {@code TS3ServerQueryException}
+     * @return Created QueryException
      */
-    private void throwQueryException(String msg, TS3ServerQueryException ex) throws QueryException {
-        throw new QueryException(msg, ex, ex.getErrorID(), ex.getErrorMessage());
+    private QueryException throwQueryException(String msg, TS3ServerQueryException ex) {
+        return new QueryException(msg, ex, ex.getErrorID(), ex.getErrorMessage());
     }
 
     /**
      * For information see {@link #throwQueryException(String, TS3ServerQueryException)}
      *
      * @param ex
-     *
-     * @throws QueryException
+     * @return Created QueryException
      * @see #throwQueryException(String, TS3ServerQueryException)
      */
-    private void throwQueryException(TS3ServerQueryException ex) throws QueryException {
-        throw new QueryException(ex, ex.getErrorID(), ex.getErrorMessage());
+    private QueryException throwQueryException(TS3ServerQueryException ex) {
+        return new QueryException(ex, ex.getErrorID(), ex.getErrorMessage());
     }
 
     /**

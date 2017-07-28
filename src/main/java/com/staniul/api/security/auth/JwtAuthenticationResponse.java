@@ -1,9 +1,9 @@
 package com.staniul.api.security.auth;
 
-public class TokenHolder {
+public class JwtAuthenticationResponse {
     private String token;
 
-    public TokenHolder(String token) {
+    public JwtAuthenticationResponse(String token) {
         this.token = token;
     }
 
