@@ -37,6 +37,9 @@
         <channel>
             <owner>96</owner>
         </channel>
+        <server>
+            <ignore>6,679,787,647</ignore>
+        </server>
     </groups>
 
     <messages>

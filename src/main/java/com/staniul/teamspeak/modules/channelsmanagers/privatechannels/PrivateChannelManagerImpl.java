@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -224,9 +225,15 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     @Task(delay = 5 * 1000)
     public synchronized void createChannelsForWaitingClientsMainLooop() throws QueryException {
         int eventChannelId = config.getInt("create-channel.channel-ids.event");
-        query.getClientList().stream()
-                .filter(c -> c.getCurrentChannelId() == eventChannelId)
-                .forEach(this::createChannelForWaitingClient);
+
+        if (query.getChannelInfo(eventChannelId).getTotalClients() > 0) {
+            Set<Integer> ignoredGroups = config.getIntSet("groups.server.ignore");
+
+            query.getClientList().stream()
+                    .filter(c -> c.getCurrentChannelId() == eventChannelId)
+                    .filter(c -> c.isInServergroup(ignoredGroups))
+                    .forEach(this::createChannelForWaitingClient);
+        }
     }
 
     private void createChannelForWaitingClient(Client client) {
@@ -388,8 +395,8 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
                         messenger.addMessage(
                                 deletedChannel.getOwner(),
                                 config.getString("messages.channel-delete.deleted-cause-empty")
-                                .replace("$NUMBER$", Integer.toString(deletedChannel.getNumber()))
-                                .replace("$DATE$", dateFormat.print(DateTime.now()))
+                                        .replace("$NUMBER$", Integer.toString(deletedChannel.getNumber()))
+                                        .replace("$DATE$", dateFormat.print(DateTime.now()))
                         );
                     }
                 }
