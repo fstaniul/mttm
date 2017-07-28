@@ -1,6 +1,5 @@
 package com.staniul;
 
-import com.staniul.web.config.SpringMVCConfiguration;
 import com.staniul.xmlconfig.di.ConfigInjectionPostProcessor;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -22,7 +21,7 @@ import javax.sql.DataSource;
 @EnableAspectJAutoProxy
 @Configuration
 @ComponentScan("com.staniul")
-@Import({ConfigInjectionPostProcessor.class, SpringMVCConfiguration.class})
+@Import({ConfigInjectionPostProcessor.class})
 public class MTTMSpringConfiguration {
     @Bean
     public Reflections reflections() {
