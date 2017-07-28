@@ -194,11 +194,15 @@ public class PrivateChannelManager {
     public void checkForClientsTask() {
         try {
             int channelId = config.getInt("eventchannel[@id]");
-            List<Client> clients = query.getClientList().stream()
-                    .filter(client -> client.getCurrentChannelId() == channelId)
-                    .filter(client -> !client.isInServergroup(config.getIntSet("servergroups[@ignore]")))
-                    .collect(Collectors.toList());
-            clients.forEach(this::createChannelForClient);
+
+            Channel eventChannel = query.getChannelInfo(channelId);
+
+            if (eventChannel.getTotalClients() > 0) {
+                query.getClientList().stream()
+                        .filter(client -> client.getCurrentChannelId() == channelId)
+                        .filter(client -> !client.isInServergroup(config.getIntSet("servergroups[@ignore]")))
+                        .forEach(this::createChannelForClient);
+            }
         } catch (QueryException e) {
             log.error("Failed to create channel for clients!", e);
         }
