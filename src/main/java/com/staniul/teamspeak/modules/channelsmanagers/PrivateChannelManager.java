@@ -197,7 +197,7 @@ public class PrivateChannelManager {
 
             Channel eventChannel = query.getChannelInfo(channelId);
 
-            if (eventChannel.getTotalClients() > 0) {
+            if (eventChannel.getSecondsEmpty() == -1L) {
                 query.getClientList().stream()
                         .filter(client -> client.getCurrentChannelId() == channelId)
                         .filter(client -> !client.isInServergroup(config.getIntSet("servergroups[@ignore]")))

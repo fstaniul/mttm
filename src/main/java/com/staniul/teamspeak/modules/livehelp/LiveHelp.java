@@ -8,6 +8,8 @@ import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 @Component
 @UseConfig("modules/lh.xml")
 public class LiveHelp {
+    private static Logger log = LogManager.getLogger(LiveHelp.class);
+
     @WireConfig
     private CustomXMLConfiguration config;
     private final Query query;
@@ -33,7 +37,8 @@ public class LiveHelp {
     public void checkForClients () throws QueryException {
         synchronized (clientsLock) {
             Channel channelInfo = query.getChannelInfo(config.getInt("channel[@id]"));
-            if (channelInfo.getTotalClients() > 0) {
+            log.info("Clients waiting for admins help: " + channelInfo.getTotalClients());
+            if (channelInfo.getSecondsEmpty() == -1L) {
                 List<Client> clientList = query.getClientList();
 
                 List<Client> clientsInHelp = clientList.stream()
