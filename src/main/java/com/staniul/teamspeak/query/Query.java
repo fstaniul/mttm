@@ -495,6 +495,10 @@ public class Query {
         sendTextMessageToClient(clientId, StringUtil.splitOnSize(message, " ", 512));
     }
 
+    public void sendTextMessageToClient (int clientId, String message, String delimiter) throws QueryException {
+        sendTextMessageToClient(clientId, StringUtil.splitOnSize(message, delimiter, 1000));
+    }
+
     /**
      * Sends messages to client. Messages cannot be longer then 1024 bytes long.
      *

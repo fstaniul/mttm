@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<admin-messenger>
+    <groups>
+        <admins>647,6,787,679</admins>
+    </groups>
+
+    <messages>
+        <templates>
+            <message>$MSG$ [b]~$AUTHOR$[/b].</message>
+            <show>
+                <standard>$MSG$.</standard>
+                <verbose>[b]$ID$[/b]: $MSG.</verbose>
+            </show>
+        </templates>
+
+        <delete>
+            <success>Usunęłam wiadomość: $MSG$</success>
+            <success-nomsg>Usunęłam wiadomość.</success-nomsg>
+            <not-found>Nie znalazłam takiej wiadomości.</not-found>
+        </delete>
+
+        <delete-admin>
+            <success>Usunęłam wiadomość.</success>
+            <not-found>Nie znalazłam wiadomości o podanym id.</not-found>
+        </delete-admin>
+
+        <add>
+            <success>Dodałam wiadomość.</success>
+            <too-long>Wiadomość jest zbyt długa.</too-long>
+        </add>
+
+        <show>
+            <nothing>Brak wiadomości do pokazania.</nothing>
+            <header>Wiadomości ([b]$NUMBER$[/b]):</header>
+        </show>
+
+        <event>
+            <header>Wiadomości ([b]$NUMBER$[/b]):</header>
+        </event>
+    </messages>
+</admin-messenger>
