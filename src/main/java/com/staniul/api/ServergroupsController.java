@@ -16,13 +16,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
+@RestController
 @UseConfig("api/servergroups.xml")
 @RequestMapping("/api/servergroups")
 public class ServergroupsController {
@@ -48,20 +47,19 @@ public class ServergroupsController {
             return new ResponseEntity<>(gamesList, HttpStatus.OK);
         } catch (QueryException e) {
             log.error("Failed to get servergroup list from server as requested by client in a rest api.", e);
-            return new ResponseEntity<>("Failed to get list of servergroups from teamspeak 3 server!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ResponseEntity<?> getListOfClientGroups (Authentication authentication) {
         ApiClientDetails clientDetails = AuthUtil.getClientDetails(authentication);
-
         try {
             List<Servergroup> clientServergroups = query.getServergroupsOfClient(clientDetails.getDatabaseId());
             return new ResponseEntity<>(clientServergroups, HttpStatus.OK);
         } catch (QueryException e) {
             log.error("Failed to get client servergroups from teamspeak 3 server.", e);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -102,7 +100,7 @@ public class ServergroupsController {
             log.error("Failed to get servergroups list from teamspeak 3 server!", e);
         }
 
-        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     public static class ServergroupsPostRequest {

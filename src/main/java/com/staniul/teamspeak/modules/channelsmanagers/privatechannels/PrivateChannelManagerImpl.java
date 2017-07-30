@@ -4,7 +4,6 @@ import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
 import com.staniul.teamspeak.commands.validators.ValidateParams;
-import com.staniul.teamspeak.modules.channelsmanagers.privatechannels.dao.PrivateChannel;
 import com.staniul.teamspeak.query.Channel;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
@@ -54,8 +53,8 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     }
 
     @Override
-    public synchronized PrivateChannel createChannel(Client client) throws QueryException {
-        PrivateChannel ret = getClientsChannel(client);
+    public synchronized PrivateChannel createChannel(int clientDatabaseId, String clientNickname) throws QueryException {
+        PrivateChannel ret = getClientsChannel(clientDatabaseId);
 
         if (ret != null) return ret;
 
@@ -64,23 +63,23 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
         if (ret == null) {
             int channelNumber = database.queryForObject("SELECT count(*) FROM private_channels", Integer.class) + 1;
 
-            ChannelProperties properties = getClientsChannelProperties(client, channelNumber);
+            ChannelProperties properties = getClientsChannelProperties(clientNickname, channelNumber);
 
             int newChannelId = query.channelCreate(properties);
 
-            ret = new PrivateChannel(channelNumber, newChannelId, client.getDatabaseId());
+            ret = new PrivateChannel(channelNumber, newChannelId, clientDatabaseId);
 
             database.update("INSERT INTO private_channels (number, id, owner) VALUES (?, ?, ?)",
                     ret.getNumber(), ret.getId(), ret.getOwner());
         }
         else {
-            ChannelProperties properties = getClientsChannelProperties(client, ret.getNumber())
+            ChannelProperties properties = getClientsChannelProperties(clientNickname, ret.getNumber())
                     .setOrder(ret.getId());
 
             int newChannelId = query.channelCreate(properties);
             query.channelDelete(ret.getId());
 
-            ret = new PrivateChannel(ret.getNumber(), newChannelId, client.getDatabaseId());
+            ret = new PrivateChannel(ret.getNumber(), newChannelId, clientDatabaseId);
 
             database.update("UPDATE private_channels SET owner = ?, id = ? WHERE number = ?",
                     ret.getOwner(), ret.getId(), ret.getNumber());
@@ -179,18 +178,18 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
         return String.format(config.getString("create-channel.number-format"), number);
     }
 
-    private ChannelProperties getClientsChannelProperties(Client client, int channelNumber) {
+    private ChannelProperties getClientsChannelProperties(String clientNickname, int channelNumber) {
         String channelNumberString = formatChannelNumber(channelNumber);
         return new ChannelProperties()
                 .setName(
                         config.getString("create-channel.client.name")
-                                .replace("$NICKNAME$", client.getNickname())
+                                .replace("$NICKNAME$", clientNickname)
                                 .replace("$NUMBER$", channelNumberString)
                 )
                 .setDescription(
                         config.getString("create-channel.client.desc")
                                 .replaceAll("[ \\t]{2,}", " ")
-                                .replace("$NICKNAME$", client.getNickname())
+                                .replace("$NICKNAME$", clientNickname)
                                 .replace("$NUMBER$", channelNumberString)
                 )
                 .setParent(config.getInt("create-channel.channel-ids.parent"))
@@ -226,7 +225,7 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     public synchronized void createChannelsForWaitingClientsMainLooop() throws QueryException {
         int eventChannelId = config.getInt("create-channel.channel-ids.event");
 
-        if (query.getChannelInfo(eventChannelId).getTotalClients() > 0) {
+        if (query.getChannelInfo(eventChannelId).getSecondsEmpty() == -1L) {
             Set<Integer> ignoredGroups = config.getIntSet("groups.server.ignore");
 
             query.getClientList().stream()
@@ -239,7 +238,7 @@ public class PrivateChannelManagerImpl implements PrivateChannelManager {
     private void createChannelForWaitingClient(Client client) {
         PrivateChannel clientsChannel;
         try {
-            clientsChannel = createChannel(client);
+            clientsChannel = createChannel(client.getDatabaseId(), client.getNickname());
         } catch (QueryException e) {
             log.error("Failed to create a channel for client!", e);
             try {

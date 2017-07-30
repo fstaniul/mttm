@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.modules.channelsmanagers.privatechannels.dao;
+package com.staniul.teamspeak.modules.channelsmanagers.privatechannels;
 
 public class PrivateChannel {
     private int number;

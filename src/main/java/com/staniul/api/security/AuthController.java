@@ -31,7 +31,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/auth")
-@UseConfig("api/scopes.xml")
+@UseConfig("api/secure/scopes.xml")
 public class AuthController {
     private static Logger log = LogManager.getLogger(AuthController.class);
 
