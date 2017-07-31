@@ -29,6 +29,8 @@ public class SpringRESTApiConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
 
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/api/admin").hasRole("ROLE_MOD")
+                .antMatchers("/api/owner").hasRole("ROLE_OWNER")
 
                 .anyRequest().authenticated();
 

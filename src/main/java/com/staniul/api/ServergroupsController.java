@@ -34,7 +34,7 @@ public class ServergroupsController {
     @Autowired
     public ServergroupsController(Query query) {this.query = query;}
 
-    @GetMapping(value = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody ResponseEntity<?> getListOfGames() {
         int sortMin = getSortMin();
         int sortMax = getSortMax();

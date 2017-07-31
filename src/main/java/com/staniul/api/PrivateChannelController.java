@@ -8,15 +8,9 @@ import com.staniul.teamspeak.query.Channel;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
-import com.staniul.xmlconfig.CustomXMLConfiguration;
-import com.staniul.xmlconfig.annotations.UseConfig;
-import com.staniul.xmlconfig.annotations.WireConfig;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.websocket.server.PathParam;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +27,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/channels")
+@RequestMapping(path = "/api/channels")
 public class PrivateChannelController {
     private static final Logger log = LogManager.getLogger(PrivateChannelController.class);
-    
+
     private final PrivateChannelManager channelManager;
     private final Query query;
 
@@ -47,8 +40,9 @@ public class PrivateChannelController {
         this.query = query;
     }
 
-    @GetMapping(value = "/create")
-    public @ResponseBody ResponseEntity<?> createChannelForClients(Authentication auth) {
+    @GetMapping("/create")
+    @ResponseBody
+    public ResponseEntity<?> createChannelForClients(Authentication auth) {
         ApiClientDetails clientDetails = AuthUtil.getClientDetails(auth);
         try {
             ClientDatabase clientDatabase = query.getClientDatabaseInfo(clientDetails.getDatabaseId());
@@ -64,7 +58,7 @@ public class PrivateChannelController {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @PostMapping(value = "/edit/name")
+    @PostMapping(path = "/edit/name", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> editChannelName(@RequestParam int type, @RequestBody EditChannelNameRequest request,
             Authentication auth) {
         ApiClientDetails clientDetails = AuthUtil.getClientDetails(auth);
@@ -95,7 +89,8 @@ public class PrivateChannelController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody ResponseEntity<?> getClientsChannel(Authentication auth) {
+    @ResponseBody
+    public ResponseEntity<?> getClientsChannel(Authentication auth) {
         ApiClientDetails clientDetails = AuthUtil.getClientDetails(auth);
         PrivateChannel clientsChannel = channelManager.getClientsChannel(clientDetails.getDatabaseId());
 
