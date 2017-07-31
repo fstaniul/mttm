@@ -5,17 +5,25 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+
+import com.staniul.teamspeak.commands.CommandResponse;
+import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.commands.validators.IntegerParamsValidator;
+import com.staniul.teamspeak.commands.validators.ValidateParams;
 import com.staniul.teamspeak.query.Channel;
+import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.teamspeak.query.channel.ChannelFlagConstants;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @UseConfig("modules/vipchannelmanager.xml")
@@ -50,6 +58,10 @@ public class VipChannelManagerImpl implements VipChannelManager {
             //Get client info and create a channel for him:
             ClientDatabase clientDatabase = query.getClientDatabaseInfo(clientDatabaseId);
             int vipChannelId = query.channelCreate(getVipChannelProperties(separatorId, clientDatabase.getNickname()));
+
+            //Set client servergroups and channelgroup
+            query.setChannelGroup(clientDatabaseId, vipChannelId, config.getInt("groups.channel.owner"));
+            addClientToVipGroups(clientDatabaseId);
 
             //Update in database:
             String sql = "INSERT INTO vip_channels (number, id, owner) VALUES (?, ?, ?)";
@@ -91,6 +103,7 @@ public class VipChannelManagerImpl implements VipChannelManager {
 
         try {
             query.channelDelete(channel.getId());
+            deletClientFromVipGroups(channel.getOwner());
             return true;
         } catch (QueryException e) {
             log.error("Failed to delete vip channel!", e);
@@ -142,5 +155,56 @@ public class VipChannelManagerImpl implements VipChannelManager {
                 .setName(config.getString("vip-channel.name").replace("$NICKNAME", clientNickname)).setOrder(after)
                 .setFlag(ChannelFlagConstants.MAXCLIENTS_UNLIMITED)
                 .setFlag(ChannelFlagConstants.MAXFAMILYCLIENTS_UNLIMITED);
+    }
+
+    private void addClientToVipGroups (int clientDatabaseId) {
+        Set<Integer> groups = getVipServergroupIds();
+        try {
+            for (int group : groups) {
+                query.servergroupAddClient(clientDatabaseId, group);
+            }
+        } catch (QueryException e) {
+            log.error("Failed to add client to vip servergroups.", e);
+        }
+    }
+
+    private void deletClientFromVipGroups (int clientDatabaseId) {
+        Set<Integer> groups = getVipServergroupIds();
+        try {
+            for (int group : groups)
+                query.servergroupDeleteClient(clientDatabaseId, group);
+        } catch (QueryException e) {
+            log.error("Failed to delete client from vip servergroups.");
+        }
+    }
+
+    private Set<Integer> getVipServergroupIds () {
+        return config.getIntSet("groups.server.vip");
+    }
+
+    @Teamspeak3Command("!vipcreate")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse createVipChannelForClientCommand(Client client, String params) {
+        int ownerDatabaseId = Integer.parseInt(params);
+        VipChannel channel = createChannel(ownerDatabaseId);
+
+        String response;
+        if (channel != null) response = config.getString("commands.create.success");
+        else response = config.getString("commands.create.fail");
+        return new CommandResponse(response);
+    }
+
+    @Teamspeak3Command("!vipdelete")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse deleteClientsVipChannelCommand (Client client, String params) {
+        int ownerDatabaseId = Integer.parseInt(params);
+        boolean deleted = deleteClientsChannel(ownerDatabaseId);
+
+        String response;
+        if (deleted) response = config.getString("commands.delete.success");
+        else response = config.getString("commands.delete.fail");
+        return new CommandResponse(response);
     }
 }

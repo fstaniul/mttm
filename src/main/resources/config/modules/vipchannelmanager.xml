@@ -6,4 +6,22 @@
     <vip-channel>
         <name>Kanał vip dla $NICKNAME$</name>
     </vip-channel>
+    <groups>
+        <channel>
+            <owner>96</owner>
+        </channel>
+        <server>
+            <vip>670,671,672</vip>
+        </server>
+    </groups>
+    <commands>
+        <create>
+            <success>Utworzyłam kanał vip.</success>
+            <fail>Błąd podczas tworzenia kanału vip.</fail>
+        </create>
+        <delete>
+            <success>Usunęłam kanał vip.</success>
+            <fail>Błąd podczas usuwania kanału vip.</fail>
+        </delete>
+    </commands>
 </vip-channel-manager>
