@@ -1,0 +1,9 @@
+<?xml version="1.0" charset="UTF-8" ?>
+<vip-channel-manager>
+    <separator>
+        <name>[*spacer$NUMBER$]...</name>
+    </separator>
+    <vip-channel>
+        <name>Kanał vip dla $NICKNAME$</name>
+    </vip-channel>
+</vip-channel-manager>
