@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/api/channels")
+@RequestMapping(path = "/api/privatechannel")
 public class PrivateChannelController {
     private static final Logger log = LogManager.getLogger(PrivateChannelController.class);
 

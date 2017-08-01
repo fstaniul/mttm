@@ -58,7 +58,7 @@ public class QueryImpl implements Query {
      * teamspeak 3 server.
      */
     @Autowired
-    public Query() {
+    public QueryImpl() {
         this.jts3ServerQuery = new JTS3ServerQuery("Query");
         connected = false;
     }
