@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +36,8 @@ public class ClientRegisterer {
 
     @Task(delay = 3 * 60 * 1000)
     public void checkForNewClients() throws QueryException {
+        log.info("Looking for new clients on teamspeak 3 server!");
+
         List<Client> clients = query.getClientList();
 
         int guestGroupId = config.getInt("groups.guest[@id]");
@@ -62,24 +63,21 @@ public class ClientRegisterer {
 
     @Task(delay = 30 * 60 * 1000)
     public void messageAdminsWithNewClientsList() throws QueryException {
-        List<Client> clients = query.getClientList();
-
-        List<Client> newClients = getNewClientList();
-        if (newClients.size() == 0)
-            return;
-
-        List<String> messages = createMessagesForAdminsAboutNewClients(newClients);
-
-        List<Client> admins = clients.stream()
+        List<Client> admins = query.getClientList().stream()
                 .filter(client -> client.isInServergroup(config.getIntSet("groups.admins[@id]")))
                 .filter(client -> !client.isInServergroup(config.getIntSet("groups.admins[@ignored]")))
                 .collect(Collectors.toList());
 
-        for (Client client : admins) {
-            try {
-                query.sendTextMessageToClient(client.getId(), messages);
-            } catch (QueryException e) {
-                log.error(String.format("Failed to send message to client %s", client), e);
+        List<Client> newClients = getNewClientList();
+        if (newClients.size() > 0) {
+            List<String> messages = createMessagesForAdminsAboutNewClients(newClients);
+
+            for (Client client : admins) {
+                try {
+                    query.sendTextMessageToClient(client.getId(), messages);
+                } catch (QueryException e) {
+                    log.error(String.format("Failed to send message to client %s", client), e);
+                }
             }
         }
 
@@ -150,11 +148,19 @@ public class ClientRegisterer {
     @ClientGroupAccess("servergroups.admins")
     public CommandResponse checkForNewClients(Client client, String params) throws QueryException {
         List<Client> newClients = getNewClientList();
+        List<Client> errorClients = getErrorClients();
 
-        if (newClients.size() == 0)
+        if (newClients.size() == 0 && errorClients.size() == 0)
             return new CommandResponse(config.getString("messages.newclients[@no]"));
 
-        List<String> messages = createMessagesForAdminsAboutNewClients(newClients);
+        List<String> messages = new ArrayList<>();
+
+        if (newClients.size() > 0)
+            messages.addAll(createMessagesForAdminsAboutNewClients(newClients));
+
+        if (errorClients.size() > 0)
+            messages.addAll(errorRegInfo(errorClients));
+
         return new CommandResponse(messages.toArray(new String[] {}));
     }
 }

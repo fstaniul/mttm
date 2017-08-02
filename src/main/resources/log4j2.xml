@@ -12,8 +12,8 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="error">
-            <AppenderRef ref="RollingFile" level="error" />
+        <Root level="info">
+            <AppenderRef ref="RollingFile" level="info" />
         </Root>
     </Loggers>
 </Configuration>
