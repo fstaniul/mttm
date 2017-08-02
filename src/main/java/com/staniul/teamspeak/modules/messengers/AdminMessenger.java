@@ -36,7 +36,7 @@ public class AdminMessenger {
     private CustomXMLConfiguration config;
     private final Query query;
     private final String dataFile = "./data/amsg.data";
-    private final String delimiter = ";;;";
+    private final String delimiter = " ";
     private final Object messageLock = new Object();
     private List<Message> messages;
 
@@ -56,39 +56,40 @@ public class AdminMessenger {
                 List<Message> msg = new ArrayList<>();
                 while ((line = reader.readLine()) != null) {
                     String[] split = line.split(delimiter);
-                    msg.add(new Message(split[0], JTS3ServerQuery.decodeTS3String(split[1])));
+                    msg.add(new Message(JTS3ServerQuery.decodeTS3String(split[0]),
+                            JTS3ServerQuery.decodeTS3String(split[1])));
                 }
                 messages = msg;
             } catch (IOException e) {
                 log.error("Failed to load messages from file! Messages are cleaned.", e);
                 messages = new ArrayList<>();
             }
-        }
-        else {
+        } else {
             messages = new ArrayList<>();
         }
     }
 
     @PreDestroy
-    private void save () {
+    private void save() {
         log.info("Saving admin messages to file.");
         try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(dataFile)), true)) {
             for (Message message : messages)
-                writer.printf("%s%s%s\n", message.getOwner(), delimiter, JTS3ServerQuery.encodeTS3String(message.getMessage()));
+                writer.printf("%s%s%s\n", JTS3ServerQuery.encodeTS3String(message.getOwner()), delimiter,
+                        JTS3ServerQuery.encodeTS3String(message.getMessage()));
         } catch (IOException e) {
             log.error("Failed to save messages to file", e);
             log.info("Dumping admin messages here: ");
-            messages.forEach(m -> System.out.printf("%s%s%s\n", m.getOwner(), delimiter, JTS3ServerQuery.encodeTS3String(m.getMessage())));
+            messages.forEach(m -> System.out.printf("%s%s%s\n", m.getOwner(), delimiter,
+                    JTS3ServerQuery.encodeTS3String(m.getMessage())));
         }
     }
-
 
     @Teamspeak3Command("!msgadd")
     @ClientGroupAccess("servergroups.admins")
     @ValidateParams(NotEmptyParamsValidator.class)
     public CommandResponse addMessage(Client client, String params) throws QueryException {
         synchronized (messageLock) {
-            Message message = new Message(params, client.getNickname());
+            Message message = new Message(client.getNickname(), params);
             messages.add(message);
             sendMessageToAllAdmins(message);
             log.info(String.format("Added new admin message: %s", message));
@@ -98,7 +99,8 @@ public class AdminMessenger {
 
     public void sendMessageToAllAdmins(Message message) throws QueryException {
         Set<Integer> adminGroupIds = config.getIntSet("admin-groups[@ids]");
-        List<Client> admins = query.getClientList().stream().filter(c -> c.isInServergroup(adminGroupIds)).collect(Collectors.toList());
+        List<Client> admins = query.getClientList().stream().filter(c -> c.isInServergroup(adminGroupIds))
+                .collect(Collectors.toList());
         for (Client admin : admins)
             query.sendTextMessageToClient(admin.getId(), message.toString());
     }
@@ -128,12 +130,9 @@ public class AdminMessenger {
                 int msgId = Integer.parseInt(params);
                 if (msgId >= 0 && msgId < messages.size())
                     delMessage = messages.get(msgId);
-            }
-            else {
+            } else {
                 String plc = params.toLowerCase();
-                delMessage = messages.stream()
-                        .filter(m -> m.getMessage().toLowerCase().startsWith(plc))
-                        .findFirst()
+                delMessage = messages.stream().filter(m -> m.getMessage().toLowerCase().startsWith(plc)).findFirst()
                         .orElse(null);
             }
 
@@ -141,8 +140,7 @@ public class AdminMessenger {
             if (delMessage != null) {
                 messages.remove(delMessage);
                 retMsg = config.getString("commands.msgdel[@response]").replace("$MSG$", delMessage.toString());
-            }
-            else {
+            } else {
                 retMsg = config.getString("commands.msgdel[@not-found]");
             }
 
@@ -152,7 +150,7 @@ public class AdminMessenger {
 
     @Teamspeak3Command("!msgshow")
     @ClientGroupAccess("servergroups.admins")
-    public CommandResponse showCommands (Client client, String params) {
+    public CommandResponse showCommands(Client client, String params) {
         synchronized (messageLock) {
             List<String> returnMsg = new LinkedList<>();
 
@@ -164,7 +162,7 @@ public class AdminMessenger {
                 returnMsg.add(i + ": " + message.toString());
             }
 
-            return new CommandResponse(returnMsg.toArray(new String[]{}));
+            return new CommandResponse(returnMsg.toArray(new String[] {}));
         }
     }
 }
