@@ -35,7 +35,6 @@ public class TaskController implements ApplicationContextAware {
     private void init() {
         Set<Method> methods = reflections.getMethodsAnnotatedWith(Task.class);
         for (Method method : methods) {
-            log.info("Found task: " + method.getName() + " [" + method + "]");
             Task ann = method.getAnnotation(Task.class);
             Object target = appContext.getBean(method.getDeclaringClass());
 

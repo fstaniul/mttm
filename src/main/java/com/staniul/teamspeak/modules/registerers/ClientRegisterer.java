@@ -36,8 +36,6 @@ public class ClientRegisterer {
 
     @Task(delay = 3 * 60 * 1000)
     public void checkForNewClients() throws QueryException {
-        log.info("Looking for new clients on teamspeak 3 server!");
-
         List<Client> clients = query.getClientList();
 
         int guestGroupId = config.getInt("groups.guest[@id]");
@@ -103,8 +101,11 @@ public class ClientRegisterer {
     private List<Client> getErrorClients() throws QueryException {
         Set<Integer> registered = config.getIntSet("groups.register[@id]");
         Set<Integer> age = config.getIntSet("groups.age[@id]");
-        return query.getClientList().stream().filter(c -> (c.isInServergroup(registered) && !c.isInServergroup(age))
-                || (c.isInServergroup(age) && !c.isInServergroup(registered))).collect(Collectors.toList());
+        Set<Integer> ignore = config.getIntSet("groups.admins[@id]");
+        return query.getClientList().stream().filter(c -> !c.isInServergroup(ignore))
+                .filter(c -> (c.isInServergroup(registered) && !c.isInServergroup(age))
+                        || (c.isInServergroup(age) && !c.isInServergroup(registered)))
+                .collect(Collectors.toList());
     }
 
     private List<String> createMessagesForAdminsAboutNewClients(List<Client> newClients) {
