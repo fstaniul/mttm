@@ -33,12 +33,11 @@ public class ClientRegisterer {
         this.query = query;
     }
 
-    @Task(delay = 1800000)
+    @Task(delay = 3 * 60 * 1000)
     public void checkForNewClients() throws QueryException {
         List<Client> clients = query.getClientList();
 
-        clients.stream()
-                .filter(client -> client.isOnlyInServergroup(config.getInt("groups.guest[@id]")))
+        clients.stream().filter(client -> client.isOnlyInServergroup(config.getInt("groups.guest[@id]")))
                 .filter(client -> client.getTimeConnected() > config.getLong("groups.new[@timeconnected]"))
                 .forEach(client -> {
                     try {
@@ -48,19 +47,23 @@ public class ClientRegisterer {
                     }
                 });
 
-        clients.stream()
-                .filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
-                .filter(client -> !client.isOnlyInServergroup(config.getInt("groups.new[@id]")))
-                .forEach(client -> {
+        clients.stream().filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
+                .filter(client -> !client.isOnlyInServergroup(config.getInt("groups.new[@id]"))).forEach(client -> {
                     try {
                         query.servergroupDeleteClient(client.getDatabaseId(), config.getInt("groups.new[@id]"));
                     } catch (QueryException e) {
                         log.error(e.getMessage(), e);
                     }
                 });
+    }
+
+    @Task(delay = 30 * 60 * 1000)
+    public void messageAdminsWithNewClientsList() throws QueryException {
+        List<Client> clients = query.getClientList();
 
         List<Client> newClients = getNewClientList();
-        if (newClients.size() == 0) return;
+        if (newClients.size() == 0)
+            return;
 
         List<String> messages = createMessagesForAdmins(newClients);
 
@@ -79,8 +82,7 @@ public class ClientRegisterer {
     }
 
     private List<Client> getNewClientList() throws QueryException {
-        return query.getClientList().stream()
-                .filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
+        return query.getClientList().stream().filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
                 .collect(Collectors.toList());
     }
 
@@ -88,7 +90,8 @@ public class ClientRegisterer {
         List<String> result = new LinkedList<>();
 
         String template = "[URL=client://%d/%s]%s[/URL]";
-        StringBuilder builder = new StringBuilder(config.getString("messages.newclients[@start]").replace("$COUNT$", Integer.toString(newClients.size())));
+        StringBuilder builder = new StringBuilder(config.getString("messages.newclients[@start]").replace("$COUNT$",
+                Integer.toString(newClients.size())));
         for (Client client : newClients) {
             String newClientInfo = String.format(template, client.getId(), client.getUniqueId(), client.getNickname());
 
@@ -115,6 +118,6 @@ public class ClientRegisterer {
             return new CommandResponse(config.getString("messages.newclients[@no]"));
 
         List<String> messages = createMessagesForAdmins(newClients);
-        return new CommandResponse(messages.toArray(new String[]{}));
+        return new CommandResponse(messages.toArray(new String[] {}));
     }
 }
