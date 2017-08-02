@@ -34,10 +34,10 @@ public class LiveHelp {
     }
 
     @Task(delay = 5 * 1000)
-    public void checkForClients () throws QueryException {
+    public void checkForClients() throws QueryException {
         synchronized (clientsLock) {
             Channel channelInfo = query.getChannelInfo(config.getInt("channel[@id]"));
-            log.info("Clients waiting for admins help: " + channelInfo.getTotalClients());
+            // log.info("Clients waiting for admins help: " + channelInfo.getTotalClients());
             if (channelInfo.getSecondsEmpty() == -1L) {
                 List<Client> clientList = query.getClientList();
 
@@ -55,20 +55,23 @@ public class LiveHelp {
                         .collect(Collectors.toList());
 
                 List<Client> adminsWhoCanHelp = admins.stream()
-                        .filter(c -> !c.isAway() && c.getHeadphones().isConnected())
-                        .collect(Collectors.toList());
+                        .filter(c -> !c.isAway() && c.getHeadphones().isConnected()).collect(Collectors.toList());
 
                 String message;
                 if (adminsWhoCanHelp.size() > 0)
-                    message = config.getString("messages.client[@info]").replace("$COUNT$", Integer.toString(adminsWhoCanHelp.size()));
-                else message = config.getString("messages.client[@no-admins-online]");
+                    message = config.getString("messages.client[@info]").replace("$COUNT$",
+                            Integer.toString(adminsWhoCanHelp.size()));
+                else
+                    message = config.getString("messages.client[@no-admins-online]");
 
                 for (Client clientInNeed : clientsInHelp) {
-                    String pokeMsg = config.getString("messages.admin[@poke]").replace("$NICKNAME$", clientInNeed.getNickname());
+                    String pokeMsg = config.getString("messages.admin[@poke]").replace("$NICKNAME$",
+                            clientInNeed.getNickname());
                     for (Client admin : adminsWhoCanHelp)
                         query.pokeClient(admin.getId(), pokeMsg, false);
 
-                    String url = String.format("[URL=client://%d/%s][B]%s[/B][/URL]", clientInNeed.getId(), clientInNeed.getUniqueId(), clientInNeed.getNickname());
+                    String url = String.format("[URL=client://%d/%s][B]%s[/B][/URL]", clientInNeed.getId(),
+                            clientInNeed.getUniqueId(), clientInNeed.getNickname());
                     String msg = config.getString("messages.admin[@info]").replace("$URL$", url);
                     for (Client admin : adminsWhoCanHelp)
                         query.sendTextMessageToClient(admin.getId(), msg);
@@ -80,7 +83,7 @@ public class LiveHelp {
     }
 
     @Task(delay = 5 * 60 * 1000)
-    public void clearClientsList () {
+    public void clearClientsList() {
         synchronized (clientsLock) {
             clientsCalled.clear();
         }
