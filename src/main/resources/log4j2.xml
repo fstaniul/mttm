@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" name="mttm" packages="">
     <Appenders>
-        <RollingFile name="RollingFile" fileName="./logs/mttm.log"
-                     filePattern="./logs/%d{yyyy-MM-dd}_%i.log">
+        <RollingFile name="RollingFile" fileName="./logs/mttm.log" filePattern="./logs/%d{yyyy-MM-dd}_%i.log">
             <PatternLayout>
                 <Pattern>%d{HH:mm:ss} [%10.10t] %-5p --- %c{1.} :: %m%n</Pattern>
             </PatternLayout>
@@ -13,8 +12,8 @@
         </RollingFile>
     </Appenders>
     <Loggers>
-        <Root level="info">
-            <AppenderRef ref="RollingFile" level="info" />
+        <Root level="error">
+            <AppenderRef ref="RollingFile" level="error" />
         </Root>
     </Loggers>
 </Configuration>
