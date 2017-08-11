@@ -203,8 +203,8 @@
                         <phase>install</phase>
                         <configuration>
                             <tasks>
-                                <scp todir="ts@ts.electronicsports.pl:/home/ts/mttm/"
-                                     sftp="true" port="2022" trust="true" password="testpw"
+                                <scp todir="admin@ts.electronicsports.pl:/home/admin/mttm/"
+                                     sftp="true" port="2022" trust="true" password="bofifi13"
                                      failonerror="false" verbose="true" passphrase="">
                                     <fileset dir="${project.basedir}">
                                         <include name="mttm.sh" />
