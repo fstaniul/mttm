@@ -25,7 +25,7 @@ public class ClientNicknameFilterAspect {
             "args(client)",
             argNames = "pjp,client")
     public Object checkClientNickname(ProceedingJoinPoint pjp, Client client) throws Throwable {
-        log.info(String.format("Checking clients nickname (%d %s)", client.getDatabaseId(), client.getNickname()));
+//        log.info(String.format("Checking clients nickname (%d %s)", client.getDatabaseId(), client.getNickname()));
 
         if (nicknameFilter.filterClientNicknameOnJoin(client)) {
             pjp.proceed();
