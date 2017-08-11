@@ -204,7 +204,7 @@
                         <configuration>
                             <tasks>
                                 <scp todir="admin@ts.electronicsports.pl:/home/admin/mttm/"
-                                     sftp="true" port="2022" trust="true" password="bofifi13"
+                                     sftp="true" port="22" trust="true" password="bofifi13"
                                      failonerror="false" verbose="true" passphrase="">
                                     <fileset dir="${project.basedir}">
                                         <include name="mttm.sh" />
