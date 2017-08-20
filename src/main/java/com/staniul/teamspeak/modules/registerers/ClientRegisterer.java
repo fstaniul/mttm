@@ -102,6 +102,7 @@ public class ClientRegisterer {
         Set<Integer> registered = config.getIntSet("groups.register[@id]");
         Set<Integer> age = config.getIntSet("groups.age[@id]");
         Set<Integer> ignore = config.getIntSet("groups.admins[@id]");
+        ignore.addAll(config.getIntSet("groups.ignored-error[@id]"));
         return query.getClientList().stream().filter(c -> !c.isInServergroup(ignore))
                 .filter(c -> (c.isInServergroup(registered) && !c.isInServergroup(age))
                         || (c.isInServergroup(age) && !c.isInServergroup(registered)))
