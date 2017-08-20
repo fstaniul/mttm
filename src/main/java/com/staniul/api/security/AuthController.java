@@ -80,6 +80,18 @@ public class AuthController {
         return new ResponseEntity<>("Failed to authorize client!", HttpStatus.UNAUTHORIZED);
     }
 
+    public String createTokenForClient (Client client) {
+        List<String> clientScopes = getClientScopes(client);
+        ApiClientDetails apiClientDetails = new ApiClientDetails(client.getDatabaseId(), clientScopes);
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(apiClientDetails, null, apiClientDetails.getGrantedAuthorities())
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return tokenUtil.generateAuthenticationToken(apiClientDetails);
+    }
+
     private List<String> getClientScopes(Client clientsOnline) {
         List<String> clientScopes = new ArrayList<>();
         List<Scope> scopes = config.getClasses(Scope.class, "scope");
