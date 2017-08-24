@@ -422,27 +422,31 @@ public class PrivateChannelManager {
     @ValidateParams(TwoIntegerParamsValidator.class)
     public CommandResponse changeChannelOwnerCommand(Client client, String params) throws QueryException {
         Matcher matcher = TwoIntegerParamsValidator.getPattern().matcher(params);
-        int channelNumber = Integer.parseInt(matcher.group(1));
-        int clientDatabaseId = Integer.parseInt(matcher.group(2));
+        if (matcher.find()) {
+            int channelNumber = Integer.parseInt(matcher.group(1));
+            int clientDatabaseId = Integer.parseInt(matcher.group(2));
 
-        synchronized (channelsLock) {
-            PrivateChannel channel = channels.stream()
-                    .filter(ch -> ch.getNumber() == channelNumber)
-                    .findFirst()
-                    .orElse(null);
+            synchronized (channelsLock) {
+                PrivateChannel channel = channels.stream()
+                        .filter(ch -> ch.getNumber() == channelNumber)
+                        .findFirst()
+                        .orElse(null);
 
-            if (channel == null)
-                return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", matcher.group(1)));
+                if (channel == null)
+                    return new CommandResponse(config.getString("messages.chso[@notfound]").replace("$NUMBER$", matcher.group(1)));
 
-            query.setChannelGroup(clientDatabaseId, channel.getId(), config.getInt("channelgroups.owner[@id]"));
-            if (channel.getOwner() != PrivateChannel.FREE_CHANNEL_OWNER)
-                query.setChannelGroup(channel.getOwner(), channel.getId(), config.getInt("channelgroups.guest[@id]"));
-            channel.setOwner(clientDatabaseId);
+                query.setChannelGroup(clientDatabaseId, channel.getId(), config.getInt("channelgroups.owner[@id]"));
+                if (channel.getOwner() != PrivateChannel.FREE_CHANNEL_OWNER)
+                    query.setChannelGroup(channel.getOwner(), channel.getId(), config.getInt("channelgroups.guest[@id]"));
+                channel.setOwner(clientDatabaseId);
 
-            return new CommandResponse(config.getString("messages.chso[@success]")
-                    .replace("$NUMBER$", Integer.toString(channel.getNumber()))
-                    .replace("$CLDBID$", Integer.toString(channel.getOwner())));
+                return new CommandResponse(config.getString("messages.chso[@success]")
+                        .replace("$NUMBER$", Integer.toString(channel.getNumber()))
+                        .replace("$CLDBID$", Integer.toString(channel.getOwner())));
+            }
         }
+
+        return new CommandResponse();
     }
 
     @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 0, second = 0)
