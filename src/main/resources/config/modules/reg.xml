@@ -2,12 +2,14 @@
 <registerer>
     <groups>
         <guest id="8"/>
-        <new id="773" timeconnected="1800000" />
-        <admins id="647,786,6,679" ignored="775,930" />
+        <new id="773" timeconnected="1800" />
+        <age id="734,733,732,681,682,683,684,685,686,687,688" />
+        <register id="641,789" />
+        <admins id="647,787,6,679" ignored="775,930" />
+        <ignored-error id="951" />
     </groups>
-
     <messages>
-        <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | "
-                    no="Brak nowych użytkowników." />
+        <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | " no="Brak nowych użytkowników." />
+        <errorclients start="Użytkownicy błędnie zarejestrowani ([b]$NUMBER$[/b]): |" />
     </messages>
 </registerer>

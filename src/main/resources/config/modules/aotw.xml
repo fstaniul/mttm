@@ -11,9 +11,9 @@
     <no-display id="11192"
                 name="Brak!" />
 
-    <avatars origin="/home/ts/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
-             destination="/home/ts/www/teamspeak/$DATE$.gif"
-             url="http://ts.electronicsports.pl/teamspeak/$DATE$.gif"/>
+    <avatars origin="/home/admin/teamspeak3-electronicsports-amd64/files/virtualserver_1/internal/avatar_$BASE64HASH$"
+             destination="/home/admin/www/teamspeak/aotw/$DATE$.gif"
+             url="http://ts.electronicsports.pl/teamspeak/aotw/$DATE$.gif"/>
 
     <commands>
         <refaotw success="Zresetowałam administratora tygodnia! Jeżeli nie ma zmiany znaczy, że wystąpił błąd!"

@@ -15,8 +15,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,75 +34,114 @@ public class ClientRegisterer {
         this.query = query;
     }
 
-    @Task(delay = 1800000)
+    @Task(delay = 3 * 60 * 1000)
     public void checkForNewClients() throws QueryException {
         List<Client> clients = query.getClientList();
 
-        clients.stream()
-                .filter(client -> client.isOnlyInServergroup(config.getInt("groups.guest[@id]")))
-                .filter(client -> client.getTimeConnected() > config.getLong("groups.new[@timeconnected]"))
-                .forEach(client -> {
-                    try {
-                        query.servergroupAddClient(client.getDatabaseId(), config.getInt("groups.new[@id]"));
-                    } catch (QueryException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                });
+        int guestGroupId = config.getInt("groups.guest[@id]");
+        int newGroupId = config.getInt("groups.new[@id]");
+        long tc = config.getLong("groups.new[@timeconnected]");
 
-        clients.stream()
-                .filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
-                .filter(client -> !client.isOnlyInServergroup(config.getInt("groups.new[@id]")))
-                .forEach(client -> {
-                    try {
-                        query.servergroupDeleteClient(client.getDatabaseId(), config.getInt("groups.new[@id]"));
-                    } catch (QueryException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                });
+        //Add clients to a new group that are currently guests and are connected for enuff time on teamspeak 3 server:
+        clients.stream().filter(c -> c.isInServergroup(guestGroupId) && c.getTimeConnected() > tc).forEach(c -> {
+            try {
+                query.servergroupAddClient(c.getDatabaseId(), newGroupId);
+            } catch (QueryException ignore) {
+            }
+        });
 
-        List<Client> newClients = getNewClientList();
-        if (newClients.size() == 0) return;
+        //Remove clients from new group that has been already registered:
+        clients.stream().filter(c -> !c.isOnlyInServergroup(newGroupId) && c.isInServergroup(newGroupId)).forEach(c -> {
+            try {
+                query.servergroupDeleteClient(c.getDatabaseId(), newGroupId);
+            } catch (QueryException ignore) {
+            }
+        });
+    }
 
-        List<String> messages = createMessagesForAdmins(newClients);
-
-        List<Client> admins = clients.stream()
+    @Task(delay = 30 * 60 * 1000)
+    public void messageAdminsWithNewClientsList() throws QueryException {
+        List<Client> admins = query.getClientList().stream()
                 .filter(client -> client.isInServergroup(config.getIntSet("groups.admins[@id]")))
                 .filter(client -> !client.isInServergroup(config.getIntSet("groups.admins[@ignored]")))
                 .collect(Collectors.toList());
 
-        for (Client client : admins) {
-            try {
-                query.sendTextMessageToClient(client.getId(), messages);
-            } catch (QueryException e) {
-                log.error(String.format("Failed to send message to client %s", client), e);
+        List<Client> newClients = getNewClientList();
+        if (newClients.size() > 0) {
+            List<String> messages = createMessagesForAdminsAboutNewClients(newClients);
+
+            for (Client client : admins) {
+                try {
+                    query.sendTextMessageToClient(client.getId(), messages);
+                } catch (QueryException e) {
+                    log.error(String.format("Failed to send message to client %s", client), e);
+                }
+            }
+        }
+
+        List<Client> errorRegs = getErrorClients();
+        if (errorRegs.size() > 0) {
+            List<String> errors = errorRegInfo(errorRegs);
+
+            for (Client admin : admins) {
+                try {
+                    query.sendTextMessageToClient(admin.getId(), errors);
+                } catch (QueryException e) {
+                    log.error("Failed to send text message to admin " + admin.getDatabaseId(), e);
+                }
             }
         }
     }
 
     private List<Client> getNewClientList() throws QueryException {
-        return query.getClientList().stream()
-                .filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
+        return query.getClientList().stream().filter(client -> client.isInServergroup(config.getInt("groups.new[@id]")))
                 .collect(Collectors.toList());
     }
 
-    private List<String> createMessagesForAdmins(List<Client> newClients) {
-        List<String> result = new LinkedList<>();
+    private List<Client> getErrorClients() throws QueryException {
+        Set<Integer> registered = config.getIntSet("groups.register[@id]");
+        Set<Integer> age = config.getIntSet("groups.age[@id]");
+        Set<Integer> ignore = config.getIntSet("groups.admins[@id]");
+        ignore.addAll(config.getIntSet("groups.ignored-error[@id]"));
+        return query.getClientList().stream().filter(c -> !c.isInServergroup(ignore))
+                .filter(c -> (c.isInServergroup(registered) && !c.isInServergroup(age))
+                        || (c.isInServergroup(age) && !c.isInServergroup(registered)))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> createMessagesForAdminsAboutNewClients(List<Client> newClients) {
+        String message = config.getString("messages.newclients[@start]").replace("$COUNT$",
+                Integer.toString(newClients.size()));
+
+        return concatenateClients(newClients, message);
+    }
+
+    private List<String> errorRegInfo(List<Client> clients) {
+        String message = config.getString("messages.errorclients[@start]").replace("$NUMBER$",
+                Integer.toString(clients.size()));
+
+        return concatenateClients(clients, message);
+    }
+
+    private List<String> concatenateClients(List<Client> clients, String startingMessage) {
+        List<String> result = new ArrayList<>();
 
         String template = "[URL=client://%d/%s]%s[/URL]";
-        StringBuilder builder = new StringBuilder(config.getString("messages.newclients[@start]").replace("$COUNT$", Integer.toString(newClients.size())));
-        for (Client client : newClients) {
+        StringBuilder sb = new StringBuilder(startingMessage);
+
+        for (Client client : clients) {
             String newClientInfo = String.format(template, client.getId(), client.getUniqueId(), client.getNickname());
 
-            String built = builder.toString();
+            String built = sb.toString();
             if (built.getBytes().length + newClientInfo.getBytes().length > 1000) {
                 result.add(built);
-                builder = new StringBuilder("| ");
+                sb = new StringBuilder("| ");
             }
 
-            builder.append(newClientInfo).append(" | ");
+            sb.append(newClientInfo).append(" | ");
         }
 
-        result.add(builder.toString());
+        result.add(sb.toString());
 
         return result;
     }
@@ -110,11 +150,19 @@ public class ClientRegisterer {
     @ClientGroupAccess("servergroups.admins")
     public CommandResponse checkForNewClients(Client client, String params) throws QueryException {
         List<Client> newClients = getNewClientList();
+        List<Client> errorClients = getErrorClients();
 
-        if (newClients.size() == 0)
+        if (newClients.size() == 0 && errorClients.size() == 0)
             return new CommandResponse(config.getString("messages.newclients[@no]"));
 
-        List<String> messages = createMessagesForAdmins(newClients);
-        return new CommandResponse(messages.toArray(new String[]{}));
+        List<String> messages = new ArrayList<>();
+
+        if (newClients.size() > 0)
+            messages.addAll(createMessagesForAdminsAboutNewClients(newClients));
+
+        if (errorClients.size() > 0)
+            messages.addAll(errorRegInfo(errorClients));
+
+        return new CommandResponse(messages.toArray(new String[] {}));
     }
 }

@@ -1,5 +1,7 @@
 package com.staniul.teamspeak.taskcontroller;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.reflections.Reflections;
 import org.springframework.beans.BeansException;
@@ -16,19 +18,21 @@ import java.util.Timer;
 
 @Component
 public class TaskController implements ApplicationContextAware {
+    private static final Logger log = LogManager.getLogger(TaskController.class);
+
     private ApplicationContext appContext;
     private Reflections reflections;
 
     private Timer timer;
 
     @Autowired
-    public TaskController (Reflections reflections) {
+    public TaskController(Reflections reflections) {
         this.reflections = reflections;
         timer = new Timer("Task's Timer");
     }
 
     @PostConstruct
-    private void init () {
+    private void init() {
         Set<Method> methods = reflections.getMethodsAnnotatedWith(Task.class);
         for (Method method : methods) {
             Task ann = method.getAnnotation(Task.class);
@@ -48,7 +52,7 @@ public class TaskController implements ApplicationContextAware {
         timer.cancel();
     }
 
-    private DateTime getDateTimeFromTask (Task task) {
+    private DateTime getDateTimeFromTask(Task task) {
         DateTime dateTime = DateTime.now();
 
         dateTime = setDay(dateTime, task.day());
@@ -59,7 +63,7 @@ public class TaskController implements ApplicationContextAware {
         return dateTime;
     }
 
-    private DateTime setDay (DateTime now, int day) {
+    private DateTime setDay(DateTime now, int day) {
         DateTime dateTime = now;
 
         if (day >= 1 && day <= 7) {
@@ -71,7 +75,7 @@ public class TaskController implements ApplicationContextAware {
         return dateTime;
     }
 
-    private DateTime setHour (DateTime now, int hour) {
+    private DateTime setHour(DateTime now, int hour) {
         DateTime dateTime = now;
 
         if (hour >= 0 && hour <= 23) {
@@ -83,7 +87,7 @@ public class TaskController implements ApplicationContextAware {
         return dateTime;
     }
 
-    private DateTime setMinutes (DateTime now, int minute) {
+    private DateTime setMinutes(DateTime now, int minute) {
         DateTime dateTime = now;
 
         if (minute >= 0 && minute <= 59) {
@@ -95,7 +99,7 @@ public class TaskController implements ApplicationContextAware {
         return dateTime;
     }
 
-    private DateTime setSeconds (DateTime now, int seconds) {
+    private DateTime setSeconds(DateTime now, int seconds) {
         DateTime dateTime = now;
 
         if (seconds >= 0 && seconds <= 59) {

@@ -38,7 +38,7 @@ public class Channel implements ChannelFlagConstants {
 
         secondsEmpty = Long.parseLong(info.get("seconds_empty"));
 
-        if (info.get("total_clients") != null) {
+        if (info.containsKey("total_clients")) {
             totalClients = Integer.parseInt(info.get("total_clients"));
             totalFamilyClients = Integer.parseInt(info.get("total_clients_family"));
         }

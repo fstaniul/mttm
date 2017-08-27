@@ -38,7 +38,7 @@ public class Client {
     private Voice microphone;
     private Voice headphones;
 
-    public Client (Client client) {
+    public Client(Client client) {
         id = client.getId();
         databaseId = client.getDatabaseId();
         uniqueId = client.getUniqueId();
@@ -71,11 +71,8 @@ public class Client {
         nickname = info.get("client_nickname");
         ip = info.get("connection_client_ip");
 
-        servergroups = Collections.unmodifiableSet(
-                Arrays.stream(info.get("client_servergroups").split(","))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toSet())
-        );
+        servergroups = Collections.unmodifiableSet(Arrays.stream(info.get("client_servergroups").split(","))
+                .map(Integer::parseInt).collect(Collectors.toSet()));
 
         channelgroup = Integer.parseInt(info.get("client_channel_group_id"));
 
@@ -123,15 +120,15 @@ public class Client {
         return ip;
     }
 
-    public boolean isInServergroup (int group) {
+    public boolean isInServergroup(int group) {
         return servergroups.contains(group);
     }
 
-    public boolean isInServergroup (Set<Integer> groups) {
+    public boolean isInServergroup(Set<Integer> groups) {
         return SetUtil.countIntersection(servergroups, groups) > 0L;
     }
 
-    public boolean isOnlyInServergroup (int group) {
+    public boolean isOnlyInServergroup(int group) {
         return servergroups.size() == 1 && servergroups.contains(group);
     }
 
@@ -168,7 +165,7 @@ public class Client {
     }
 
     public long getTimeConnected() {
-        return System.currentTimeMillis() / 1000 - timeLastConnected;
+        return System.currentTimeMillis() / 1000L - timeLastConnected;
     }
 
     public Voice getMicrophone() {
@@ -186,8 +183,7 @@ public class Client {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Client &&
-                ((Client) obj).databaseId == databaseId;
+        return obj instanceof Client && ((Client) obj).databaseId == databaseId;
     }
 
     @Override

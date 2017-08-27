@@ -32,27 +32,25 @@ import java.util.stream.Collectors;
 @Aspect
 @Order(0)
 public class CommandEventAccessCheckAspect {
-    private static Logger log = LogManager.getLogger(CommandEventAccessCheckAspect.class);
-
     private Environment environment;
     private CommandMessenger commandMessenger;
 
     @Autowired
-    public CommandEventAccessCheckAspect (Environment environment, CommandMessenger commandMessenger) {
+    public CommandEventAccessCheckAspect(Environment environment, CommandMessenger commandMessenger) {
         this.environment = environment;
         this.commandMessenger = commandMessenger;
     }
 
-    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client, ..)) && " +
-            "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && @annotation(com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess) && " +
-            "args(client, ..)")
+    @Pointcut(value = "execution(com.staniul.teamspeak.commands.CommandResponse * (com.staniul.teamspeak.query.Client, ..)) && "
+            + "@annotation(com.staniul.teamspeak.commands.Teamspeak3Command) && @annotation(com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess) && "
+            + "args(client, ..)")
     public void invokeCommand(Client client) {
     }
 
-    @Pointcut("execution(public void * (com.staniul.teamspeak.query.Client)) && " +
-            "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && @annotation(com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess) && " +
-            "args(client)")
-    public void joinEvent (Client client) {
+    @Pointcut("execution(public void * (com.staniul.teamspeak.query.Client)) && "
+            + "@annotation(com.staniul.teamspeak.events.Teamspeak3Event) && @annotation(com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess) && "
+            + "args(client)")
+    public void joinEvent(Client client) {
     }
 
     @Around(value = "invokeCommand(client)", argNames = "pjp,client")
@@ -69,27 +67,28 @@ public class CommandEventAccessCheckAspect {
     }
 
     @Around(value = "joinEvent(client)", argNames = "pjp,client")
-    public Object checkEventClientAccess (ProceedingJoinPoint pjp, Client client) throws Throwable {
+    public Object checkEventClientAccess(ProceedingJoinPoint pjp, Client client) throws Throwable {
         boolean access = checkClientAccess(pjp, client);
 
         if (access) {
-            log.info(String.format("Client (%d %s) access to method (%s) approved.", client.getDatabaseId(), client.getNickname(),
-                    ((MethodSignature) pjp.getSignature()).getMethod().getName()));
+            // log.info(String.format("Client (%d %s) access to method (%s) approved.", client.getDatabaseId(), client.getNickname(),
+            // ((MethodSignature) pjp.getSignature()).getMethod().getName()));
             return pjp.proceed();
         }
 
-        log.info(String.format("Client (%d %s) access to method (%s) revoked.", client.getDatabaseId(), client.getNickname(),
-                ((MethodSignature) pjp.getSignature()).getMethod().getName()));
+        // log.info(String.format("Client (%d %s) access to method (%s) revoked.", client.getDatabaseId(), client.getNickname(),
+        // ((MethodSignature) pjp.getSignature()).getMethod().getName()));
 
         return null;
     }
 
-    private boolean checkClientAccess (ProceedingJoinPoint pjp, Client client) {
+    private boolean checkClientAccess(ProceedingJoinPoint pjp, Client client) {
         List<ClientGroupAccess> anns = AroundAspectUtil.getAnnotationsOfAspectMethod(pjp, ClientGroupAccess.class);
         boolean access = true;
         for (ClientGroupAccess ann : anns) {
-            Set<Integer> groups = Arrays.stream(environment.getProperty(ann.value()).split(",")).map(Integer::parseInt).collect(Collectors.toSet());
-            log.info(String.format("Restricted by (%s), clients groups (%s)", groups, client.getServergroups()));
+            Set<Integer> groups = Arrays.stream(environment.getProperty(ann.value()).split(",")).map(Integer::parseInt)
+                    .collect(Collectors.toSet());
+            // log.info(String.format("Restricted by (%s), clients groups (%s)", groups, client.getServergroups()));
             ClientGroupAccessCheck check = ClientGroupAccessCheck.create(groups, ann.check());
             if (check == null || !check.apply(client))
                 access = false;
