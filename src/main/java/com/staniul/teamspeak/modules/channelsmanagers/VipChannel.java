@@ -1,17 +1,29 @@
 package com.staniul.teamspeak.modules.channelsmanagers;
 
+import org.springframework.jdbc.core.RowMapper;
+
 import java.util.List;
 
 public class VipChannel {
+    public static RowMapper<VipChannel> rowMapper () {
+        return (rs, rowNum) -> new VipChannel(rs.getInt("number"), rs.getInt("channel_id"), rs.getInt("owner_id"), rs.getInt("spacer_id"));
+    }
+
+    private int number;
     private int channelId;
     private int ownerId;
     private int spacerId;
     private List<Integer> subChannelsIds;
 
-    public VipChannel(int channelId, int ownerId, int spacerId) {
+    public VipChannel(int number, int channelId, int ownerId, int spacerId) {
+        this.number = number;
         this.channelId = channelId;
         this.ownerId = ownerId;
         this.spacerId = spacerId;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
     public int getChannelId() {

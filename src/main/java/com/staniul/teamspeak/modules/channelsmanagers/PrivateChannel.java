@@ -1,9 +1,15 @@
 package com.staniul.teamspeak.modules.channelsmanagers;
 
+import org.springframework.jdbc.core.RowMapper;
+
 import java.io.Serializable;
 
 public class PrivateChannel implements Serializable {
     public transient static final int FREE_CHANNEL_OWNER = -1;
+
+    public static RowMapper<PrivateChannel> rowMapper () {
+        return (rs, rowNum) -> new PrivateChannel(rs.getInt("channel_id"), rs.getInt("number"), rs.getInt("owner_id"));
+    }
 
     private int id;
     private int number;

@@ -1,7 +1,9 @@
 package com.staniul.teamspeak.modules.channelsmanagers;
 
 import com.staniul.teamspeak.query.Client;
+import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
+import com.staniul.teamspeak.query.QueryException;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -28,12 +30,38 @@ public class ChannelManagerImpl implements ChannelManager {
 
     @Override
     public PrivateChannel createPrivateChannel(int databaseId) throws ChannelManagerException {
-        return null;
+        PrivateChannel clientsChannel = getClientsPrivateChannel(databaseId);
+        if (clientsChannel != null) return clientsChannel;
+
+        PrivateChannel freeChannel = getFreePrivateChannel();
+        if (freeChannel != null) { //There is free channel:
+            clientsChannel = transformFreePrivateChannel(freeChannel, databaseId);
+        }
+        else {
+            clientsChannel = createNewPrivateChannel(databaseId);
+        }
+
+        setChannelOwner(clientsChannel, databaseId);
+
+        return clientsChannel;
     }
 
     @Override
     public PrivateChannel createPrivateChannel(Client client) throws ChannelManagerException {
-        return null;
+        return createPrivateChannel(client.getDatabaseId());
+    }
+
+    private PrivateChannel transformFreePrivateChannel(PrivateChannel freeChannel, int databaseId) {
+        try {
+            ClientDatabase clientDatabase = query.getClientDatabaseInfo(databaseId);
+            String channelName = config.getString("privatechannels.channelname")
+                    .replace("%CHANNEL_NUMBER%", Integer.toString(freeChannel.getNumber()))
+                    .replace("%CLIENT_NICKNAME%", clientDatabase.getNickname());
+            int channelOrder = freeChannel.getId();
+
+        } catch (QueryException ex) {
+
+        }
     }
 
     @Override
@@ -63,7 +91,7 @@ public class ChannelManagerImpl implements ChannelManager {
 
     @Override
     public VipChannel createVipChannel(Client client) throws ChannelManagerException {
-        return null;
+        return createVipChannel(client.getDatabaseId());
     }
 
     @Override
@@ -77,11 +105,26 @@ public class ChannelManagerImpl implements ChannelManager {
     }
 
     private VipChannel queryForClientsVipChannel (int clientDatabaseId) {
-        String sql = "";
-
-        List<VipChannel> vipChannel = jdbcTemplate.query("SELECT * FROM vip_channels WHERE owner_id = ? LIMIT 1",
+        List<VipChannel> vipChannels = jdbcTemplate.query("SELECT * FROM vip_channels WHERE owner_id = ? LIMIT 1",
                 new Object[] {clientDatabaseId},
-                (rs, rowNum) -> new VipChannel(rs.getInt("number"), )))
+                VipChannel.rowMapper());
+
+        return vipChannels.size() == 1 ? vipChannels.get(0) : null;
     }
 
+    private PrivateChannel queryForClientsPrivateChannel (int clientDatabaseId) {
+        List<PrivateChannel> privateChannels = jdbcTemplate.query("SELECT * FROM private_channels WHERE owner_id = ? LIMIT 1",
+                new Object[]{clientDatabaseId},
+                PrivateChannel.rowMapper());
+
+        return privateChannels.size() == 1 ? privateChannels.get(0) : null;
+    }
+
+    private List<VipChannel> queryForVipChannels () {
+        return jdbcTemplate.query("SELECT * FROM vip_channels ORDER BY number ASC", VipChannel.rowMapper());
+    }
+
+    private List<PrivateChannel> queryFroPrivateChannels () {
+        return jdbcTemplate.query("SELECT * FROM private_channels ORDER BY number ASC", PrivateChannel.rowMapper());
+    }
 }
