@@ -1,4 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <channelmanager>
+    <eventchannelid>9158</eventchannelid>
 
+    <privatechannel>
+        <name>[%CHANNEL_NUMBER%] Kanał %CLIENT_NICKNAME%</name>
+        <description>Nowy kanał prywatny [b]%CLIENT_NICKNAME%[/b]
+            Numer tego kanału to [b]%CHANNEL_NUMBER%[/b], prosimy o nie usuwanie numeru porządkowego z nazwy kanału!
+
+            W przypadku jakichkolwiek pytań prosimy o kontakt z administracją serwera teamspeak na kanale [b]Live
+            Help[/b]
+
+            [i](Ta wiadomość może zostać usunięta)[/i]
+        </description>
+        <parent>737</parent>
+        <empty>604800</empty>
+    </privatechannel>
+
+    <vipchannel>
+        <after>7707</after>
+        <name>Kanał VIP %CLIENT_NICKNAME%</name>
+        <description>Kanał VIP %CLIENT_NICKNAME%
+
+            W celu uzyskania większej liczby podkanałów proszę skontaktować się z administracją teamspeak, poprzez
+            wiadomość prywatną lub kanał [b]Live Help![/b]
+        </description>
+        <spacer>
+            <name>[*spacer-VIP-%NUMBER%]...</name>
+        </spacer>
+    </vipchannel>
+
+    <freechannel>
+        <name>[%CHANNEL_NUMBER%] WOLNY</name>
+        <topic>Kanał wolny %CHANNEL_NUMBER%</topic>
+        <description>Wolny kanał o numerze [b]%CHANNEL_NUMBER%[/b].
+
+            Jeżeli wejdziesz na kanał w sekcji [b]CentrumPomocy[/b] tam możesz otrzymać swój własny kanał prywatny.
+            Wolny kanał z najmniejszym numerem (najbliżej góry teamspeaka) stanie się twoim kanałem prywatnym w kilka
+            chwil. Kanały tworzone są automatycznie.
+
+            Jeżeliposiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem napisz do Weroniki:
+            !ccn%CHANNEL_NUMBER%
+        </description>
+    </freechannel>
+
+    <channelgroups>
+        <private>
+            <owner>96</owner>
+        </private>
+        <vip>
+            <owner>97</owner>
+        </vip>
+        <guest>8</guest>
+    </channelgroups>
+
+    <messages>
+        <private>
+            <user>
+                <create>
+                    <success>Utworzyłam kanał prywatny dla Ciebie. Jego numer to [b]%CHANNEL_NUMBER%[/b]. Prosimy o nie
+                        usuwanie numeru porządkowego z nazwy kanału.
+                    </success>
+                    <error>Wystąpił błąd podczas tworzenia twojego kanału prywatnego. Proszę skontaktuj się
+                        zadministracjąteamspeak.
+                    </error>
+                </create>
+            </user>
+            <admin>
+                <delete>
+                    <success>Usunęłam kanał o numerze [b]%CHANNEL_NUMBER%[/b].</success>
+                    <notfound>Nie znalazłam kanału prywatnego o numerze [b]%CHANNEL_NUMBER%[/b].</notfound>
+                    <free>Kanał o numerze [b]%CHANNEL_NUMBER%[/b] jest wolny. Nie możesz usunąć wolnego kanału!</free>
+                </delete>
+                <changeowner>
+                    <success>Zmieniłam właściciela kanału o numerze [b]%CHANNEL_NUMBER%[/b] na [b]%CLIENT_ID%[/b]</success>
+                    <notfound>Nie znalazłam kanału o numerze [b]%CHANNEL_NUMBER%[/b]</notfound>
+                    <error>Wystąpił błąd podczas zmiany właściciela kanału, proszę poinformuj Filipo.</error>
+                </changeowner>
+            </admin>
+        </private>
+    </messages>
 </channelmanager>

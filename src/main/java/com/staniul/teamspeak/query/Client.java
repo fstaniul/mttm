@@ -188,6 +188,6 @@ public class Client {
 
     @Override
     public int hashCode() {
-        return 37 ^ databaseId;
+        return databaseId;
     }
 }
