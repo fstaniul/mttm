@@ -5,12 +5,11 @@
     <privatechannel>
         <name>[%CHANNEL_NUMBER%] Kanał %CLIENT_NICKNAME%</name>
         <description>Nowy kanał prywatny [b]%CLIENT_NICKNAME%[/b]
-            Numer tego kanału to [b]%CHANNEL_NUMBER%[/b], prosimy o nie usuwanie numeru porządkowego z nazwy kanału!
+Numer tego kanału to [b]%CHANNEL_NUMBER%[/b], prosimy o nie usuwanie numeru porządkowego z nazwy kanału!
 
-            W przypadku jakichkolwiek pytań prosimy o kontakt z administracją serwera teamspeak na kanale [b]Live
-            Help[/b]
+W przypadku jakichkolwiek pytań prosimy o kontakt z administracją serwera teamspeak na kanale [b]LiveHelp[/b]
 
-            [i](Ta wiadomość może zostać usunięta)[/i]
+[i](Ta wiadomość może zostać usunięta)[/i]
         </description>
         <parent>737</parent>
         <empty>604800</empty>
@@ -21,8 +20,7 @@
         <name>Kanał VIP %CLIENT_NICKNAME%</name>
         <description>Kanał VIP %CLIENT_NICKNAME%
 
-            W celu uzyskania większej liczby podkanałów proszę skontaktować się z administracją teamspeak, poprzez
-            wiadomość prywatną lub kanał [b]Live Help![/b]
+W celu uzyskania większej liczby podkanałów proszę skontaktować się z administracją teamspeak, poprzezwiadomość prywatną lub kanał [b]Live Help![/b]
         </description>
         <spacer>
             <name>[*spacer-VIP-%NUMBER%]...</name>
@@ -34,12 +32,10 @@
         <topic>Kanał wolny %CHANNEL_NUMBER%</topic>
         <description>Wolny kanał o numerze [b]%CHANNEL_NUMBER%[/b].
 
-            Jeżeli wejdziesz na kanał w sekcji [b]CentrumPomocy[/b] tam możesz otrzymać swój własny kanał prywatny.
-            Wolny kanał z najmniejszym numerem (najbliżej góry teamspeaka) stanie się twoim kanałem prywatnym w kilka
-            chwil. Kanały tworzone są automatycznie.
+Jeżeli wejdziesz na kanał w sekcji [b]CentrumPomocy[/b] tam możesz otrzymać swój własny kanał prywatny.
+Wolny kanał z najmniejszym numerem (najbliżej góry teamspeaka) stanie się twoim kanałem prywatnym w kilka chwil. Kanały tworzone są automatycznie.
 
-            Jeżeliposiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem napisz do Weroniki:
-            !ccn%CHANNEL_NUMBER%
+Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kanałem napisz do Weroniki: !ccn %CHANNEL_NUMBER%
         </description>
     </freechannel>
 
@@ -57,12 +53,8 @@
         <private>
             <user>
                 <create>
-                    <success>Utworzyłam kanał prywatny dla Ciebie. Jego numer to [b]%CHANNEL_NUMBER%[/b]. Prosimy o nie
-                        usuwanie numeru porządkowego z nazwy kanału.
-                    </success>
-                    <error>Wystąpił błąd podczas tworzenia twojego kanału prywatnego. Proszę skontaktuj się
-                        zadministracjąteamspeak.
-                    </error>
+                    <success>Utworzyłam kanał prywatny dla Ciebie. Jego numer to [b]%CHANNEL_NUMBER%[/b]. Prosimy o nieusuwanie numeru porządkowego z nazwy kanału.</success>
+                    <error>Wystąpił błąd podczas tworzenia twojego kanału prywatnego. Proszę skontaktuj się z administracją teamspeak.</error>
                 </create>
             </user>
             <admin>

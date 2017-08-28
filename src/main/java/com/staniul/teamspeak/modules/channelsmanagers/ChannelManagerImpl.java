@@ -141,6 +141,7 @@ public class ChannelManagerImpl implements ChannelManager {
 
     private void createSubChannels(int channelId) throws QueryException {
         ChannelProperties properties = new ChannelProperties()
+                .setParent(channelId)
                 .setFlag(ChannelProperties.MAXCLIENTS_UNLIMITED | ChannelProperties.MAXFAMILYCLIENTS_UNLIMITED)
                 .setCodec(4)
                 .setCodecQuality(10);
@@ -269,7 +270,7 @@ public class ChannelManagerImpl implements ChannelManager {
                 String message = config.getString("messages.private.user.create.success")
                         .replace("%CHANNEL_NUMBER%", Integer.toString(channel.getNumber()));
 
-                query.sendTextMessageToClient(client.getId(), config.getString(message));
+                query.sendTextMessageToClient(client.getId(), message);
                 query.moveClient(client.getId(), channel.getId());
             } catch (ChannelManagerException ex) {
                 query.sendTextMessageToClient(client.getId(), config.getString("messages.private.user.create.error"));
@@ -308,11 +309,13 @@ public class ChannelManagerImpl implements ChannelManager {
                 .replace("%CHANNEL_NUMBER%", Integer.toString(number));
         String description = config.getString("freechannel.description")
                 .replace("%CHANNEL_NUMBER%", Integer.toString(number));
+        int parent = config.getInt("privatechannel.parent");
 
         ChannelProperties properties = new ChannelProperties()
                 .setName(name)
                 .setTopic(topic)
                 .setDescription(description)
+                .setParent(parent)
                 .setOrder(order)
                 .setMaxClients(0)
                 .setMaxFamilyClients(0)
@@ -403,16 +406,16 @@ public class ChannelManagerImpl implements ChannelManager {
         try {
             int errCode = deleteChannel(channelNumber);
             if (errCode == 0) {
-                String message = config.getString("messages.admin.delete.success")
+                String message = config.getString("messages.private.admin.delete.success")
                         .replace("%CHANNEL_NUMBER%", params);
                 return new CommandResponse(message);
             }
             else if (errCode == 1) {
-                String message = config.getString("messages.admin.delete.notfound").replace("%CHANNEL_NUMBER%", params);
+                String message = config.getString("messages.private.admin.delete.notfound").replace("%CHANNEL_NUMBER%", params);
                 return new CommandResponse(message);
             }
             else if (errCode == 2) {
-                String message = config.getString("messages.admin.delete.free")
+                String message = config.getString("messages.private.admin.delete.free")
                         .replace("%CHANNEL_NUMBER%", params);
                 return new CommandResponse(message);
             }
@@ -436,14 +439,14 @@ public class ChannelManagerImpl implements ChannelManager {
 
             if (channel == null) {
                 String message = config.getString("messages.private.admin.changeowner.notfound")
-                        .replace("%CHANNEL_NUMBER%", Integer.toString(channelNumber));
+                        .replace("%CHANNEL_NUMBER%", String.format("%03d", channelNumber));
                 return new CommandResponse(message);
             }
 
             try {
                 changePrivateChannelOwner(channel.getId(), owner);
                 String message = config.getString("message.private.admin.changeowner.success")
-                        .replace("%CHANNEL_NUMBER%", Integer.toString(channelNumber))
+                        .replace("%CHANNEL_NUMBER%", String.format("%03d", channelNumber))
                         .replace("%CLIENT_ID%", Integer.toString(owner));
 
                 return new CommandResponse(message);
