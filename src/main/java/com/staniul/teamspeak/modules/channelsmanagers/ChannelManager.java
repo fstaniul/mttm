@@ -15,6 +15,24 @@ public interface ChannelManager {
     PrivateChannel createPrivateChannel(Client client) throws ChannelManagerException;
 
     /**
+     * Changes private channel owner.
+     * @param channelNumber Channel number
+     * @param ownerId Client database id
+     * @return {@code true} on success, {@code false} if channel was not found.
+     * @throws ChannelManagerException When there is an error with setting channel groups.
+     */
+    boolean changePrivateChannelOwner(int channelNumber, int ownerId) throws ChannelManagerException;
+
+    /**
+     * Changes channel number to free channel with given number
+     * @param ownerId Database id of owner.
+     * @param channelNumber Number of free channel to use.
+     * @return {@code true} on success, {@code false} otherwise
+     * @throws ChannelManagerException When there is an error with reordering channels.
+     */
+    boolean changePrivateChannelNumber(int ownerId, int channelNumber) throws  ChannelManagerException;
+
+    /**
      * Returns clients private channel if it exists, ie client is an owner of one of private channels.
      * @param databaseId Database id of client.
      * @return {@code PrivateChannel} object containing information about clients channel or {@code null} if it was not
@@ -49,6 +67,15 @@ public interface ChannelManager {
     VipChannel createVipChannel(int databaseId) throws ChannelManagerException;
 
     VipChannel createVipChannel(Client client) throws ChannelManagerException;
+
+    /**
+     * Changes owner of a VIP channel with given number.
+     * @param channelNumber Number of vip channel.
+     * @param ownerId Database id of a new owner.
+     * @return {@code true} - success, {@code false} - not found
+     * @throws ChannelManagerException when there is an error while changing owner of a vip channel.
+     */
+    boolean changeVipChannelOwner (int channelNumber, int ownerId) throws ChannelManagerException;
 
     /**
      * Gets clients vip channel or returns null if client does not have a vip channel.

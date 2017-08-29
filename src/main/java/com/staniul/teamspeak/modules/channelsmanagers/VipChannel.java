@@ -45,4 +45,9 @@ public class VipChannel {
     public void setSubChannelsIds(List<Integer> subChannelsIds) {
         this.subChannelsIds = subChannelsIds;
     }
+
+    @Override
+    public String toString() {
+        return String.format("VIP Channel %d with id %d and owner %d", number, channelId, ownerId);
+    }
 }

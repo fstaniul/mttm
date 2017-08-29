@@ -49,6 +49,10 @@ Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kana�
         <guest>8</guest>
     </channelgroups>
 
+    <servergroups>
+        <vip>670,671,672</vip>
+    </servergroups>
+
     <messages>
         <private>
             <user>
@@ -56,6 +60,11 @@ Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kana�
                     <success>Utworzyłam kanał prywatny dla Ciebie. Jego numer to [b]%CHANNEL_NUMBER%[/b]. Prosimy o nieusuwanie numeru porządkowego z nazwy kanału.</success>
                     <error>Wystąpił błąd podczas tworzenia twojego kanału prywatnego. Proszę skontaktuj się z administracją teamspeak.</error>
                 </create>
+                <changenumber>
+                    <success>Zmieniłam numer twojego kanału na [b]%CHANNEL_NUMBER%[/b].</success>
+                    <notfound>Nie posiadasz kanału prywatnego, lub kanał o numerze [b]%CHANNEL_NUMBER%[/b] nie jest wolny.</notfound>
+                    <error>Wystąpił błąd podczas wykonywania polecenia, proszę skontaktuj się z administracją teamspeak.</error>
+                </changenumber>
             </user>
             <admin>
                 <delete>
@@ -70,5 +79,20 @@ Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kana�
                 </changeowner>
             </admin>
         </private>
+        <vip>
+            <admin>
+                <create>
+                    <success>Utworzyłam kanał vip dla użytkownika.</success>
+                    <error>Wystąpił błąd podczas tworzenia kanału vip: </error>
+                </create>
+                <list>
+                    <dataerror>Jest błąd w bazie danych! Niepoprawne id kanału vip!</dataerror>
+                </list>
+                <changeowner>
+                    <success>Zmieniłam właściciela kanału VIP o numerze [b]%CHANNEL_NUMBER%[/b].</success>
+                    <notfound>Nie znalazłam kanału vip o numerze [b]%CHANNEL_NUMBER%[/b]!</notfound>
+                </changeowner>
+            </admin>
+        </vip>
     </messages>
 </channelmanager>

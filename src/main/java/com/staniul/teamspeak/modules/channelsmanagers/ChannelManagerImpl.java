@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -151,6 +152,46 @@ public class ChannelManagerImpl implements ChannelManager {
     }
 
     @Override
+    public synchronized boolean changePrivateChannelOwner(int channelNumber, int ownerId) throws ChannelManagerException {
+        PrivateChannel privateChannel = queryForPrivateChannel(channelNumber);
+
+        if (privateChannel == null) return false;
+
+        try {
+            changePrivateChannelOwnerInner(privateChannel.getId(), ownerId);
+            jdbcTemplate.update("UPDATE private_channels SET owner_id = ? WHERE number = ?", ownerId, channelNumber);
+        } catch (QueryException e) {
+            throw new ChannelManagerException(e.getErrorId(), e.getMessage(), e);
+        }
+
+        return true;
+    }
+
+    @Override
+    public synchronized boolean changePrivateChannelNumber(int ownerId, int channelNumber) throws ChannelManagerException {
+        PrivateChannel clientsChannel = queryForClientsPrivateChannel(ownerId);
+        PrivateChannel freeChannel = queryForPrivateChannel(channelNumber);
+
+        if (clientsChannel == null || freeChannel == null || !freeChannel.isFree()) {
+            return false;
+        }
+
+        try {
+            int freeChannelId = createFreeChannel(clientsChannel.getNumber(), clientsChannel.getId());
+            query.channelMove(clientsChannel.getId(), freeChannel.getId());
+            query.channelDelete(freeChannel.getId());
+
+            //UPDATE:
+            jdbcTemplate.update("UPDATE private_channels SET channel_id = ?, owner_id = ? WHERE number = ?", clientsChannel.getId(), clientsChannel.getOwner(), freeChannel.getNumber());
+            jdbcTemplate.update("UPDATE private_channels SET channel_id = ?, owner_id = '-1' WHERE number = ?", freeChannelId, clientsChannel.getNumber());
+
+            return true;
+        } catch (QueryException e) {
+            throw new ChannelManagerException(e.getErrorId(), e.getMessage(), e);
+        }
+    }
+
+    @Override
     public PrivateChannel getClientsPrivateChannel(int databaseId) {
         return queryForClientsPrivateChannel(databaseId);
     }
@@ -210,6 +251,10 @@ public class ChannelManagerImpl implements ChannelManager {
 
             query.setChannelGroup(databaseId, id, config.getInt("channelgroups.vip.owner"));
 
+            Set<Integer> vipGroups = config.getIntSet("servergroups.vip");
+            for (Integer vipGroup : vipGroups)
+                query.servergroupAddClient(databaseId, vipGroup);
+
             createSubChannels(id);
 
             return clientsChannel;
@@ -221,6 +266,50 @@ public class ChannelManagerImpl implements ChannelManager {
     @Override
     public VipChannel createVipChannel(Client client) throws ChannelManagerException {
         return createVipChannel(client.getDatabaseId());
+    }
+
+    @Override
+    public synchronized boolean changeVipChannelOwner(int channelNumber, int ownerId) throws ChannelManagerException {
+        VipChannel vipChannel = queryForVipChannel(channelNumber);
+
+        //Not found return false according to spec.
+        if (vipChannel == null) return false;
+
+        Set<Integer> vipGroups = config.getIntSet("servergroups.vip");
+        int guestGroup = config.getInt("channelgroups.guest");
+        int ownerGroup = config.getInt("channelgroups.vip.owner");
+
+        //Remove previous channel owner from groups:
+        vipGroups.forEach(g -> {
+            try {
+                query.servergroupDeleteClient(vipChannel.getOwnerId(), g);
+            } catch (QueryException e) {
+                log.error(e);
+            }
+        });
+        try {
+            query.setChannelGroup(vipChannel.getOwnerId(), vipChannel.getChannelId(), guestGroup);
+        } catch (QueryException e) {
+            throw new ChannelManagerException(e.getErrorId(), e.getMessage(), e);
+        }
+
+        //Add new channel owner and update database records:
+        vipGroups.forEach(g -> {
+            try {
+                query.servergroupAddClient(ownerId, g);
+            } catch (QueryException e) {
+                log.error(e);
+            }
+        });
+        try {
+            query.setChannelGroup(ownerId, vipChannel.getChannelId(), ownerGroup);
+        } catch (QueryException e) {
+            throw new ChannelManagerException(e.getErrorId(), e.getMessage(), e);
+        }
+
+        jdbcTemplate.update("UPDATE vip_channels SET owner_id = ? WHERE number = ?", ownerId, channelNumber);
+
+        return true;
     }
 
     @Override
@@ -260,6 +349,11 @@ public class ChannelManagerImpl implements ChannelManager {
 
     private List<PrivateChannel> queryForPrivateChannels() {
         return jdbcTemplate.query("SELECT * FROM private_channels ORDER BY number ASC", PrivateChannel.rowMapper());
+    }
+
+    private VipChannel queryForVipChannel(int number) {
+        List<VipChannel> vipChannels = jdbcTemplate.query("SELECT * FROM vip_cannels WHERE number = ?", new Object[]{number}, VipChannel.rowMapper());
+        return vipChannels.size() == 1 ? vipChannels.get(0) : null;
     }
 
     private synchronized void createChannelForClient(Client client) {
@@ -325,7 +419,7 @@ public class ChannelManagerImpl implements ChannelManager {
         return query.channelCreate(properties);
     }
 
-    private void changePrivateChannelOwner (int channelId, int owner) throws QueryException {
+    private void changePrivateChannelOwnerInner(int channelId, int owner) throws QueryException {
         List<ClientChannelInfo> clientChannelInfos = query.getChannelgroupClientList(channelId)
                 .stream()
                 .filter(cci -> cci.getChannelgroupId() == config.getInt("channelgroups.private.owner"))
@@ -343,6 +437,7 @@ public class ChannelManagerImpl implements ChannelManager {
         query.setChannelGroup(owner, channelId, ownerGroup);
     }
 
+
     @Task(delay = 5000)
     public void checkForClients() throws QueryException {
         int eventChannelId = config.getInt("eventchannelid");
@@ -357,7 +452,7 @@ public class ChannelManagerImpl implements ChannelManager {
     }
 
     @Task(delay = 24 * 60 * 60 * 1000)
-    public synchronized void checkPrivateChannels () throws QueryException {
+    public synchronized void checkPrivateChannels() throws QueryException {
         List<PrivateChannel> privateChannels = queryForPrivateChannels();
         List<Channel> teamspeak3Channels = query.getChannelList();
         Pattern channelNamePattern = Pattern.compile("(\\[\\d{3}\\]).*");
@@ -429,33 +524,124 @@ public class ChannelManagerImpl implements ChannelManager {
     @Teamspeak3Command("!chso")
     @ClientGroupAccess("servergroups.admins")
     @ValidateParams(TwoIntegerParamsValidator.class)
-    public CommandResponse changeChannelOwnerCommand (Client client, String params) {
+    public CommandResponse changeChannelOwnerCommand(Client client, String params) {
         Matcher matcher = TwoIntegerParamsValidator.getPattern().matcher(params);
 
         if (matcher.find()) {
             int channelNumber = Integer.parseInt(matcher.group(1));
             int owner = Integer.parseInt(matcher.group(2));
-            PrivateChannel channel = queryForPrivateChannel(channelNumber);
 
-            if (channel == null) {
-                String message = config.getString("messages.private.admin.changeowner.notfound")
-                        .replace("%CHANNEL_NUMBER%", String.format("%03d", channelNumber));
-                return new CommandResponse(message);
-            }
 
             try {
-                changePrivateChannelOwner(channel.getId(), owner);
-                String message = config.getString("message.private.admin.changeowner.success")
+                String response;
+
+                if (changePrivateChannelOwner(channelNumber, owner))
+                    response = config.getString("message.private.admin.changeowner.success");
+
+                else response = config.getString("messages.private.admin.changeowner.notfound");
+
+                response = response
                         .replace("%CHANNEL_NUMBER%", String.format("%03d", channelNumber))
                         .replace("%CLIENT_ID%", Integer.toString(owner));
 
-                return new CommandResponse(message);
-            } catch (QueryException e) {
+                return new CommandResponse(response);
+            } catch (ChannelManagerException e) {
                 String message = config.getString("message.private.admin.changeowner.error");
                 return new CommandResponse(message);
             }
         }
 
         return new CommandResponse("PARAMS DID NOT MATCH THE REQUIRED FORM");
+    }
+
+    @Teamspeak3Command("!ccn")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse changeChannelNumberCommand (Client client, String params) {
+        int channelNumber = Integer.parseInt(params);
+
+        String response;
+
+        try {
+            if (changePrivateChannelNumber(client.getDatabaseId(), channelNumber)) {
+                response = config.getString("messages.private.user.changenumber.success");
+            }
+            else response = config.getString("messages.private.user.changenumber.notfound");
+
+        } catch (ChannelManagerException e) {
+            log.error(e);
+            response = config.getString("messages.private.user.changenumber.error");
+        }
+
+        response = response
+                .replace("%CHANNEL_NUMBER%", params);
+
+        return new CommandResponse(response);
+    }
+
+    @Teamspeak3Command("!cvc")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse createVipChannelForClientCommand(Client client, String params) {
+        int clientDatabaseId = Integer.parseInt(params);
+        try {
+            createVipChannel(clientDatabaseId);
+            return new CommandResponse(config.getString("messages.vip.admin.create.success"));
+        } catch (ChannelManagerException e) {
+            log.error("Failed to create a vip channel for client " + e.getLocalizedMessage(), e);
+            return new CommandResponse(config.getString("messages.vip.admin.create.error") + e.getMessage());
+        }
+    }
+
+    @Teamspeak3Command("!vcl")
+    @ClientGroupAccess("servergroups.headadmins")
+    public CommandResponse vipChanneListCommand(Client client, String params) throws QueryException {
+        List<VipChannel> vipChannels = queryForVipChannels();
+        List<Channel> channels = query.getChannelList();
+
+        String labelMsg = "nr: nazwa | id | wlasciciel";
+        query.sendTextMessageToClient(client.getId(), labelMsg);
+
+        for (VipChannel vipChannel : vipChannels) {
+            Channel channelInfo = channels.stream()
+                    .filter(ch -> ch.getId() == vipChannel.getChannelId())
+                    .findFirst()
+                    .orElse(null);
+
+            if (channelInfo == null) {
+                return new CommandResponse(config.getString("messages.vip.admin.list.dataerror") + " " + vipChannel);
+            }
+
+            String message = String.format("%d: %s | %d | %d", vipChannel.getNumber(), channelInfo.getName(), vipChannel.getChannelId(), vipChannel.getOwnerId());
+            query.sendTextMessageToClient(client.getId(), message);
+        }
+
+        return new CommandResponse();
+    }
+
+
+    @Teamspeak3Command("!cvco")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(TwoIntegerParamsValidator.class)
+    public CommandResponse changeVipChannelOwnerCommand(Client client, String params) throws ChannelManagerException {
+        Pattern pattern = TwoIntegerParamsValidator.getPattern();
+        Matcher matcher = pattern.matcher(params);
+
+        if (matcher.find()) {
+            int channelNumber = Integer.parseInt(matcher.group(1));
+            int newOwnerId = Integer.parseInt(matcher.group(2));
+
+            String response;
+            if (changeVipChannelOwner(channelNumber, newOwnerId)) {
+                response = config.getString("messages.vip.admin.changeowner.success");
+            }
+            else {
+                response = config.getString("messages.vip.admin.changeowner.notfound");
+            }
+
+            response = response.replace("%CHANNEL_NUMBER%", Integer.toString(channelNumber));
+            return new CommandResponse(response);
+        }
+
+        return new CommandResponse("INVALID PARAMETERS!");
     }
 }
