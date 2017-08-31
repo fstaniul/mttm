@@ -483,11 +483,13 @@ public class ChannelManagerImpl implements ChannelManager {
                 }
             }
 
-            if (channelInfo.getSecondsEmpty() > secondsEmptyBeforeDelte) {
-                try {
-                    deleteChannel(privateChannel.getNumber());
-                } catch (QueryException e) {
-                    log.error("Failed to delete private channel after the time expired!", e);
+            if (!privateChannel.isFree()) {
+                if (channelInfo.getSecondsEmpty() > secondsEmptyBeforeDelte) {
+                    try {
+                        deleteChannel(privateChannel.getNumber());
+                    } catch (QueryException e) {
+                        log.error("Failed to delete private channel after the time expired!", e);
+                    }
                 }
             }
         }
@@ -556,7 +558,7 @@ public class ChannelManagerImpl implements ChannelManager {
 
     @Teamspeak3Command("!ccn")
     @ValidateParams(IntegerParamsValidator.class)
-    public CommandResponse changeChannelNumberCommand (Client client, String params) {
+    public CommandResponse changeChannelNumberCommand(Client client, String params) {
         int channelNumber = Integer.parseInt(params);
 
         String response;

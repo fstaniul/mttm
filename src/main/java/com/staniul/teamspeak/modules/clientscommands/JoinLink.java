@@ -1,7 +1,5 @@
 package com.staniul.teamspeak.modules.clientscommands;
 
-import com.staniul.teamspeak.security.clientaccesscheck.ClientChannelgroupAccessCheck;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
@@ -25,11 +23,11 @@ public class JoinLink {
     }
 
     @Teamspeak3Command("!jl")
-    @ClientGroupAccess(value = "channelgroups.admins", check = ClientChannelgroupAccessCheck.class)
     public CommandResponse sendClientJoinLink (Client client, String params) {
-        String message = "ts3server://" + config.getString("teamspeak[@addr]");
+        String message = "[URL]ts3server://" + config.getString("teamspeak[@addr]");
         message += "?cid=" + client.getCurrentChannelId();
         message += "".equals(params) ? "" : "&channel_password=" + params;
+        message += "[/URL]";
 
         return new CommandResponse(message);
     }
