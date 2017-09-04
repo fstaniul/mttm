@@ -1,13 +1,12 @@
 package com.staniul.teamspeak.modules.adminlists;
 
-import com.staniul.teamspeak.modules.registerers.adminoftheweek.AdminCompetitionJudge2;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -30,14 +29,12 @@ public class AdminOfflineList {
     @WireConfig
     private CustomXMLConfiguration config;
     private final Query query;
-    private final AdminCompetitionJudge2 aotw;
 
     private List<Servergroup2> servergroup2s;
 
     @Autowired
-    public AdminOfflineList(Query query, AdminCompetitionJudge2 aotw) {
+    public AdminOfflineList(Query query) {
         this.query = query;
-        this.aotw = aotw;
     }
 
     @PostConstruct
@@ -58,12 +55,6 @@ public class AdminOfflineList {
 
         for (Servergroup2 servergroup2 : servergroup2s)
             data.put(servergroup2, query.getClientDatabaseListInServergroup(servergroup2.getId()));
-
-        if (aotw.getAdminOfTheWeek().getPreviousAdminGroup() != -1) {
-            List<ClientDatabase> aotw_info = query.getClientDatabaseListInServergroup(config.getInt("aotw[@id]"));
-            Servergroup2 prevAotwGroup = servergroup2s.stream().filter(sg -> sg.getId() == aotw.getAdminOfTheWeek().getPreviousAdminGroup()).findFirst().orElse(null);
-            data.get(prevAotwGroup).add(aotw_info.get(0));
-        }
 
         refreshDisplay(data);
     }

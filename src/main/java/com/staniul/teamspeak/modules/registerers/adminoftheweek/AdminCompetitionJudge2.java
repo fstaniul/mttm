@@ -1,14 +1,12 @@
 package com.staniul.teamspeak.modules.registerers.adminoftheweek;
 
-import com.staniul.teamspeak.modules.registerers.RegisterCounter;
-import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.teamspeak.commands.CommandResponse;
-import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.modules.registerers.RegisterCounter;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.ClientDatabase;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
+import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -17,7 +15,6 @@ import org.apache.logging.log4j.Logger;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -31,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+//@Component
 @UseConfig("modules/aotw2.xml")
 public class AdminCompetitionJudge2 {
     //Logger
@@ -85,7 +82,7 @@ public class AdminCompetitionJudge2 {
         }
     }
 
-    @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 5, second = 0)
+//    @Task(delay = 7 * 24 * 60 * 60 * 1000, day = 7, hour = 0, minute = 5, second = 0)
     public void assignNewAdminOfTheWeek () throws QueryException, IOException {
         removeCurrent();
         AdminInfo newBestAdmin = countBestAdmin();
@@ -191,7 +188,7 @@ public class AdminCompetitionJudge2 {
         return "[IMG]" + config.getString("avatars[@url]").replace("$DATE$", date) + "[/IMG]";
     }
 
-    @Teamspeak3Command("!refaotw")
+//    @Teamspeak3Command("!refaotw")
     @ClientGroupAccess("servergroups.headadmins")
     public CommandResponse refreshAdminOfTheWeekOnCall (Client client, String params) throws QueryException, IOException {
         assignNewAdminOfTheWeek();

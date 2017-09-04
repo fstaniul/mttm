@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <live-help>
     <channel id="9098"/>
-    <admin-groups ids="647,6,679,787" ignore="775"/>
-    <client-groups ignore="647,6,679,787"/>
+    <admin-groups ids="647,6,787,679" ignore="775"/>
+    <client-groups ignore="647,953,6,787,679,961,701,961,962"/>
 
     <messages>
         <admin poke="Użytkownik [b]$NICKNAME$[/b] potrzebuje pomocy!"
