@@ -398,7 +398,7 @@ public class ChannelManagerImpl implements ChannelManager {
 
     private int createFreeChannel(int number, int order) throws QueryException {
         String name = config.getString("freechannel.name")
-                .replace("%CHANNEL_NUMBER%", Integer.toString(number));
+                .replace("%CHANNEL_NUMBER%", String.format("%03d", number));
         String topic = config.getString("freechannel.topic")
                 .replace("%CHANNEL_NUMBER%", Integer.toString(number));
         String description = config.getString("freechannel.description")
