@@ -60,6 +60,10 @@ public class AdminOfflineList {
     }
 
     private void refreshDisplay(Map<Servergroup2, List<ClientDatabase>> data) throws QueryException {
+        int count = 0;
+        for (Map.Entry<Servergroup2, List<ClientDatabase>> entry : data.entrySet()) {
+            count += entry.getValue().size();
+        }
         StringBuilder description = new StringBuilder();
         for (Servergroup2 servergroup2 : servergroup2s) {
             description.append("[IMG]").append(servergroup2.getIcon()).append("[/IMG]")
@@ -74,6 +78,7 @@ public class AdminOfflineList {
             description.append("\n");
         }
 
+        description.append(config.getString("display[@count]").replace("%NUMBER%", Integer.toString(count))).append("\n");
         query.channelChangeDescription(description.toString(), config.getInt("display[@id]"));
     }
 }

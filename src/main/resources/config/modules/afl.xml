@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admins-offline-list>
     <groups>
-        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png" />
-        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icon_strateg.png" />
-        <servergroup2 id="6" name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png" />
-        <servergroup2 id="951" name="Kierownik Facebooka" icon="http://ts.electronicsports.pl/teamspeak/icon_graphics.png" />
-        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icon_graphics.png" />
-        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_headmod.png" />
-        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png" />
+        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
+        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
+        <servergroup2 id="6" name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
+        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
+        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
+        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_aotw.png"/>
+        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
+        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
+        <servergroup2 id="962" name="Organizatorzy Turniejów" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
     </groups>
 
-    <display id="7710"
+    <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"
+             id="7710"
              listsign=" • "
              entry="[b]$ENTRY$[/b]"
-             header="[size=13][color=blue] $HEADER$:[/color][/size]" />
+             header="[size=13][color=blue] $HEADER$:[/color][/size]"/>
 
     <commands>
-        <refafl response="Odświerzyłam listę administratorów." />
+        <refafl response="Odświerzyłam listę administratorów."/>
     </commands>
 </admins-offline-list>
