@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admins-offline-list>
     <groups>
-        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
-        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icon_ha.png"/>
-        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
-        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
-        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icon_admin.png"/>
-        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_aotw.png"/>
-        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
-        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon_mod.png"/>
+        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icon/w.png"/>
+        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icon/s.png"/>
+        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon/a.png"/>
+        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeak/icon/f.png"/>
+        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icon/g.png"/>
+        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon/gm.png"/>
+        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icon/m.png"/>
+        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icon/r.png"/>
     </groups>
 
     <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"
