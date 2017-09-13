@@ -34,7 +34,7 @@ public class ClientRegisterer {
         this.query = query;
     }
 
-    @Task(delay = 3 * 60 * 1000)
+    @Task(delay = 60 * 1000)
     public void checkForNewClients() throws QueryException {
         List<Client> clients = query.getClientList();
 
@@ -59,7 +59,7 @@ public class ClientRegisterer {
         });
     }
 
-    @Task(delay = 30 * 60 * 1000)
+    @Task(delay = 3 * 60 * 1000)
     public void messageAdminsWithNewClientsList() throws QueryException {
         List<Client> admins = query.getClientList().stream()
                 .filter(client -> client.isInServergroup(config.getIntSet("groups.admins[@id]")))
