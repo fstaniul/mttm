@@ -8,6 +8,7 @@ import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
+import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.teamspeak.torunament.data.TournamentPlayer;
 import com.staniul.teamspeak.torunament.data.TournamentTeam;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
@@ -40,7 +41,17 @@ public class TournamentChannelCreator {
 
     @Teamspeak3Command("!ctc")
     @ClientGroupAccess("servergroups.headadmins")
-    public CommandResponse createTournamentChannels(Client client, String params) throws QueryException {
+    public CommandResponse createTournamentChannelsCommand(Client client, String params) throws QueryException {
+        createTournamentChannelsInner();
+        return new CommandResponse(config.getString("messages.create.successful"));
+    }
+
+    @Task(delay = 60 * 60 * 1000)
+    public void createTournamentChannelsTask () throws QueryException {
+        createTournamentChannelsInner();
+    }
+
+    private void createTournamentChannelsInner () throws QueryException {
         final JdbcTemplate jdbcTemplate = getJdbcTemplate();
         List<TournamentTeam> teams = jdbcTemplate.query(config.getString("query"), TournamentTeam.rowMapper());
 
@@ -50,12 +61,24 @@ public class TournamentChannelCreator {
             );
         }
 
-        List<Channel> channels = query.getChannelList().stream()
+        List<Channel> channels = query.getChannelList();
+        List<Channel> subchannels = channels.stream()
                 .filter(channel -> channel.getParentId() == config.getInt("parentChannelId"))
                 .collect(Collectors.toList());
 
+        Channel parentchannel = channels.stream()
+                .filter(channel -> channel.getId() == config.getInt("parentChannelId"))
+                .findFirst()
+                .orElse(null);
+
+        if (parentchannel == null) throw new IllegalStateException("Parent channel for tournaments not found!");
+
+        String channelName = config.getString("parentChannelName").replace("%TEAM_COUNT%", Integer.toString(teams.size()));
+        if (!parentchannel.getName().equalsIgnoreCase(channelName))
+            query.channelRename(channelName, parentchannel.getId());
+
         for (TournamentTeam tournamentTeam : teams) {
-            Channel channel = channels.stream()
+            Channel channel = subchannels.stream()
                     .filter(channel1 -> channel1.getName().equalsIgnoreCase(tournamentTeam.getName()))
                     .findFirst()
                     .orElse(null);
@@ -68,8 +91,8 @@ public class TournamentChannelCreator {
                                 config.getString("channel.description")
                                         .replace("%TEAM_NAME%", tournamentTeam.getName())
                                         .replace("%TEAM_SQUAD%", tournamentTeam.getPlayers().stream()
-                                            .map(tp -> String.format("%s [b]%s[/b] (%s)", tp.getName(), tp.getNickname(), tp.getPosition()))
-                                            .collect(Collectors.joining("\n")))
+                                                .map(tp -> String.format("%s [b]%s[/b] (%s)", tp.getName(), tp.getNickname(), tp.getPosition()))
+                                                .collect(Collectors.joining("\n")))
                         )
                         .setTopic(config.getString("channel.topic").replace("%TEAM_NAME%", tournamentTeam.getName()))
                         .setCodec(4)
@@ -80,7 +103,5 @@ public class TournamentChannelCreator {
                 query.channelCreate(properties);
             }
         }
-
-        return new CommandResponse(config.getString("messages.create.successful"));
     }
 }

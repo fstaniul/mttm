@@ -9,6 +9,7 @@
     <query>SELECT * FROM teams</query>
     <queryTeammates>SELECT * FROM players WHERE team = ? ORDER BY id</queryTeammates>
     <parentChannelId>16574</parentChannelId>
+    <parentChannelName>Lobby (%TEAM_COUNT%)</parentChannelName>
 
     <channel>
         <description>Kanał na turniej dla drużyny %TEAM_NAME%.
