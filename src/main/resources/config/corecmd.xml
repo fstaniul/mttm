@@ -30,8 +30,8 @@
     <scopes>
         <scope id="1" groups="8,773,641,789,787,679,6,647,701,951,962,953" />
         <scope id="2" groups="641,789,787,679,6,647,961,701,951,962,953" />
-        <scope id="3" groups="787,679,6,647" />
-        <scope id="4" groups="647" />
+        <scope id="3" groups="787,679,6,647,961,953" />
+        <scope id="4" groups="647,953" />
     </scopes>
 
     <commands>

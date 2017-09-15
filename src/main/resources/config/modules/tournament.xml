@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<tournament>
+    <jdbc>
+        <url>jdbc:mysql://localhost:3306/tournament</url>
+        <login>tournament</login>
+        <password>ts20122012</password>
+    </jdbc>
+
+    <query>SELECT * FROM teams</query>
+    <queryTeammates>SELECT * FROM players WHERE team = ? ORDER BY id</queryTeammates>
+    <parentChannelId>16574</parentChannelId>
+
+    <channel>
+        <description>Kanał na turniej dla drużyny %TEAM_NAME%.
+
+Zawodnicy:
+%TEAM_SQUAD%</description>
+        <topic>Kanał drużyny %TEAM_NAME%.</topic>
+    </channel>
+
+    <messages>
+        <create>
+            <successful>Utworzyłam kanały na turniej</successful>
+        </create>
+    </messages>
+</tournament>
