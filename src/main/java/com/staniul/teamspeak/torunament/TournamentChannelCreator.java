@@ -79,7 +79,7 @@ public class TournamentChannelCreator {
 
         for (TournamentTeam tournamentTeam : teams) {
             Channel channel = subchannels.stream()
-                    .filter(channel1 -> channel1.getName().equalsIgnoreCase(tournamentTeam.getName()))
+                    .filter(channel1 -> channel1.getName().equalsIgnoreCase(tournamentTeam.getName().length() > 40 ? tournamentTeam.getName().substring(0, 40) : tournamentTeam.getName()))
                     .findFirst()
                     .orElse(null);
 
@@ -100,7 +100,11 @@ public class TournamentChannelCreator {
                         .setMaxClients(5)
                         .setMaxFamilyClients(5);
 
-                query.channelCreate(properties);
+                try {
+                    query.channelCreate(properties);
+                } catch (QueryException e) {
+                    if (e.getErrorId() != 771) throw e;
+                }
             }
         }
     }

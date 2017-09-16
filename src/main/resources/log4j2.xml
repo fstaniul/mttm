@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" name="mttm" packages="">
+    <Appenders>
+        <RollingFile name="RollingFile" fileName="./logs/mttm.log" filePattern="./logs/%d{yyyy-MM-dd}_%i.log">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss} [%10.10t] %-5p --- %c{1.} :: %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="RollingFile" level="info" />
+        </Root>
+    </Loggers>
+</Configuration>
