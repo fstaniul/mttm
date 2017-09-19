@@ -1,4 +1,4 @@
-package com.staniul.teamspeak.torunament.data;
+package com.staniul.teamspeak.modules.torunament.data;
 
 import org.springframework.jdbc.core.RowMapper;
 
