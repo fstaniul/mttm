@@ -451,7 +451,7 @@ public class ChannelManagerImpl implements ChannelManager {
         }
     }
 
-    @Task(delay = 24 * 60 * 60 * 1000)
+    @Task(delay = 24 * 60 * 60 * 1000, day = 1, hour = 0, minute = 5, second = 0)
     public synchronized void checkPrivateChannels() throws QueryException {
         List<PrivateChannel> privateChannels = queryForPrivateChannels();
         List<Channel> teamspeak3Channels = query.getChannelList();
