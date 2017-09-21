@@ -69,7 +69,7 @@ public class AdminOfflineList {
             description.append("[IMG]").append(servergroup2.getIcon()).append("[/IMG]")
                     .append(config.getString("display[@header]").replace("$HEADER$", servergroup2.getName()))
                     .append("\n");
-            data.get(servergroup2).sort(Comparator.comparing(ClientDatabase::getNickname));
+            data.get(servergroup2).sort(Comparator.comparing(ClientDatabase::getNickname, Comparator.comparing(String::toLowerCase)));
             for (ClientDatabase admin : data.get(servergroup2)) {
                 description.append(config.getString("display[@listsign]"))
                         .append(config.getString("display[@entry]").replace("$ENTRY$", admin.getNickname()))

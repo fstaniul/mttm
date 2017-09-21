@@ -46,7 +46,6 @@ public class TournamentChannelCreator {
         return new CommandResponse(config.getString("messages.create.successful"));
     }
 
-    @Task(delay = 60 * 60 * 1000)
     public void createTournamentChannelsTask () throws QueryException {
         createTournamentChannelsInner();
     }
@@ -105,6 +104,15 @@ public class TournamentChannelCreator {
                 } catch (QueryException e) {
                     if (e.getErrorId() != 771) throw e;
                 }
+            }
+
+            else {
+                String description = config.getString("channel.description")
+                        .replace("%TEAM_NAME%", tournamentTeam.getName())
+                        .replace("%TEAM_SQUAD%", tournamentTeam.getPlayers().stream()
+                                .map(tp -> String.format("%s [b]%s[/b] (%s)", tp.getName(), tp.getNickname(), tp.getPosition()))
+                                .collect(Collectors.joining("\n")));
+                query.channelChangeDescription(description, channel.getId());
             }
         }
     }

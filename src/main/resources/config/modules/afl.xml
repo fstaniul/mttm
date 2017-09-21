@@ -4,7 +4,7 @@
         <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png"/>
         <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icons/strateg.png"/>
         <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"/>
-        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeaks/icon/facebook.png"/>
+        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeak/icons/facebook.png"/>
         <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icons/grafik.png"/>
         <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"/>
         <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/moderator.png"/>
