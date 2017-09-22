@@ -2,15 +2,14 @@ package com.staniul.teamspeak.modules.torunament;
 
 import com.staniul.teamspeak.commands.CommandResponse;
 import com.staniul.teamspeak.commands.Teamspeak3Command;
+import com.staniul.teamspeak.modules.torunament.data.TournamentPlayer;
+import com.staniul.teamspeak.modules.torunament.data.TournamentTeam;
 import com.staniul.teamspeak.query.Channel;
 import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.teamspeak.query.channel.ChannelProperties;
 import com.staniul.teamspeak.security.clientaccesscheck.ClientGroupAccess;
-import com.staniul.teamspeak.taskcontroller.Task;
-import com.staniul.teamspeak.modules.torunament.data.TournamentPlayer;
-import com.staniul.teamspeak.modules.torunament.data.TournamentTeam;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import com.staniul.xmlconfig.annotations.WireConfig;
@@ -44,10 +43,6 @@ public class TournamentChannelCreator {
     public CommandResponse createTournamentChannelsCommand(Client client, String params) throws QueryException {
         createTournamentChannelsInner();
         return new CommandResponse(config.getString("messages.create.successful"));
-    }
-
-    public void createTournamentChannelsTask () throws QueryException {
-        createTournamentChannelsInner();
     }
 
     private void createTournamentChannelsInner () throws QueryException {
