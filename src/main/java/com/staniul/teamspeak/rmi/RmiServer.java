@@ -10,7 +10,7 @@ import java.rmi.server.UnicastRemoteObject;
 @Component
 public class RmiServer {
     public RmiServer (RmiController controller) throws RemoteException {
-        RmiController stub = (RmiController) UnicastRemoteObject.exportObject(controller, 0);
+        RmiController stub = (RmiController) UnicastRemoteObject.exportObject(controller, 12000);
         Registry registry = LocateRegistry.getRegistry();
         registry.rebind("RmiController", stub);
     }
