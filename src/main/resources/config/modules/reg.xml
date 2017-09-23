@@ -5,8 +5,8 @@
         <new id="773" timeconnected="300" />
         <age id="734,733,732,681,682,683,684,685,686,687,688" />
         <register id="641,789" />
-        <admins id="679,961" ignored="775" />
-        <ignored-error id="647,953,6,962,951,701,787" />
+        <admins id="679,961,951" ignored="775" />
+        <ignored-error id="647,953,6,962,701,787" />
     </groups>
     <messages>
         <newclients start="Nowi użytkownicy ([b]$COUNT$[/b]): | " no="Brak nowych użytkowników." />

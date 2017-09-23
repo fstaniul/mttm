@@ -1,10 +1,11 @@
 package com.staniul.teamspeak.rmi;
 
-import org.springframework.stereotype.Component;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import java.util.function.*;
-
-@Component
+//@Component
 public class RmiControllerImpl implements RmiController {
     @Override
     public <R> R supply (Supplier<R> supplier) {
