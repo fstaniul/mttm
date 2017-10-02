@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admins-offline-list>
     <groups>
-        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png"/>
-        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icons/strateg.png"/>
-        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"/>
-        <servergroup2 id="951" name="Facebook Menadżer" icon="http://ts.electronicsports.pl/teamspeak/icons/facebook.png"/>
-        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icons/grafik.png"/>
-        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"/>
-        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/moderator.png"/>
-        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"/>
+        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png" />
+        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icons/strateg.png" />
+        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png" />
+        <servergroup2 id="951" name="Facebook Menadżerzy" icon="http://ts.electronicsports.pl/teamspeak/icons/facebook.png" />
+        <servergroup2 id="701" name="Graficy" icon="http://ts.electronicsports.pl/teamspeak/icons/grafik.png" />
+        <servergroup2 id="787" name="Główni moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png" />
+        <servergroup2 id="679" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/moderator.png" />
+        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png" />
     </groups>
 
     <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"
              id="7710"
              listsign=" • "
              entry="[b]$ENTRY$[/b]"
-             header="[size=13][color=blue] $HEADER$:[/color][/size]"/>
+             header="[size=13][color=blue] $HEADER$:[/color][/size]" />
 
     <commands>
-        <refafl response="Odświerzyłam listę administratorów."/>
+        <refafl response="Odświerzyłam listę administratorów." />
     </commands>
 </admins-offline-list>

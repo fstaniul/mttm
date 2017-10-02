@@ -151,6 +151,20 @@ public class ChannelManagerImpl implements ChannelManager {
         query.channelCreate(properties.setName("#2"));
     }
 
+    private void createVipSubChannels(int channelId) throws QueryException {
+        ChannelProperties properties = new ChannelProperties()
+                .setParent(channelId)
+                .setFlag(ChannelProperties.MAXCLIENTS_UNLIMITED | ChannelProperties.MAXFAMILYCLIENTS_UNLIMITED)
+                .setCodec(4)
+                .setCodecQuality(10);
+
+        query.channelCreate(properties.setName("#1"));
+        query.channelCreate(properties.setName("#2"));
+        query.channelCreate(properties.setName("#3"));
+        query.channelCreate(properties.setName("#4"));
+        query.channelCreate(properties.setName("#5"));
+    }
+
     @Override
     public synchronized boolean changePrivateChannelOwner(int channelNumber, int ownerId) throws ChannelManagerException {
         PrivateChannel privateChannel = queryForPrivateChannel(channelNumber);
@@ -220,8 +234,8 @@ public class ChannelManagerImpl implements ChannelManager {
         try {
             ClientDatabase clientDatabase = query.getClientDatabaseInfo(databaseId);
 
-            int order = vipChannels.size() == 0 ? config.getInt("vipchannels.after") : vipChannels.get(vipChannels.size() - 1).getSpacerId();
-            String name = config.getString("vipchannels.name").replace("%CLIENT_NICKNAME%", clientDatabase.getNickname());
+            int order = vipChannels.size() == 0 ? config.getInt("vipchannel.after") : vipChannels.get(vipChannels.size() - 1).getSpacerId();
+            String name = config.getString("vipchannel.name").replace("%CLIENT_NICKNAME%", clientDatabase.getNickname());
 
             ChannelProperties properties = new ChannelProperties()
                     .setName(name)
@@ -233,7 +247,7 @@ public class ChannelManagerImpl implements ChannelManager {
             int id = query.channelCreate(properties);
 
             int number = vipChannels.size();
-            String spacerName = config.getString("vipchannels.spacer.name").replace("%NUMBER%", Integer.toString(number));
+            String spacerName = config.getString("vipchannel.spacer.name").replace("%NUMBER%", Integer.toString(number));
 
             ChannelProperties spacerProperties = new ChannelProperties()
                     .setName(spacerName)
@@ -255,7 +269,7 @@ public class ChannelManagerImpl implements ChannelManager {
             for (Integer vipGroup : vipGroups)
                 query.servergroupAddClient(databaseId, vipGroup);
 
-            createSubChannels(id);
+            createVipSubChannels(id);
 
             return clientsChannel;
         } catch (QueryException ex) {
@@ -352,7 +366,7 @@ public class ChannelManagerImpl implements ChannelManager {
     }
 
     private VipChannel queryForVipChannel(int number) {
-        List<VipChannel> vipChannels = jdbcTemplate.query("SELECT * FROM vip_cannels WHERE number = ?", new Object[]{number}, VipChannel.rowMapper());
+        List<VipChannel> vipChannels = jdbcTemplate.query("SELECT * FROM vip_channels WHERE number = ?", new Object[]{number}, VipChannel.rowMapper());
         return vipChannels.size() == 1 ? vipChannels.get(0) : null;
     }
 
@@ -645,5 +659,45 @@ public class ChannelManagerImpl implements ChannelManager {
         }
 
         return new CommandResponse("INVALID PARAMETERS!");
+    }
+
+    public boolean deleteVipChannel (int channelNumber) throws QueryException {
+        VipChannel vipChannel = queryForVipChannel(channelNumber);
+
+        if (vipChannel == null) return false;
+
+        query.channelDelete(vipChannel.getChannelId());
+        query.channelDelete(vipChannel.getSpacerId());
+
+        jdbcTemplate.update("DELETE from vip_channels WHERE number = ?", channelNumber);
+        jdbcTemplate.update("UPDATE vip_channels SET number = number - 1 WHERE number > ?", channelNumber);
+
+        Set<Integer> vipGroups = config.getIntSet("servergroups.vip");
+        for (Integer vipGroup : vipGroups) {
+            try {
+                query.servergroupDeleteClient(vipChannel.getOwnerId(), vipGroup);
+            } catch (QueryException e) {
+                log.error("Failed to remove client from vip servergroup", e);
+            }
+        }
+
+        return true;
+    }
+
+    @Teamspeak3Command("!vcdel")
+    @ClientGroupAccess("servergroups.headadmins")
+    @ValidateParams(IntegerParamsValidator.class)
+    public CommandResponse deleteVipChannelCommand (Client client, String params) throws ChannelManagerException {
+        int channelNumber = Integer.parseInt(params);
+        try {
+            if (deleteVipChannel(channelNumber)) {
+                return new CommandResponse(config.getString("messages.vip.admin.delete.success"));
+
+            }else {
+                return new CommandResponse(config.getString("messages.vip.admin.delete.failed"));
+            }
+        } catch (QueryException e) {
+            throw new ChannelManagerException(112,"Failed to delete vip channel with number " + params, e);
+        }
     }
 }

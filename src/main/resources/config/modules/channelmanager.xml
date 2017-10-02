@@ -92,6 +92,10 @@ Jeżeli posiadasz już kanał prywatny i chcesz, aby ten kanał był twoim kana�
                     <success>Zmieniłam właściciela kanału VIP o numerze [b]%CHANNEL_NUMBER%[/b].</success>
                     <notfound>Nie znalazłam kanału vip o numerze [b]%CHANNEL_NUMBER%[/b]!</notfound>
                 </changeowner>
+                <delete>
+                    <success>Usunęłam kanał VIP o numerze [b]%NUMBER%[/b].</success>
+                    <fail>Nie znalazłam kanału VIP o podanym numerze.</fail>
+                </delete>
             </admin>
         </vip>
     </messages>
