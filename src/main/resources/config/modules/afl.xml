@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admins-offline-list>
     <groups>
-        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png" />
-        <servergroup2 id="953" name="Strateg" icon="http://ts.electronicsports.pl/teamspeak/icons/strateg.png" />
+        <servergroup2 id="647" name="Właściciele" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png" />
         <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png" />
         <servergroup2 id="787" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png" />
         <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png" />
