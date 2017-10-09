@@ -2,7 +2,7 @@
 <core-commands>
     <command-list>
         <cmd command="!help" scope="1" description="Pokazuje tą listę dostępnych komend." />
-        <cmd command="!reg" scope="3" description="Wysyła listę nowych użytkowników obecnych teraz na serwerze." />
+        <cmd command="!reg" scope="2" description="Wysyła listę nowych użytkowników obecnych teraz na serwerze." />
         <cmd command="!chso" scope="3" description="Zmienia właściciela kanału o podanym numerze na użytkownika z podanym database id. [i](Przykład: !chso 12 19321)[/i]" />
         <cmd command="!chdel" scope="3" description="Usuwa kanał o podanym numerze. [i](Przykład: !chdel 12)[/i]" />
         <cmd command="!msgadd" scope="3" description="Dodaje wiadomość i wysyła ją do wszystkich administratorów online. Każdy administrator po dołączeniu na server otrzyma tą wiadomość." />
@@ -11,9 +11,9 @@
         <cmd command="!msg" scope="3" description="Wysyła wiadomość do użytkowników." />
         <cmd command="!msgadmin" scope="3" description="Wysyła wiadomość do administratorów." />
         <cmd command="!msgall" scope="3" description="Wysyła wiadomość do użytkowników i administratorów." />
-        <cmd command="!refaol" scope="4" description="Odświerza listę administratorów online." />
-        <cmd command="!refafl" scope="4" description="Odświerza listę administracji (na górze teamspeaka)." />
-        <cmd command="!refaotw" scope="4" description="Odświerza administratora tygodnia na żądanie." />
+        <cmd command="!refaol" scope="4" description="Odświeża listę administratorów online." />
+        <cmd command="!refafl" scope="4" description="Odświeża listę administracji (na górze teamspeaka)." />
+        <cmd command="!refaotw" scope="4" description="Odświeża administratora tygodnia na żądanie." />
         <cmd command="!ignore" scope="1" description="Wyłącza wiadomość powitalną wysyłaną przy każdym połączeniu na serwer." />
         <cmd command="!unignore" scope="1" description="Włącza wysyłanie wiadomości powitalnej, o ile wcześniej opcja została wyłączona." />
         <cmd command="!jl" scope="1" description="Wysyła link do natychmiastowego połączenia na ten kanał na którym się znajdujesz. Możesz podać jako parametr hasło do kanału." />
@@ -28,10 +28,10 @@
     </command-list>
 
     <scopes>
-        <scope id="1" groups="8,773,641,789,787,679,6,647,701,951,962,953" />
-        <scope id="2" groups="641,789,787,679,6,647,961,701,951,962,953" />
-        <scope id="3" groups="787,679,6,647,961,953,951" />
-        <scope id="4" groups="647,953" />
+        <scope id="1" groups="8,773,641,789,787,679,6,647,701,951,962,953,985" />
+        <scope id="2" groups="787,6,647,961,985" />
+        <scope id="3" groups="787,6,647,961" />
+        <scope id="4" groups="647" />
     </scopes>
 
     <commands>

@@ -2,12 +2,10 @@
 <admin-online-list>
     <groups>
         <servergroup id="647" rank="1" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png"/>
-        <servergroup id="953" rank="2" icon="http://ts.electronicsports.pl/teamspeak/icons/strateg.png"/>
-        <servergroup id="6" rank="3" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"/>
-        <servergroup id="951" icon="http://ts.electronicsports.pl/teamspeak/icons/facebook.png"/>
-        <servergroup id="787" rank="5" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"/>
-        <servergroup id="679" rank="6" icon="http://ts.electronicsports.pl/teamspeak/icons/moderator.png"/>
-        <servergroup id="961" rank="7" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"/>
+        <servergroup id="6" rank="2" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"/>
+        <servergroup id="787" rank="3" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"/>
+        <servergroup id="961" rank="4" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"/>
+        <servergroup id="985" rank="4" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"/>
     </groups>
 
     <displaychannel id="9097"/>

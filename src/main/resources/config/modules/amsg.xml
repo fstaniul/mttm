@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admin-messenger>
-    <admin-groups ids="647,953,6,787,679,961" />
+    <admin-groups ids="647,6,787,961,985" />
     <commands>
         <msgdel response="Usunęłam wiadomość: $MSG$" not-found="Nie znalazłam wiadomości!" />
         <msgshow no-msg="Brak wiadomości do pokazania!" />
