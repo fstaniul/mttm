@@ -50,11 +50,14 @@ public class AdminOfflineList {
     }
 
     public void refreshAdminList() throws QueryException {
-
         Map<Servergroup2, List<ClientDatabase>> data = new HashMap<>();
 
-        for (Servergroup2 servergroup2 : servergroup2s)
-            data.put(servergroup2, query.getClientDatabaseListInServergroup(servergroup2.getId()));
+        for (Servergroup2 servergroup2 : servergroup2s) {
+            data.put(servergroup2, !servergroup2.isSolo() ?
+                            query.getClientDatabaseListInServergroup(servergroup2.getId()) :
+                            query.getClientDatabaseListInServergroup(servergroup2.getId()).subList(0, 1)
+            );
+        }
 
         refreshDisplay(data);
     }

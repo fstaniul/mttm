@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <live-help>
     <channel id="9098"/>
-    <admin-groups ids="647,6,787,679,961" ignore="775"/>
+    <admin-groups ids="647,6,787,679,961,1014" ignore="775"/>
     <client-groups ignore="647,953,6,787,679,961,701,961,962"/>
 
     <messages>

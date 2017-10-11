@@ -4,6 +4,7 @@ public class Servergroup2 {
     private int id;
     private String name;
     private String icon;
+    private boolean solo;
 
     public Servergroup2 () {}
 
@@ -23,5 +24,9 @@ public class Servergroup2 {
 
     public String getIcon() {
         return icon;
+    }
+
+    public boolean isSolo() {
+        return solo;
     }
 }

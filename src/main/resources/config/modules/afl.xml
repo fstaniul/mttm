@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <admins-offline-list>
     <groups>
-        <servergroup2 id="647" name="Właściciele" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png" />
-        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png" />
-        <servergroup2 id="787" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png" />
-        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png" />
-        <servergroup2 id="985" name="Rejestratorzy (Okres próbny)" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png" />
+        <servergroup2 id="647" name="Właściciel" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png" solo="true" />
+        <servergroup2 id="1014" name="Właścicielka" icon="http://ts.electronicsports.pl/teamspeak/icons/wlascicielka.png" solo="true" />
+        <servergroup2 id="6"   name="Administratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"
+                      solo="false" />
+        <servergroup2 id="787" name="Moderatorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"
+                      solo="false" />
+        <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"
+                      solo="false"/>
+        <servergroup2 id="985" name="Rejestratorzy (Okres próbny)" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"
+                      solo="false"/>
     </groups>
 
     <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"

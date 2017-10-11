@@ -2,6 +2,7 @@
 <admin-online-list>
     <groups>
         <servergroup id="647" rank="1" icon="http://ts.electronicsports.pl/teamspeak/icons/wlasciciel.png"/>
+        <servergroup id="1014" rank="1" icon="http://ts.electronicsports.pl/teamspeak/icons/wlascicielka.png"/>
         <servergroup id="6" rank="2" icon="http://ts.electronicsports.pl/teamspeak/icons/administrator.png"/>
         <servergroup id="787" rank="3" icon="http://ts.electronicsports.pl/teamspeak/icons/glowny_moderator.png"/>
         <servergroup id="961" rank="4" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"/>
