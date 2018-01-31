@@ -52,7 +52,7 @@ public class ClientNicknameFilter {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(regexFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null)
-                patterns.add(Pattern.compile(".*" + line.toLowerCase() + ".*"));
+                patterns.add(Pattern.compile(line, Pattern.CASE_INSENSITIVE));
         } catch (IOException e) {
             log.error("Failed to load file with nickname filters", e);
         }
@@ -71,7 +71,7 @@ public class ClientNicknameFilter {
     }
 
     private String patternToString(Pattern pattern) {
-        return pattern.pattern().substring(2, pattern.pattern().length() - 2);
+        return pattern.pattern();
     }
 
     public boolean filterClientNicknameOnJoin(Client client) {
@@ -121,7 +121,7 @@ public class ClientNicknameFilter {
     @ClientGroupAccess("servergroups.headadmins")
     @ValidateParams(NotEmptyParamsValidator.class)
     public CommandResponse addNewNicknameFilter(Client client, String params) {
-        patterns.add(Pattern.compile(".*" + params + ".*"));
+        patterns.add(Pattern.compile(params, Pattern.CASE_INSENSITIVE));
         return new CommandResponse(config.getString("commands.add").replace("$FILTER$", params));
     }
 
@@ -129,7 +129,7 @@ public class ClientNicknameFilter {
     @ClientGroupAccess("servergroups.headadmins")
     public CommandResponse showNicknameFilters(Client client, String params) {
         StringBuilder sb = new StringBuilder(config.getString("commands.show"));
-        for (Pattern pattern : patterns) sb.append(" ").append(patternToString(pattern)).append(",");
+        for (Pattern pattern : patterns) sb.append(patternToString(pattern)).append("\n");
         if (patterns.size() > 0) sb.delete(sb.length() - 1, sb.length());
         return new CommandResponse(sb.toString());
     }

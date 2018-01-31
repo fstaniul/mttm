@@ -552,7 +552,7 @@ public class ChannelManagerImpl implements ChannelManager {
                 String response;
 
                 if (changePrivateChannelOwner(channelNumber, owner))
-                    response = config.getString("message.private.admin.changeowner.success");
+                    response = config.getString("messages.private.admin.changeowner.success");
 
                 else response = config.getString("messages.private.admin.changeowner.notfound");
 
@@ -562,7 +562,7 @@ public class ChannelManagerImpl implements ChannelManager {
 
                 return new CommandResponse(response);
             } catch (ChannelManagerException e) {
-                String message = config.getString("message.private.admin.changeowner.error");
+                String message = config.getString("messages.private.admin.changeowner.error");
                 return new CommandResponse(message);
             }
         }

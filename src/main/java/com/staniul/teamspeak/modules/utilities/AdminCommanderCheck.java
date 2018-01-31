@@ -4,17 +4,16 @@ import com.staniul.teamspeak.query.Client;
 import com.staniul.teamspeak.query.Query;
 import com.staniul.teamspeak.query.QueryException;
 import com.staniul.teamspeak.query.client.Platform;
-import com.staniul.teamspeak.taskcontroller.Task;
 import com.staniul.xmlconfig.CustomXMLConfiguration;
 import com.staniul.xmlconfig.annotations.UseConfig;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 @UseConfig("modules/cc.xml")
 public class AdminCommanderCheck {
     private static Logger log = LogManager.getLogger(AdminCommanderCheck.class);
@@ -22,11 +21,12 @@ public class AdminCommanderCheck {
     private CustomXMLConfiguration config;
     private final Query query;
 
+    @Autowired
     public AdminCommanderCheck(Query query) {
         this.query = query;
     }
 
-    @Task(delay = 5 * 60 * 1000)
+//    @Task(delay = 5 * 60 * 1000)
     public void checkChannelCommander () throws QueryException {
         log.info("Poking admins about channel commander!");
 

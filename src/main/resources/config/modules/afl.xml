@@ -9,12 +9,14 @@
                       solo="false" />
         <servergroup2 id="961" name="Rejestratorzy" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"
                       solo="false"/>
+        <servergroup2 id="1021" name="Rejestratorki" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestratorka.png"
+                      solo="false"/>
         <servergroup2 id="985" name="Rejestratorzy (Okres próbny)" icon="http://ts.electronicsports.pl/teamspeak/icons/rejestrator.png"
                       solo="false"/>
     </groups>
 
     <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"
-             id="7710"
+             id="18449"
              listsign=" • "
              entry="[b]$ENTRY$[/b]"
              header="[size=13][color=blue] $HEADER$:[/color][/size]" />
