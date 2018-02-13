@@ -1,0 +1,7 @@
+<play-music-configuration>
+    <bot-ids>13178,17037</bot-ids>
+    <messages>
+        <success>Komendy wysłane z podanym opoznieniem [b]%DELAY%[/b], tytuł piosenki: %TITLE%</success>
+        <invalid-params>Podane parametry są złe! Poprawne użycie komendy to: !play [czas (ms)] &lt;tytuł&gt;</invalid-params>
+    </messages>
+</play-music-configuration>
