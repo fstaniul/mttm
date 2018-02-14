@@ -18,7 +18,7 @@
     <display count="[center][size=10][b]Łącznie %NUMBER% osób.[/b][/size][/center]"
              id="18449"
              listsign=" • "
-             entry="[b]$ENTRY$[/b]"
+             entry="[b][URL=client:///$UNIQUEID$]$NICKNAME$[/URL][/b]"
              header="[size=13][color=blue] $HEADER$:[/color][/size]" />
 
     <commands>

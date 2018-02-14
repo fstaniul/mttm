@@ -75,7 +75,9 @@ public class AdminOfflineList {
             data.get(servergroup2).sort(Comparator.comparing(ClientDatabase::getNickname, Comparator.comparing(String::toLowerCase)));
             for (ClientDatabase admin : data.get(servergroup2)) {
                 description.append(config.getString("display[@listsign]"))
-                        .append(config.getString("display[@entry]").replace("$ENTRY$", admin.getNickname()))
+                        .append(config.getString("display[@entry]")
+                                .replace("$NICKNAME$", admin.getNickname())
+                                .replace("$UNIQUEID$", admin.getUniqueId()))
                         .append("\n");
             }
             description.append("\n");
